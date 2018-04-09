@@ -56,10 +56,10 @@ public class ProfileActivity extends AppCompatActivity {
 
         // Here we are passed the profile's User ID from the UsersActivity, we use this to fetch the info from the database,
         // so that we can show it on the profile page
-        final String profile_uid = getIntent().getStringExtra("user_id");
+        final String profile_id = getIntent().getStringExtra("user_id");
 
         // Here we point the databases to the correct places, as well as fetch the current user, which is not the same as the user for the profile page
-        mUsersDatabase = FirebaseDatabase.getInstance().getReference().child("Users").child(profile_uid);
+        mUsersDatabase = FirebaseDatabase.getInstance().getReference().child("Users").child(profile_id);
         mFriendReqDatabase = FirebaseDatabase.getInstance().getReference().child("Friend_req");
         mFriendsDatabase = FirebaseDatabase.getInstance().getReference().child("Friends");
         mNotificationDatabase = FirebaseDatabase.getInstance().getReference().child("Notifications");
@@ -121,9 +121,9 @@ public class ProfileActivity extends AppCompatActivity {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
 
-                        if(dataSnapshot.hasChild(profile_uid)) {
+                        if(dataSnapshot.hasChild(profile_id)) {
 
-                            String request_type = dataSnapshot.child(profile_uid).child("request_type").getValue().toString();
+                            String request_type = dataSnapshot.child(profile_id).child("request_type").getValue().toString();
                             if(request_type.equals("received")){
 
                                 // Change the current status to 3, which means a request from the person has been received and is pending action from the user
@@ -151,7 +151,7 @@ public class ProfileActivity extends AppCompatActivity {
                             mFriendsDatabase.child(mCurrent_user.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
                                 @Override
                                 public void onDataChange(DataSnapshot dataSnapshot) {
-                                     if (dataSnapshot.hasChild(profile_uid)) {
+                                     if (dataSnapshot.hasChild(profile_id)) {
 
                                          mCurrent_state = 1;
                                          mProfileSendReqBtn.setText(R.string.unfriend);
@@ -203,15 +203,15 @@ public class ProfileActivity extends AppCompatActivity {
                 if (mCurrent_state == 0) {
 
                     // Here we add an entry to the user's uid so we know we have sent a request
-                    mFriendReqDatabase.child(mCurrent_user.getUid()).child(profile_uid).child("request_type").setValue("sent")
+                    mFriendReqDatabase.child(mCurrent_user.getUid()).child(profile_id).child("request_type").setValue("sent")
                             .addOnCompleteListener(new OnCompleteListener<Void>() {
                         @Override
                         public void onComplete(@NonNull Task<Void> task) {
 
                             if(task.isSuccessful()) {
 
-                                // Then we add an entry in under their uid to let them know they've received a friend reuest from us
-                                mFriendReqDatabase.child(profile_uid).child(mCurrent_user.getUid()).child("request_type")
+                                // Then we add an entry in under their uid to let them know they've received a friend request from us
+                                mFriendReqDatabase.child(profile_id).child(mCurrent_user.getUid()).child("request_type")
                                         .setValue("received").addOnSuccessListener(new OnSuccessListener<Void>() {
                                     @Override
                                     public void onSuccess(Void aVoid) {
@@ -222,7 +222,7 @@ public class ProfileActivity extends AppCompatActivity {
                                         notificationData.put("type", "request");
 
                                         // With the HashMap we can then push the values to our database, and once complete, update the state and so on.
-                                        mNotificationDatabase.child(profile_uid).push().setValue(notificationData).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                        mNotificationDatabase.child(profile_id).push().setValue(notificationData).addOnCompleteListener(new OnCompleteListener<Void>() {
                                             @Override
                                             public void onComplete(@NonNull Task<Void> task) {
                                                 // Change the current status to 2, which means a request is pending and change the button text
@@ -254,12 +254,12 @@ public class ProfileActivity extends AppCompatActivity {
                 //--------FRIEND REQUEST SENT--------//
                 if(mCurrent_state == 2) {
 
-                    mFriendReqDatabase.child(mCurrent_user.getUid()).child(profile_uid).removeValue().addOnCompleteListener(new OnCompleteListener<Void>() {
+                    mFriendReqDatabase.child(mCurrent_user.getUid()).child(profile_id).removeValue().addOnCompleteListener(new OnCompleteListener<Void>() {
                         @Override
                         public void onComplete(@NonNull Task<Void> task) {
                             if (task.isSuccessful()) {
 
-                                mFriendReqDatabase.child(profile_uid).child(mCurrent_user.getUid()).removeValue().addOnCompleteListener(new OnCompleteListener<Void>() {
+                                mFriendReqDatabase.child(profile_id).child(mCurrent_user.getUid()).removeValue().addOnCompleteListener(new OnCompleteListener<Void>() {
                                     @Override
                                     public void onComplete(@NonNull Task<Void> task) {
 
@@ -294,23 +294,23 @@ public class ProfileActivity extends AppCompatActivity {
                     final String currentDate = DateFormat.getDateTimeInstance().format(new Date());
 
                     // Add the current date to the friends database in users profile
-                    mFriendsDatabase.child(mCurrent_user.getUid()).child(profile_uid).setValue(currentDate).addOnCompleteListener(new OnCompleteListener<Void>() {
+                    mFriendsDatabase.child(mCurrent_user.getUid()).child(profile_id).setValue(currentDate).addOnCompleteListener(new OnCompleteListener<Void>() {
                         @Override
                         public void onComplete(@NonNull Task<Void> task) {
 
                             // Add the current date to the other users profile in the database
-                            mFriendsDatabase.child(profile_uid).child(mCurrent_user.getUid()).setValue(currentDate).addOnCompleteListener(new OnCompleteListener<Void>() {
+                            mFriendsDatabase.child(profile_id).child(mCurrent_user.getUid()).setValue(currentDate).addOnCompleteListener(new OnCompleteListener<Void>() {
                                 @Override
                                 public void onComplete(@NonNull Task<Void> task) {
 
                                     // Remove the pending request from the datebase from our user id
-                                    mFriendReqDatabase.child(mCurrent_user.getUid()).child(profile_uid).removeValue().addOnCompleteListener(new OnCompleteListener<Void>() {
+                                    mFriendReqDatabase.child(mCurrent_user.getUid()).child(profile_id).removeValue().addOnCompleteListener(new OnCompleteListener<Void>() {
                                         @Override
                                         public void onComplete(@NonNull Task<Void> task) {
                                             if (task.isSuccessful()) {
 
                                                 // and then again in the other user's ID
-                                                mFriendReqDatabase.child(profile_uid).child(mCurrent_user.getUid()).removeValue().addOnCompleteListener(new OnCompleteListener<Void>() {
+                                                mFriendReqDatabase.child(profile_id).child(mCurrent_user.getUid()).removeValue().addOnCompleteListener(new OnCompleteListener<Void>() {
                                                     @Override
                                                     public void onComplete(@NonNull Task<Void> task) {
 
@@ -341,13 +341,13 @@ public class ProfileActivity extends AppCompatActivity {
                 }
                  if (mCurrent_state == 1) {
                      // Remove the pending request from the datebase from our user id
-                     mFriendsDatabase.child(mCurrent_user.getUid()).child(profile_uid).removeValue().addOnCompleteListener(new OnCompleteListener<Void>() {
+                     mFriendsDatabase.child(mCurrent_user.getUid()).child(profile_id).removeValue().addOnCompleteListener(new OnCompleteListener<Void>() {
                          @Override
                          public void onComplete(@NonNull Task<Void> task) {
                              if (task.isSuccessful()) {
 
                                  // and then again in the other user's ID
-                                 mFriendsDatabase.child(profile_uid).child(mCurrent_user.getUid()).removeValue().addOnCompleteListener(new OnCompleteListener<Void>() {
+                                 mFriendsDatabase.child(profile_id).child(mCurrent_user.getUid()).removeValue().addOnCompleteListener(new OnCompleteListener<Void>() {
                                      @Override
                                      public void onComplete(@NonNull Task<Void> task) {
 
