@@ -19,6 +19,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.iid.FirebaseInstanceId;
 
 import java.util.HashMap;
 
@@ -111,9 +112,12 @@ public class RegisterActivity extends AppCompatActivity {
                     // Then we point our database reference to that very ID
                     mDatabase = FirebaseDatabase.getInstance().getReference().child("Users").child(uid);
 
+                    String deviceToken = FirebaseInstanceId.getInstance().getToken();
+
                     //Then we create a HashMap and and fill in the users information for that
                     // account, everything but the display name is default values
                     HashMap<String, String> userMap = new HashMap<>();
+                    userMap.put("device_token", deviceToken);
                     userMap.put("name", display_name);
                     userMap.put("status", "Default status");
                     userMap.put("image", "default");
