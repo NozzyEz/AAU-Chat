@@ -18,16 +18,20 @@ public class FirebaseMessagingService extends com.google.firebase.messaging.Fire
     public void onMessageReceived(RemoteMessage remoteMessage) {
         super.onMessageReceived(remoteMessage);
 
-        String title = "Friend Request";
-        String message = "You have received a new friend request, congrats";
+        // Here we get the notification title and message from our Firebase function
+        String notificationTitle = remoteMessage.getNotification().getTitle();
+        String notificationBody = remoteMessage.getNotification().getBody();
 
-        sendFriendReqNotification(title, message);
+        // When that function calls this service we run this method after extracting the title and remote message
+        sendFriendReqNotification(notificationTitle, notificationBody);
 
 
     }
 
+    // This method takes care of our notifications
     public void sendFriendReqNotification(String title, String message){
 
+        // Here we create a new NotificationHelper object from a class we've built to deal with our notifications
         mNotificationHelper = new NotificationHelper(this);
         NotificationCompat.Builder nb = mNotificationHelper.getChannnel1Notification(title, message);
         mNotificationHelper.getManager().notify(1, nb.build());

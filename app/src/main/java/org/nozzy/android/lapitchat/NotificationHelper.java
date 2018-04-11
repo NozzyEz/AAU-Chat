@@ -13,19 +13,24 @@ import android.support.v4.app.NotificationCompat;
  * Created by Nozzy on 11/04/2018.
  */
 
+// This class takes care of our notifications inside of the app for us
 public class NotificationHelper extends ContextWrapper{
-    public static final String CHANNEL_ID_1 = "Friend Requests";
-    public static final String CHANNEL_NAME_1 = "Friend Requests";
+    public static final String CHANNEL_ID_1 = "Channel 1"; // Needs more specificity
+    public static final String CHANNEL_NAME_1 = "Channel 1"; // So does this
 
     private NotificationManager mManager;
 
     public NotificationHelper(Context base) {
         super(base);
+        // Inside of our constructor we first do a check for the users version of android, and only
+        // continue with our method if the user runs Android Oreo 8.0 or newer
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             createChannels();
         }
     }
 
+    // If the user does run Android Oreo, we have to create notification channels for our
+    // notifications to be sent on, which is what we set up down below
     @TargetApi(Build.VERSION_CODES.O)
     private void createChannels() {
 
