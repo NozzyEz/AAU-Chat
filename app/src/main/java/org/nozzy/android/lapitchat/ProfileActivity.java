@@ -64,7 +64,8 @@ public class ProfileActivity extends AppCompatActivity {
         mFriendsDatabase = FirebaseDatabase.getInstance().getReference().child("Friends");
         mNotificationDatabase = FirebaseDatabase.getInstance().getReference().child("Notifications");
 
-        mUsersDatabase.keepSynced(true);
+        // Keeps the database synched, there is a 'bug' with using this, that makes it so the friends status does not update
+        // mUsersDatabase.keepSynced(true);
 
         mCurrent_user = FirebaseAuth.getInstance().getCurrentUser();
 
