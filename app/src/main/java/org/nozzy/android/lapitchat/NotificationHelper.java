@@ -4,8 +4,10 @@ import android.annotation.TargetApi;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.ContextWrapper;
+import android.content.Intent;
 import android.os.Build;
 import android.support.v4.app.NotificationCompat;
 
@@ -43,6 +45,7 @@ public class NotificationHelper extends ContextWrapper{
         getManager().createNotificationChannel(channelReq);
     }
 
+    // Here we check to see if there is a manager in place, if that is not the case, we set it
     public NotificationManager getManager() {
 
         if(mManager == null) {
@@ -52,14 +55,25 @@ public class NotificationHelper extends ContextWrapper{
         return mManager;
     }
 
-    public NotificationCompat.Builder getChannnel1Notification(String title, String message) {
+    // This is how the actual notification is set up
+    public NotificationCompat.Builder getChannnel1Notification(String title, String message, String click_action, String from_user_id) {
 
+        // Here we create an intent to send the user to the profile activity of whom sent them a request
+        Intent resultIntent = new Intent(click_action);
+        // With it we pass the user ID of the sender along with the intent
+        resultIntent.putExtra("user_id", from_user_id);
+
+        // This intent is pending and ready to execute when the user taps it from within the app
+        PendingIntent resultPendingIntent = PendingIntent.getActivity(this, 0, resultIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+        // And here we return the notification back to the FirebaseMessagingService class for showing.
         return new NotificationCompat.Builder(getApplicationContext(),CHANNEL_ID_1)
                 .setContentTitle(title)
                 .setContentText(message)
-                .setSmallIcon(R.drawable.notification_icon);
+                .setSmallIcon(R.drawable.notification_icon)
+                .setContentIntent(resultPendingIntent);
 
-    }
+        }
 
 
 }

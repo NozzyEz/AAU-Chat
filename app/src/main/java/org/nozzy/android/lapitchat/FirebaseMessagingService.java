@@ -2,6 +2,8 @@ package org.nozzy.android.lapitchat;
 
 
 
+import android.app.PendingIntent;
+import android.content.Intent;
 import android.support.v4.app.NotificationCompat;
 
 import com.google.firebase.messaging.RemoteMessage;
@@ -22,21 +24,21 @@ public class FirebaseMessagingService extends com.google.firebase.messaging.Fire
         String notificationTitle = remoteMessage.getNotification().getTitle();
         String notificationBody = remoteMessage.getNotification().getBody();
 
-        // When that function calls this service we run this method after extracting the title and remote message
-        sendFriendReqNotification(notificationTitle, notificationBody);
+        String click_action = remoteMessage.getNotification().getClickAction();
+        String from_user_id = remoteMessage.getData().get("from_user_id");
 
+        // When that function calls this service we run this method after extracting the title and remote message
+        sendFriendReqNotification(notificationTitle, notificationBody, click_action, from_user_id);
 
     }
 
     // This method takes care of our notifications
-    public void sendFriendReqNotification(String title, String message){
+    public void sendFriendReqNotification(String title, String message, String click_action, String from_user_id){
 
         // Here we create a new NotificationHelper object from a class we've built to deal with our notifications
         mNotificationHelper = new NotificationHelper(this);
-        NotificationCompat.Builder nb = mNotificationHelper.getChannnel1Notification(title, message);
+        NotificationCompat.Builder nb = mNotificationHelper.getChannnel1Notification(title, message, click_action, from_user_id);
         mNotificationHelper.getManager().notify(1, nb.build());
-
-
 
     }
 }
