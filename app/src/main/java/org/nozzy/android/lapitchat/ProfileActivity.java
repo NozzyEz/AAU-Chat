@@ -54,9 +54,15 @@ public class ProfileActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile);
 
-        // Here we are passed the profile's User ID from the UsersActivity, we use this to fetch the info from the database,
+        // Here we are passed the profile's User ID, we use this to fetch the info from the database,
         // so that we can show it on the profile page
-        final String profile_id = getIntent().getStringExtra("user_id");
+        final String profile_id;
+        String data = getIntent().getStringExtra("user_id");
+        if (data == null)
+            profile_id = getIntent().getStringExtra("from_user_id");
+        else
+            profile_id =  getIntent().getStringExtra("user_id");
+
 
         // Here we point the databases to the correct places, as well as fetch the current user, which is not the same as the user for the profile page
         mUsersDatabase = FirebaseDatabase.getInstance().getReference().child("Users").child(profile_id);
