@@ -11,6 +11,8 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.squareup.picasso.Callback;
@@ -28,6 +30,8 @@ public class UsersActivity extends AppCompatActivity {
     private Toolbar mToolbar;
     private RecyclerView mUsersList;
     private DatabaseReference mUsersDatabase;
+    private FirebaseAuth mAuth;
+    private String mCurrentUserID;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,11 +52,16 @@ public class UsersActivity extends AppCompatActivity {
         // and finally we point our database reference to the Users database
         mUsersDatabase = FirebaseDatabase.getInstance().getReference().child("Users");
         mUsersDatabase.keepSynced(true);
+
+        mAuth = FirebaseAuth.getInstance();
+        mCurrentUserID = mAuth.getCurrentUser().getUid();
     }
 
     @Override
     protected void onStart() {
         super.onStart();
+
+        mUsersDatabase.child(mCurrentUserID).child("online").setValue(true);
 
         // We setup our Firebase recycler adapter with help from our Users class, a UsersViewHolder class, and the layout we have created to show users.
         FirebaseRecyclerAdapter<Users, UsersViewHolder> firebaseRecyclerAdapter = new FirebaseRecyclerAdapter<Users, UsersViewHolder>(
@@ -131,5 +140,11 @@ public class UsersActivity extends AppCompatActivity {
                 }
             });
         }
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        mUsersDatabase.child(mCurrentUserID).child("online").setValue(false);
     }
 }

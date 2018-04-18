@@ -12,6 +12,8 @@ import android.view.MenuItem;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 // This is our main activity, where most of the app foundation is laid down, we have our toolbar
 // with an options menu, a tabview where we can switch between different tabs.
@@ -24,6 +26,8 @@ public class MainActivity extends AppCompatActivity {
 
     private ViewPager mViewPager;
     private SectionsPagerAdapter mSectionsPagerAdapter;
+
+    private DatabaseReference mUserRef;
 
     private TabLayout mTabLayout;
 
@@ -39,6 +43,8 @@ public class MainActivity extends AppCompatActivity {
         mToolbar = findViewById(R.id.main_page_toolbar);
         setSupportActionBar(mToolbar);
         getSupportActionBar().setTitle("LapitChat");
+
+        mUserRef = FirebaseDatabase.getInstance().getReference().child("Users").child(mAuth.getCurrentUser().getUid());
 
         // Setting up our tabs
         mViewPager = findViewById(R.id.main_tabpager);
@@ -61,8 +67,18 @@ public class MainActivity extends AppCompatActivity {
         // registration or login
         if (currentUser == null) {
             sendToStart();
-        }
+        } else {
 
+            mUserRef.child("online").setValue(true);
+
+        }
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+
+        mUserRef.child("online").setValue(false);
     }
 
     // We use this method when a user is not logged in upon opening the app, or if the user logs out
