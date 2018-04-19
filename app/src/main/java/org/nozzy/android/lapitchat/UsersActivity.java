@@ -15,6 +15,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ServerValue;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.NetworkPolicy;
 import com.squareup.picasso.Picasso;
@@ -61,7 +62,7 @@ public class UsersActivity extends AppCompatActivity {
     protected void onStart() {
         super.onStart();
 
-        mUsersDatabase.child(mCurrentUserID).child("online").setValue(true);
+        mUsersDatabase.child(mCurrentUserID).child("online").setValue("true");
 
         // We setup our Firebase recycler adapter with help from our Users class, a UsersViewHolder class, and the layout we have created to show users.
         FirebaseRecyclerAdapter<Users, UsersViewHolder> firebaseRecyclerAdapter = new FirebaseRecyclerAdapter<Users, UsersViewHolder>(
@@ -145,6 +146,7 @@ public class UsersActivity extends AppCompatActivity {
     @Override
     protected void onPause() {
         super.onPause();
-        mUsersDatabase.child(mCurrentUserID).child("online").setValue(false);
+        mUsersDatabase.child(mCurrentUserID).child("online").setValue(ServerValue.TIMESTAMP);
+
     }
 }

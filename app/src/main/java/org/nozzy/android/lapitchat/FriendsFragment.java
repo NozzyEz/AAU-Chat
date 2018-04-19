@@ -1,7 +1,10 @@
 package org.nozzy.android.lapitchat;
 
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
@@ -80,21 +83,51 @@ public class FriendsFragment extends Fragment {
             protected void populateViewHolder(final FriendsViewHolder friendsViewHolder, final Friends friends, int position) {
 
 
-                String list_user_id = getRef(position).getKey();
+                final String list_user_id = getRef(position).getKey();
 
                 mUsersDatabase.child(list_user_id).addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
 
-                        String userName = dataSnapshot.child("name").getValue().toString();
+                        final String userName = dataSnapshot.child("name").getValue().toString();
                         String userThumb = dataSnapshot.child("thumb_image").getValue().toString();
 
                         friendsViewHolder.setName(userName);
                         friendsViewHolder.setDate(friends.getDate());
                         friendsViewHolder.setThumb(userThumb, getContext());
 
+                        friendsViewHolder.mView.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+
+                                CharSequence options[] = new CharSequence[]{"Open Profile", "Send Message"};
+
+                                AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+                                builder.setTitle("Select Options");
+                                builder.setItems(options, new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialogInterface, int i) {
+
+                                        // Click Event for each item
+                                        switch (i) {
+                                            case 0:
+                                                sendToProfile(list_user_id);
+                                                break;
+                                            case 1:
+                                                sendToChat(list_user_id, userName);
+                                                break;
+                                        }
+
+                                    }
+                                });
+
+                                builder.show();
+
+                            }
+                        });
+
                         if (dataSnapshot.hasChild("online")) {
-                            Boolean userOnline = (Boolean) dataSnapshot.child("online").getValue();
+                            String userOnline = dataSnapshot.child("online").getValue().toString();
                             friendsViewHolder.setOnline(userOnline);
                         }
 
@@ -110,6 +143,19 @@ public class FriendsFragment extends Fragment {
         };
 
         mFriendsList.setAdapter(friendsRecyclerViewAdapter);
+    }
+
+    private void sendToChat(String list_user_id, String userName) {
+        Intent chatIntent = new Intent(getContext(), ChatActivity.class);
+        chatIntent.putExtra("user_id", list_user_id);
+        chatIntent.putExtra("user_name", userName);
+        startActivity(chatIntent);
+    }
+
+    private void sendToProfile(String list_user_id) {
+        Intent profileIntent = new Intent(getContext(), ProfileActivity.class);
+        profileIntent.putExtra("user_id", list_user_id);
+        startActivity(profileIntent);
     }
 
     public static class FriendsViewHolder extends RecyclerView.ViewHolder {
@@ -153,10 +199,10 @@ public class FriendsFragment extends Fragment {
             });
 
         }
-        public void setOnline(Boolean online) {
+        public void setOnline(String online) {
             ImageView userOnlineView = mView.findViewById(R.id.user_online_indicator);
 
-            if(online.equals(true)) {
+            if(online.equals("true")) {
                 userOnlineView.setVisibility(View.VISIBLE);
             } else {
                 userOnlineView.setVisibility(View.INVISIBLE);

@@ -14,6 +14,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ServerValue;
 
 // This is our main activity, where most of the app foundation is laid down, we have our toolbar
 // with an options menu, a tabview where we can switch between different tabs.
@@ -69,7 +70,7 @@ public class MainActivity extends AppCompatActivity {
             sendToStart();
         } else {
 
-            mUserRef.child("online").setValue(true);
+            mUserRef.child("online").setValue("true");
 
         }
     }
@@ -77,8 +78,11 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onPause() {
         super.onPause();
+        FirebaseUser currentUser = mAuth.getCurrentUser();
 
-        mUserRef.child("online").setValue(false);
+        if (currentUser != null) {
+            mUserRef.child("online").setValue(ServerValue.TIMESTAMP);
+        }
     }
 
     // We use this method when a user is not logged in upon opening the app, or if the user logs out
