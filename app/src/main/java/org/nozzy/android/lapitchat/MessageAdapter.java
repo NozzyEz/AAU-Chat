@@ -1,5 +1,6 @@
 package org.nozzy.android.lapitchat;
 
+import android.content.Context;
 import android.graphics.Color;
 import android.support.v7.widget.RecyclerView;
 import android.text.Layout;
@@ -12,6 +13,14 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+import com.squareup.picasso.Callback;
+import com.squareup.picasso.NetworkPolicy;
+import com.squareup.picasso.Picasso;
 
 import java.util.List;
 
@@ -21,6 +30,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
 
     private List<Messages> mMessageList;
     private FirebaseAuth mAuth;
+    private DatabaseReference mUsersDatabase;
 
     public MessageAdapter(List<Messages> mMessageList) {
         this.mMessageList = mMessageList;
@@ -39,6 +49,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
 
         public TextView displayName;
         public TextView messageText;
+        public TextView messageTime;
         public CircleImageView profileImage;
         public View messageView;
 
@@ -47,6 +58,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
 
             messageView = itemView.findViewById(R.id.message_single_layout);
             messageText = itemView.findViewById(R.id.message_item_text);
+            messageTime = itemView.findViewById(R.id.message_time_text);
             profileImage = itemView.findViewById(R.id.message_profile_image);
             displayName = itemView.findViewById(R.id.message_display_name);
 
@@ -55,21 +67,53 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
     }
 
     @Override
-    public void onBindViewHolder(MessageAdapter.MessageViewHolder holder, int position) {
+    public void onBindViewHolder(final MessageAdapter.MessageViewHolder holder, int position) {
 
         mAuth = FirebaseAuth.getInstance();
         String current_user_id = mAuth.getCurrentUser().getUid();
 
 
-        Messages c = mMessageList.get(position);
+        final Messages c = mMessageList.get(position);
 
         String from_user = c.getFrom();
 
+        mUsersDatabase = FirebaseDatabase.getInstance().getReference().child("Users").child(from_user);
+
+        mUsersDatabase.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+
+                String name = dataSnapshot.child("name").getValue().toString();
+                holder.displayName.setText(name);
+
+                final String image = dataSnapshot.child("thumb_image").getValue().toString();
+                Picasso.with(holder.profileImage.getContext()).load(image).networkPolicy(NetworkPolicy.OFFLINE)
+                        .placeholder(R.drawable.generic).into(holder.profileImage, new Callback() {
+                    @Override
+                    public void onSuccess() {
+
+                    }
+
+                    @Override
+                    public void onError() {
+                        Picasso.with(holder.profileImage.getContext()).load(image).placeholder(R.drawable.generic).into(holder.profileImage);
+                    }
+                });
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+
         if (from_user.equals(current_user_id)) {
+            holder.profileImage.setVisibility(View.INVISIBLE);
             ((RelativeLayout) holder.messageView).setGravity(Gravity.END);
+
             holder.messageText.setBackgroundResource(R.drawable.message_text_background_current_user);
             holder.messageText.setTextColor(Color.BLACK);
-            holder.profileImage.setVisibility(View.INVISIBLE);
         } else {
             holder.messageText.setBackgroundResource(R.drawable.message_text_background);
             holder.messageText.setTextColor(Color.WHITE);

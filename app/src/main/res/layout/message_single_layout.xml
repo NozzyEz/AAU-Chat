@@ -30,7 +30,7 @@
         android:layout_marginTop="25dp"
         android:layout_marginStart="10dp"
         android:background="@drawable/message_text_background"
-        android:padding="5dp"
+        android:padding="10dp"
         android:text="sample text"
         android:textColor="@android:color/white"
         android:textSize="14sp" />
