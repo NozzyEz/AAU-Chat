@@ -60,6 +60,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
             messageView = itemView.findViewById(R.id.message_single_layout);
             messageText = itemView.findViewById(R.id.message_item_text);
             messageTime = itemView.findViewById(R.id.message_time_text);
+
             profileImage = itemView.findViewById(R.id.message_profile_image);
             displayName = itemView.findViewById(R.id.message_display_name);
 
@@ -115,6 +116,8 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
             holder.messageText.setBackgroundResource(R.drawable.message_text_background_current_user);
             holder.messageText.setTextColor(Color.BLACK);
         } else {
+            holder.profileImage.setVisibility(View.VISIBLE);
+            ((LinearLayout) holder.messageView).setGravity(Gravity.START);
             holder.messageText.setBackgroundResource(R.drawable.message_text_background);
             holder.messageText.setTextColor(Color.WHITE);
 

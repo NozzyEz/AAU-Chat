@@ -4,9 +4,8 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:padding="5dp"
-    android:gravity="left"
+    android:gravity="start"
     android:orientation="vertical">
-
 
 
     <LinearLayout
@@ -53,7 +52,8 @@
             android:padding="10dp"
             android:text="sample text"
             android:textColor="@android:color/white"
-            android:textSize="14sp" />
+            android:textSize="14sp"
+            android:maxWidth="250dp"/>
     </LinearLayout>
 
 

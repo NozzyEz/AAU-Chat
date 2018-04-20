@@ -1,6 +1,7 @@
 package org.nozzy.android.lapitchat;
 
 import android.content.Context;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -22,6 +23,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ServerValue;
 import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Callback;
@@ -56,10 +58,14 @@ public class ChatActivity extends AppCompatActivity {
     private EditText mChatMessageView;
 
     private RecyclerView mMesssagesList;
+    private SwipeRefreshLayout mRefreshLayout;
 
     private final List<Messages> messagesList = new ArrayList<>();
     private LinearLayoutManager mLinearLayout;
     private MessageAdapter mAdapter;
+
+    private static final int  TOTAL_ITEMS_TO_LOAD = 10;
+    private int mCurrentPage = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -96,6 +102,7 @@ public class ChatActivity extends AppCompatActivity {
         mAdapter = new MessageAdapter(messagesList);
 
         mMesssagesList = findViewById(R.id.chat_messages_list);
+        mRefreshLayout = findViewById(R.id.message_swipe_layout);
         mLinearLayout = new LinearLayoutManager(this);
 
         mMesssagesList.setHasFixedSize(true);
@@ -190,6 +197,18 @@ public class ChatActivity extends AppCompatActivity {
 
             }
         });
+
+        mRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+
+                mCurrentPage ++;
+
+                messagesList.clear();
+                loadMessages();
+
+            }
+        });
     }
 
     @Override
@@ -218,7 +237,11 @@ public class ChatActivity extends AppCompatActivity {
 
     private void loadMessages() {
 
-        mRootRef.child("Messages").child(mCurrentUserID).child(mChatUser).addChildEventListener(new ChildEventListener() {
+        DatabaseReference messageRef = mRootRef.child("Messages").child(mCurrentUserID).child(mChatUser);
+
+        Query messageQuery = messageRef.limitToLast(mCurrentPage * TOTAL_ITEMS_TO_LOAD);
+
+        messageQuery.addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
 
@@ -226,6 +249,11 @@ public class ChatActivity extends AppCompatActivity {
 
                 messagesList.add(message);
                 mAdapter.notifyDataSetChanged();
+
+                // Scroll the view to the bottom when a message is sent or received.
+                mMesssagesList.scrollToPosition(messagesList.size() - 1);
+
+                mRefreshLayout.setRefreshing(false);
 
             }
 
