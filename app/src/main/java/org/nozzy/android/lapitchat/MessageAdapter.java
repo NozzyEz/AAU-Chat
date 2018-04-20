@@ -9,6 +9,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -110,8 +111,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
 
         if (from_user.equals(current_user_id)) {
             holder.profileImage.setVisibility(View.INVISIBLE);
-            ((RelativeLayout) holder.messageView).setGravity(Gravity.END);
-
+            ((LinearLayout) holder.messageView).setGravity(Gravity.END);
             holder.messageText.setBackgroundResource(R.drawable.message_text_background_current_user);
             holder.messageText.setTextColor(Color.BLACK);
         } else {
