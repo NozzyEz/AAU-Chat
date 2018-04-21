@@ -66,6 +66,9 @@ public class ChatActivity extends AppCompatActivity {
 
     private static final int  TOTAL_ITEMS_TO_LOAD = 10;
     private int mCurrentPage = 1;
+    private int itemPos = 0;
+    private String mLastKey = "";
+    private String mPreviousLastKey = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -203,37 +206,77 @@ public class ChatActivity extends AppCompatActivity {
             public void onRefresh() {
 
                 mCurrentPage ++;
+                itemPos = 0;
 
-                messagesList.clear();
-                loadMessages();
+                loadMoreMessages();
 
             }
         });
     }
 
-    @Override
-    public void onStart() {
-        super.onStart();
+    private void loadMoreMessages() {
 
-        // Check if user is signed in (non-null) and update UI accordingly.
-        FirebaseUser currentUser = mAuth.getCurrentUser();
+        DatabaseReference messageRef = mRootRef.child("Messages").child(mCurrentUserID).child(mChatUser);
 
-        // Checks to see if a user is logged in, if not, send user to the start page for
-        // registration or login
-        if (currentUser != null) {
-            mRootRef.child("Users").child(mCurrentUserID).child("online").setValue("true");
-        }
+        Query messageQuery = messageRef.orderByKey().endAt(mLastKey).limitToLast(10);
+
+        messageQuery.addChildEventListener(new ChildEventListener() {
+
+            @Override
+            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+
+                Messages message = dataSnapshot.getValue(Messages.class);
+                String messageKey = dataSnapshot.getKey();
+
+                if (!mPreviousLastKey.equals(messageKey)) {
+
+                    messagesList.add(itemPos++, message);
+
+                } else {
+                    mPreviousLastKey = mLastKey;
+                }
+
+                if (itemPos == 1) {
+
+                    mLastKey = messageKey;
+
+                }
+
+
+
+                Log.d("TOTALKEYS", "Last key: " + mLastKey +  "| Prev Key: " + mPreviousLastKey + "| Current key: " + messageKey);
+
+                mAdapter.notifyDataSetChanged();
+
+                mRefreshLayout.setRefreshing(false);
+                mLinearLayout.scrollToPositionWithOffset(8,0);
+                mCurrentPage++;
+
+            }
+
+            @Override
+            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+
+            }
+
+            @Override
+            public void onChildRemoved(DataSnapshot dataSnapshot) {
+
+            }
+
+            @Override
+            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+
     }
 
-    @Override
-    protected void onPause() {
-        super.onPause();
-        FirebaseUser currentUser = mAuth.getCurrentUser();
-
-        if (currentUser != null) {
-            mRootRef.child("Users").child(mCurrentUserID).child("online").setValue(ServerValue.TIMESTAMP);
-        }
-    }
 
     private void loadMessages() {
 
@@ -246,6 +289,16 @@ public class ChatActivity extends AppCompatActivity {
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
 
                 Messages message = dataSnapshot.getValue(Messages.class);
+
+                itemPos++;
+
+                if (itemPos == 1) {
+
+                    String messageKey = dataSnapshot.getKey();
+                    mLastKey = messageKey;
+                    mPreviousLastKey = messageKey;
+
+                }
 
                 messagesList.add(message);
                 mAdapter.notifyDataSetChanged();
@@ -312,11 +365,33 @@ public class ChatActivity extends AppCompatActivity {
                     if (databaseError != null) {
                         Log.d("CHAT_LOG", databaseError.getMessage());
                     }
-
                 }
             });
-
         }
-
     }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+
+        // Check if user is signed in (non-null) and update UI accordingly.
+        FirebaseUser currentUser = mAuth.getCurrentUser();
+
+        // Checks to see if a user is logged in, if not, send user to the start page for
+        // registration or login
+        if (currentUser != null) {
+            mRootRef.child("Users").child(mCurrentUserID).child("online").setValue("true");
+        }
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        FirebaseUser currentUser = mAuth.getCurrentUser();
+
+        if (currentUser != null) {
+            mRootRef.child("Users").child(mCurrentUserID).child("online").setValue(ServerValue.TIMESTAMP);
+        }
+    }
+
 }

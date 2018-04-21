@@ -31,7 +31,6 @@
 
     </LinearLayout>
 
-
     <LinearLayout
         android:id="@+id/message_bottom_layout"
         android:layout_width="wrap_content"
@@ -55,6 +54,4 @@
             android:textSize="14sp"
             android:maxWidth="250dp"/>
     </LinearLayout>
-
-
 </LinearLayout>
