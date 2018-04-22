@@ -242,10 +242,6 @@ public class ChatActivity extends AppCompatActivity {
 
                 }
 
-
-
-                Log.d("TOTALKEYS", "Last key: " + mLastKey +  "| Prev Key: " + mPreviousLastKey + "| Current key: " + messageKey);
-
                 mAdapter.notifyDataSetChanged();
 
                 mRefreshLayout.setRefreshing(false);
