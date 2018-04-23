@@ -9,6 +9,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -52,6 +53,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
         public TextView messageText;
         public TextView messageTime;
         public CircleImageView profileImage;
+        public ImageView messageImage;
         public View messageView;
 
         public MessageViewHolder(View itemView) {
@@ -59,10 +61,11 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
 
             messageView = itemView.findViewById(R.id.message_single_layout);
             messageText = itemView.findViewById(R.id.message_item_text);
+            messageImage = itemView.findViewById(R.id.message_image_layout);
             messageTime = itemView.findViewById(R.id.message_time_text);
-
             profileImage = itemView.findViewById(R.id.message_profile_image);
             displayName = itemView.findViewById(R.id.message_display_name);
+
 
 
         }
@@ -78,6 +81,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
         final Messages c = mMessageList.get(position);
 
         String from_user = c.getFrom();
+        String message_type = c.getType();
 
         mUsersDatabase = FirebaseDatabase.getInstance().getReference().child("Users").child(from_user);
 
@@ -115,14 +119,40 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
             ((LinearLayout) holder.messageView).setGravity(Gravity.END);
             holder.messageText.setBackgroundResource(R.drawable.message_text_background_current_user);
             holder.messageText.setTextColor(Color.BLACK);
+
+            if(message_type.equals("text")) {
+
+                holder.messageText.setText(c.getMessage());
+                holder.messageImage.setVisibility(View.INVISIBLE);
+
+            } else if (message_type.equals("image")) {
+
+                holder.messageText.setVisibility(View.INVISIBLE);
+
+                Picasso.with(holder.profileImage.getContext()).load(c.getMessage()).placeholder(R.drawable.generic).into(holder.messageImage);
+
+            }
+
         } else {
             holder.profileImage.setVisibility(View.VISIBLE);
             ((LinearLayout) holder.messageView).setGravity(Gravity.START);
             holder.messageText.setBackgroundResource(R.drawable.message_text_background);
             holder.messageText.setTextColor(Color.WHITE);
 
+            if(message_type.equals("text")) {
+
+                holder.messageText.setText(c.getMessage());
+                holder.messageImage.setVisibility(View.INVISIBLE);
+
+            } else if (message_type.equals("image")) {
+
+                holder.messageText.setVisibility(View.INVISIBLE);
+
+                Picasso.with(holder.profileImage.getContext()).load(c.getMessage()).placeholder(R.drawable.generic).into(holder.messageImage);
+
+            }
+
         }
-        holder.messageText.setText(c.getMessage());
         holder.displayName.setText(c.getFrom());
     }
 

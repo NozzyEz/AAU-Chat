@@ -54,4 +54,12 @@
             android:textSize="14sp"
             android:maxWidth="250dp"/>
     </LinearLayout>
+
+    <ImageView
+        android:id="@+id/message_image_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="0dp"
+        android:scaleType="centerCrop"
+        android:maxWidth="250dp"/>
 </LinearLayout>
