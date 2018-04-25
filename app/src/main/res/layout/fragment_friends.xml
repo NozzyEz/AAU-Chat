@@ -2,7 +2,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="org.nozzy.android.lapitchat.FriendsFragment">
+    tools:context="org.nozzy.android.AAU_Chat.FriendsFragment">
 
     <android.support.v7.widget.RecyclerView
         android:layout_width="match_parent"

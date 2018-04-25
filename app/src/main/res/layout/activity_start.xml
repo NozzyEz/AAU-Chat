@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/colorPrimary"
-    tools:context="org.nozzy.android.lapitchat.StartActivity"
+    tools:context="org.nozzy.android.AAU_Chat.StartActivity"
     tools:layout_editor_absoluteY="25dp">
 
     <TextView
