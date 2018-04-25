@@ -2,6 +2,7 @@ package org.nozzy.android.AAU_Chat;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -38,12 +39,16 @@ import com.squareup.picasso.Callback;
 import com.squareup.picasso.NetworkPolicy;
 import com.squareup.picasso.Picasso;
 
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import de.hdodenhof.circleimageview.CircleImageView;
+import id.zelory.compressor.Compressor;
 
 
 public class ChatActivity extends AppCompatActivity {
@@ -258,8 +263,80 @@ public class ChatActivity extends AppCompatActivity {
 
             final String push_id = user_message_push.getKey();
 
-            StorageReference filepath = mImageStorage.child("message_images").child(push_id + ".jpg");
+            // StorageReference filepath = mImageStorage.child("message_images").child(push_id + ".jpg");
 
+            // First we create a new file from the URI of the image
+            File imageToCompress = new File(imageUri.getPath());
+
+            //
+            byte[] imageByteArray = new byte[0];
+
+            // Then we compress it to a bitmap
+            try {
+                Bitmap compressedImageBitmap = new Compressor(this)
+                        .setQuality(75)
+                        .compressToBitmap(imageToCompress);
+
+                // After creating a new bitmap we then need a byte array output stream
+                ByteArrayOutputStream baos = new ByteArrayOutputStream();
+
+                // We use the Bitmap.compress() method to write our compressed image into a byte array
+                compressedImageBitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
+                //Which we finally do here
+                imageByteArray = baos.toByteArray();
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            final byte[] finalByteArray = imageByteArray;
+
+
+            // Before we can upload the compressed image we have to tell our app where in the storage we want to put it
+            StorageReference compressedFilePath = mImageStorage.child("message_images").child("compressed").child(push_id + ".jpg");
+
+            // And once that is done, we use an UploadTask to upload the compressed image
+            UploadTask uploadTask = compressedFilePath.putBytes(finalByteArray);
+            uploadTask.addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
+                @Override
+                public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
+                    // And in it's onCompleteListener we retrieve the URL of the image if the task was successful
+                    if (task.isSuccessful()) {
+
+                        String download_url = task.getResult().getDownloadUrl().toString();
+
+                        // which we then store in the database entry for the message that is being sent
+                        Map messageMap = new HashMap();
+                        messageMap.put("message", download_url);
+                        messageMap.put("seen", false);
+                        messageMap.put("type", "image");
+                        messageMap.put("time", ServerValue.TIMESTAMP);
+                        messageMap.put("from", mCurrentUserID);
+
+                        Map messageUserMap = new HashMap();
+                        messageUserMap.put(current_user_ref + "/" + push_id, messageMap);
+                        messageUserMap.put(chat_user_ref + "/" + push_id, messageMap);
+
+                        mChatMessageView.setText("");
+
+                        mRootRef.updateChildren(messageUserMap, new DatabaseReference.CompletionListener() {
+                            @Override
+                            public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
+
+                                if (databaseError != null) {
+                                    Log.d("CHAT_LOG", databaseError.getMessage().toString());
+                                }
+
+                            }
+                        });
+
+                    }
+
+
+                }
+            });
+
+            /*
             filepath.putFile(imageUri).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
                 @Override
                 public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
@@ -296,7 +373,7 @@ public class ChatActivity extends AppCompatActivity {
 
                 }
             });
-
+            */
         }
 
     }
