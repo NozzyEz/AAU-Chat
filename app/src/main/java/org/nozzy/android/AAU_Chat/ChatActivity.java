@@ -457,11 +457,10 @@ public class ChatActivity extends AppCompatActivity {
     public void onStart() {
         super.onStart();
 
-        // Check if user is signed in (non-null) and update UI accordingly.
+        // Get the current user from Firebase Auth
         FirebaseUser currentUser = mAuth.getCurrentUser();
 
-        // Checks to see if a user is logged in, if not, send user to the start page for
-        // registration or login
+        // If there is a current user, set them as online when the activity starts
         if (currentUser != null) {
             mRootRef.child("Users").child(mCurrentUserID).child("online").setValue("true");
         }
@@ -472,6 +471,7 @@ public class ChatActivity extends AppCompatActivity {
         super.onPause();
         FirebaseUser currentUser = mAuth.getCurrentUser();
 
+        // Set the current user to offline with a timestamp when they leave the activity
         if (currentUser != null) {
             mRootRef.child("Users").child(mCurrentUserID).child("online").setValue(ServerValue.TIMESTAMP);
         }
