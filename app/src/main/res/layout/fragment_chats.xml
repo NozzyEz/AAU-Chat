@@ -2,32 +2,14 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context="org.nozzy.android.AAU_Chat.ChatsFragment">
 
     <!-- TODO: Update blank fragment layout -->
 
-    <android.support.v4.view.ViewPager
-        android:id="@+id/container_main"
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/conv_list"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior"
-        app:layout_scrollFlags="scroll|enterAlways">
-
-        <android.support.design.widget.TabLayout
-            android:id="@+id/tabs2"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@color/colorPrimary" />
-        <android.support.v7.widget.Toolbar
-            android:id="@+id/toolbar"
-            android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
-            android:background="?attr/colorPrimary"
-            app:layout_scrollFlags="scroll|enterAlways">
-
-        </android.support.v7.widget.Toolbar>
-    </android.support.v4.view.ViewPager>
-
+        android:layout_alignParentStart="true" />
 
 </RelativeLayout>
