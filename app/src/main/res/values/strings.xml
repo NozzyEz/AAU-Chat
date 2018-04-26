@@ -20,4 +20,7 @@
     <string name="accept_friend_req">Accept Friend Request</string>
     <string name="unfriend">Unfriend this person</string>
     <string name="enter_message">Enter Message…</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>
