@@ -1,4 +1,4 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -6,6 +6,7 @@
     tools:context="org.nozzy.android.AAU_Chat.ChatsFragment">
 
     <!-- TODO: Update blank fragment layout -->
+<<<<<<< HEAD
 
     <android.support.v4.view.ViewPager
         android:id="@+id/container_main"
@@ -29,5 +30,12 @@
         </android.support.v7.widget.Toolbar>
     </android.support.v4.view.ViewPager>
 
+=======
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:text="Обичам те Pilence!!!"
+        android:textSize="24sp" />
+>>>>>>> parent of d0d592b... Removed All references to the old name
 
-</RelativeLayout>
+</FrameLayout>
