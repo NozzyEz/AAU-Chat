@@ -46,8 +46,7 @@
             android:padding="10dp"
             android:scaleX="1.5"
             android:scaleY="1.5"
-            app:srcCompat="@drawable/ic_add_black_24dp"
-            android:contentDescription="TODO" />
+            app:srcCompat="@drawable/ic_add_black_24dp" />
 
         <EditText
             android:id="@+id/chat_message_view"
