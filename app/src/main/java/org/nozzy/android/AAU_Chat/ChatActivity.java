@@ -51,6 +51,7 @@ import de.hdodenhof.circleimageview.CircleImageView;
 import id.zelory.compressor.Compressor;
 
 
+
 public class ChatActivity extends AppCompatActivity {
 
     private String mChatUser;
@@ -280,23 +281,22 @@ public class ChatActivity extends AppCompatActivity {
                 // After creating a new bitmap we then need a byte array output stream
                 ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
-                // We use the Bitmap.compress() method to write our compressed image into a byte array
+                // We use the Bitmap.compress() method to write our compressed image into a byte array output stream
                 compressedImageBitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
-                //Which we finally do here
+
+                //And with the byte array output stream we can store it back in our byte array
                 imageByteArray = baos.toByteArray();
 
             } catch (IOException e) {
                 e.printStackTrace();
             }
 
-            final byte[] finalByteArray = imageByteArray;
-
 
             // Before we can upload the compressed image we have to tell our app where in the storage we want to put it
             StorageReference compressedFilePath = mImageStorage.child("message_images").child("compressed").child(push_id + ".jpg");
 
             // And once that is done, we use an UploadTask to upload the compressed image
-            UploadTask uploadTask = compressedFilePath.putBytes(finalByteArray);
+            UploadTask uploadTask = compressedFilePath.putBytes(imageByteArray);
             uploadTask.addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
                 @Override
                 public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
