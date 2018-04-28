@@ -12,11 +12,7 @@ import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.OkHttpDownloader;
 import com.squareup.picasso.Picasso;
 
-/**
- * Created by AkshayeJH on 01/07/17.
- */
-
-public class AAUChat extends Application{
+public class AAUChat extends Application {
 
     private DatabaseReference mUserDatabase;
     private FirebaseAuth mAuth;

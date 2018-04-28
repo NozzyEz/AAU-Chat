@@ -111,20 +111,23 @@ public class MainActivity extends AppCompatActivity {
         super.onOptionsItemSelected(item);
 
         switch (item.getItemId()) {
+            // If the Account Settings button was pressed, go to the SettingsActivity
+            case R.id.main_settings_btn:
+                Intent settingsIntent = new Intent(MainActivity.this, SettingsActivity.class);
+                startActivity(settingsIntent);
+                break;
+            // If the All Users button was pressed, go to the UsersActivity
+            case R.id.main_users_btn:
+                Intent usersIntent = new Intent(MainActivity.this, UsersActivity.class);
+                startActivity(usersIntent);
+                break;
+            // If the Log Out button was pressed, log the user out and go to the StartActivity
             case R.id.main_logout_btn:
                 if (mAuth.getCurrentUser() != null) {
                     mUserRef.child("online").setValue(ServerValue.TIMESTAMP);
                 }
                 FirebaseAuth.getInstance().signOut();
                 sendToStart();
-                break;
-            case R.id.main_settings_btn:
-                Intent settingsIntent = new Intent(MainActivity.this, SettingsActivity.class);
-                startActivity(settingsIntent);
-                break;
-            case R.id.main_users_btn:
-                Intent usersIntent = new Intent(MainActivity.this, UsersActivity.class);
-                startActivity(usersIntent);
                 break;
             default:
                 break;

@@ -89,37 +89,30 @@ public class SettingsActivity extends AppCompatActivity {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
 
+                // Gets all the relevant user's data from the database
                 String name = dataSnapshot.child("name").getValue().toString();
                 final String image = dataSnapshot.child("image").getValue().toString();
                 String status = dataSnapshot.child("status").getValue().toString();
                 String thumbnail = dataSnapshot.child("thumb_image").getValue().toString();
 
+                // Updates the name and status fields based on those in the database
                 mDisplayName.setText(name);
                 mStatus.setText(status);
 
                 // If the user's database entry for image is not 'default' we load their image into the UI, but with our generic image in place as a placeholder
                 if(!image.equals("default")) {
-
                     // We use the Picasso library to do the image loading, this way we can store the image offline for faster loading
                     Picasso.with(SettingsActivity.this).load(image).networkPolicy(NetworkPolicy.OFFLINE)
                             .placeholder(R.drawable.generic).into(mImage, new Callback() {
                         @Override
-                        public void onSuccess() {
-
-                        }
-
+                        public void onSuccess() { }
                         @Override
                         public void onError() {
-
+                            // If the image fails to load, set the image to the default one
                             Picasso.with(SettingsActivity.this).load(image).placeholder(R.drawable.generic).into(mImage);
-
                         }
                     });
-
                 }
-
-
-
 
             }
 
@@ -152,10 +145,11 @@ public class SettingsActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
 
+                // Creates an intent for the default gallery picker
                 Intent galleryIntent = new Intent();
                 galleryIntent.setType("image/*");
                 galleryIntent.setAction(Intent.ACTION_GET_CONTENT);
-
+                // Starts the activity with the request code GALLERY_PICK, which is caught in the onActivityResult method
                 startActivityForResult(Intent.createChooser(galleryIntent, "SELECT IMAGE"), GALLERY_PICK);
 
                 // start picker to get image for cropping and then use the image in cropping
@@ -178,10 +172,13 @@ public class SettingsActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, final Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
+        // Checks if the activity was the default gallery picker
         if(requestCode == GALLERY_PICK && resultCode == RESULT_OK) {
 
+            // Gets the picked image
             Uri imageUri = data.getData();
 
+            // Starts the image cropper activity
             CropImage.activity(imageUri)
                     .setAspectRatio(1,1)
                     .setMinCropWindowSize(500, 500)
@@ -189,80 +186,85 @@ public class SettingsActivity extends AppCompatActivity {
 
         }
 
+        // Checks if the activity was the image cropper
         if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
 
+            // Gets the result from the image cropper activity
             CropImage.ActivityResult result = CropImage.getActivityResult(data);
 
             if (resultCode == RESULT_OK) {
 
+                // Shows a progress dialog (loading screen) until the images are uploaded
                 mProgressDialog = new ProgressDialog(SettingsActivity.this);
                 mProgressDialog.setTitle("Uploading Image");
                 mProgressDialog.setMessage("Please wait while the image is being uploaded");
                 mProgressDialog.setCanceledOnTouchOutside(false);
                 mProgressDialog.show();
 
+                // Gets the cropped image
                 Uri resultUri = result.getUri();
-
+                // Creates a thumbnail image file (with the path of the cropped one) for compression
                 final File thumb_filePath = new File(resultUri.getPath());
-
+                // Gets the user's ID - this will be the name of the profile picture when storing
                 String current_user_id = mCurrentUser.getUid();
 
                 byte[] thumb_byte = new byte[0];
-
                 try {
-
+                    // Creates a compressor, loads the image onto it
                     Bitmap thumb_bitmap = new Compressor(this)
                             .setMaxWidth(200)
                             .setMaxHeight(200)
                             .setQuality(75)
                             .compressToBitmap(thumb_filePath);
-
+                    // A BAOS stores the resulting image data after compression,
+                    // which we then transfer to a byte array
                     ByteArrayOutputStream baos = new ByteArrayOutputStream();
                     thumb_bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
                     thumb_byte = baos.toByteArray();
+                } catch (IOException e) { e.printStackTrace(); }
 
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-
+                // Creates references with filepaths for the image and the thumbnail to be stored in the database
                 StorageReference filepath = mImageStorage.child("profile_images").child(current_user_id + ".jpg");
                 final StorageReference thumb_filepath = mImageStorage.child("profile_images").child("thumbnails").child(current_user_id + ".jpg");
 
-
+                // Another byte array for the thumb image (God knows why)
                 final byte[] finalThumb_byte = thumb_byte;
+
+                // Attempts to put the image into the database
                 filepath.putFile(resultUri).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
                     @Override
                     public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
                         if (task.isSuccessful()) {
 
+                            // Gets the download link to the image that we just uploaded
                             final String download_url = task.getResult().getDownloadUrl().toString();
 
+                            // Creates a task to upload the compressed image in the form of a byte array to the database
                             UploadTask uploadTask = thumb_filepath.putBytes(finalThumb_byte);
                             uploadTask.addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
                                 @Override
                                 public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> thumb_task) {
-
-                                    String thumb_downloadUrl = thumb_task.getResult().getDownloadUrl().toString();
-
                                     if(thumb_task.isSuccessful()) {
+                                        // Gets the download link to the thumbnail that we just uploaded
+                                        String thumb_downloadUrl = thumb_task.getResult().getDownloadUrl().toString();
 
+                                        // Creates a hashmap for storing two new images in the database
                                         Map update_hashMap = new HashMap();
                                         update_hashMap.put("image", download_url);
                                         update_hashMap.put("thumb_image", thumb_downloadUrl);
 
+                                        // Updates the image and thumb_image values of the user in the database
                                         mUserDatabase.updateChildren(update_hashMap).addOnCompleteListener(new OnCompleteListener<Void>() {
                                             @Override
                                             public void onComplete(@NonNull Task<Void> task) {
                                                 if(task.isSuccessful()) {
-
                                                     mProgressDialog.dismiss();
                                                     Toast.makeText(SettingsActivity.this, "Successful", Toast.LENGTH_LONG).show();
-
                                                 }
                                             }
                                         });
                                     } else {
-
+                                        // Shows a toast if the thumbnail upload was unsuccessful
                                         Toast.makeText(SettingsActivity.this, "Error in uploading thumbnail", Toast.LENGTH_LONG).show();
                                         mProgressDialog.dismiss();
 
@@ -271,7 +273,8 @@ public class SettingsActivity extends AppCompatActivity {
                                 }
                             });
                         } else {
-                            Toast.makeText(SettingsActivity.this, "Not today", Toast.LENGTH_LONG).show();
+                            // Shows a toast if the image upload was unsuccessful
+                            Toast.makeText(SettingsActivity.this, "Error in uploading image", Toast.LENGTH_LONG).show();
                             mProgressDialog.dismiss();
                         }
                     }

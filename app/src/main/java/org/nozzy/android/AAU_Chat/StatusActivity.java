@@ -48,11 +48,12 @@ public class StatusActivity extends AppCompatActivity {
         getSupportActionBar().setTitle("Account Status");
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        // String to show the user's current status message
-        String statusValue = getIntent().getStringExtra("statusValue");
-
+        // Setting up the status text field and the save button
         mStatus = findViewById(R.id.status_input);
         mSavebtn = findViewById(R.id.status_save_btn);
+
+        // String to show the user's current status message
+        String statusValue = getIntent().getStringExtra("statusValue");
 
         // Setting the status field to show the current message before entering a new one.
         mStatus.getEditText().setText(statusValue);
@@ -62,11 +63,13 @@ public class StatusActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
 
+                // Shows a progress dialog (loading screen) until the new status is stored to the database
                 mProgress = new ProgressDialog(StatusActivity.this);
                 mProgress.setTitle("Saving changes");
                 mProgress.setMessage("Changes are being saved, please wait a moment");
                 mProgress.show();
 
+                // Gets the text of the new status message
                 String status = mStatus.getEditText().getText().toString();
 
                 // Set the value for the status message inside of our database in the field with the name 'status'
@@ -75,6 +78,7 @@ public class StatusActivity extends AppCompatActivity {
                     public void onComplete(@NonNull Task<Void> task) {
                         if(task.isSuccessful()) {
 
+                            // Hides the progress dialog
                             mProgress.dismiss();
 
                             // Sending the user back to the settings activity once the task is successful
@@ -84,7 +88,7 @@ public class StatusActivity extends AppCompatActivity {
 
 
                         } else {
-
+                            // If the saving was unsuccessful, shows a toast
                             Toast.makeText(getApplicationContext(), "There was an error when saving changes", Toast.LENGTH_LONG).show();
 
                         }
