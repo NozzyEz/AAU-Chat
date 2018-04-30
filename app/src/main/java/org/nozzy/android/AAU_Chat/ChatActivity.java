@@ -424,6 +424,7 @@ public class ChatActivity extends AppCompatActivity {
 
             String current_user_ref = "Messages/" + mCurrentUserID + "/" + mChatUser;
             String chat_user_ref = "Messages/" + mChatUser + "/" + mCurrentUserID;
+            String notification_ref = "Notifications/" + mChatUser;
 
             DatabaseReference user_message_push = mRootRef.child("Messages").child(mCurrentUserID).child(mChatUser).push();
             String push_id = user_message_push.getKey();
@@ -435,9 +436,14 @@ public class ChatActivity extends AppCompatActivity {
             messageMap.put("time", ServerValue.TIMESTAMP);
             messageMap.put("from", mCurrentUserID);
 
+            Map notificationMap = new HashMap();
+            notificationMap.put("from", mCurrentUserID);
+            notificationMap.put("type", "message");
+
             Map messageUserMap = new HashMap();
             messageUserMap.put(current_user_ref + "/" + push_id, messageMap);
-            messageUserMap.put(chat_user_ref + "/" + push_id,messageMap);
+            messageUserMap.put(chat_user_ref + "/" + push_id, messageMap);
+            messageUserMap.put(notification_ref + "/" + push_id, notificationMap);
 
             mChatMessageView.setText("");
 
