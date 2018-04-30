@@ -12,6 +12,7 @@ import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.OkHttpDownloader;
 import com.squareup.picasso.Picasso;
 
+// This class contains code that is used by the app in general.
 public class AAUChat extends Application {
 
     private DatabaseReference mUserDatabase;
@@ -34,21 +35,17 @@ public class AAUChat extends Application {
 
         mAuth = FirebaseAuth.getInstance();
 
+        // This code is used for setting the user's online attribute to a timestamp whenever they disconnect
+        // This way we can know when was the user last seen online
         if(mAuth.getCurrentUser() != null) {
-
             mUserDatabase = FirebaseDatabase.getInstance()
                     .getReference().child("Users").child(mAuth.getCurrentUser().getUid());
-
             mUserDatabase.addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
-
                     if (dataSnapshot != null) {
-
                         mUserDatabase.child("online").onDisconnect().setValue(ServerValue.TIMESTAMP);
-
                     }
-
                 }
 
                 @Override

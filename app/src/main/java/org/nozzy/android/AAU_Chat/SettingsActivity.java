@@ -207,7 +207,7 @@ public class SettingsActivity extends AppCompatActivity {
                 final File thumb_filePath = new File(resultUri.getPath());
                 // Gets the user's ID - this will be the name of the profile picture when storing
                 String current_user_id = mCurrentUser.getUid();
-
+                // A byte array for storing the image
                 byte[] thumb_byte = new byte[0];
                 try {
                     // Creates a compressor, loads the image onto it
