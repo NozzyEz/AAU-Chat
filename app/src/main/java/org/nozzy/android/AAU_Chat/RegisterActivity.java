@@ -76,7 +76,7 @@ public class RegisterActivity extends AppCompatActivity {
                 String password = mPassword.getEditText().getText().toString();
 
                 // Here we check to make sure that all the text fields has information put in so that the app does not crash
-                if (!TextUtils.isEmpty(display_name) || !TextUtils.isEmpty(email) || !TextUtils.isEmpty(password)) {
+                if (!TextUtils.isEmpty(display_name) && !TextUtils.isEmpty(email) && !TextUtils.isEmpty(password)) {
 
                     // Then we start our progress dialog with some information for the user so that
                     // they know that we are actively working in the background
