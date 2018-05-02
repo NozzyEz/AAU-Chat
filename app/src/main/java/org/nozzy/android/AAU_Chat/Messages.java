@@ -1,5 +1,7 @@
 package org.nozzy.android.AAU_Chat;
 
+// Class to set and get the values for the messages.
+// Used for displaying all messages in a RecyclerView in ChatActivity.
 public class Messages {
 
     private String message, type, from;

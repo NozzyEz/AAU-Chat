@@ -103,6 +103,7 @@ public class UsersActivity extends AppCompatActivity {
 
     }
 
+    // A ViewHolder class made for displaying a single user in the recycler view
     public static class UsersViewHolder extends RecyclerView.ViewHolder {
 
         View mView;
@@ -110,31 +111,25 @@ public class UsersActivity extends AppCompatActivity {
 
         public UsersViewHolder(View itemView) {
             super(itemView);
-
             mView = itemView;
-
-
         }
-
+        // Sets the name for the name text field
         public void setName(String name) {
             TextView mUserNameView = mView.findViewById(R.id.user_single_name);
             mUserNameView.setText(name);
         }
-
+        // Sets the status for the status text field
         public void setStatus(String status) {
             TextView mStatusView = mView.findViewById(R.id.user_single_status);
             mStatusView.setText(status);
         }
-
+        // Sets the image for the image view
         public void setUserImage(final String userImage, final Context ctx) {
             final CircleImageView mUserImageView = mView.findViewById(R.id.user_single_image);
             Picasso.with(ctx).load(userImage).networkPolicy(NetworkPolicy.OFFLINE)
                     .placeholder(R.drawable.generic).into(mUserImageView, new Callback() {
                 @Override
-                public void onSuccess() {
-
-                }
-
+                public void onSuccess() { }
                 @Override
                 public void onError() {
                     Picasso.with(ctx).load(userImage).placeholder(R.drawable.generic).into(mUserImageView);

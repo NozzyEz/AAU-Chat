@@ -28,6 +28,7 @@ import java.util.List;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
+// A custom adapter meant for adapting a list of messages into a RecyclerView.
 public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageViewHolder>{
 
     private List<Messages> mMessageList;
@@ -114,23 +115,25 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
             }
         });
 
+        // Changes the layout based on who sent the message and the type of message
         if (from_user.equals(current_user_id)) {
+            // If the message has been sent by the current user:
+            // Hide the profile image
             holder.profileImage.setVisibility(View.INVISIBLE);
+            // Move the message to the right
             ((LinearLayout) holder.messageView).setGravity(Gravity.END);
+            // Sets the background of the message to white
             holder.messageText.setBackgroundResource(R.drawable.message_text_background_current_user);
+            // Sets the text to black
             holder.messageText.setTextColor(Color.BLACK);
 
+            // If it's a text message
             if(message_type.equals("text")) {
-
                 holder.messageText.setText(c.getMessage());
                 holder.messageImage.setVisibility(View.INVISIBLE);
-
             } else if (message_type.equals("image")) {
-
                 holder.messageText.setVisibility(View.INVISIBLE);
-
                 Picasso.with(holder.profileImage.getContext()).load(c.getMessage()).placeholder(R.drawable.generic).into(holder.messageImage);
-
             }
 
         } else {

@@ -16,6 +16,9 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException;
+import com.google.firebase.auth.FirebaseAuthUserCollisionException;
+import com.google.firebase.auth.FirebaseAuthWeakPasswordException;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
@@ -28,17 +31,19 @@ import java.util.HashMap;
 // email, name and password.
 public class RegisterActivity extends AppCompatActivity {
 
-    private FirebaseAuth mAuth;
-
+    // UI
     private TextInputLayout mDisplayName;
     private TextInputLayout mEmail;
     private TextInputLayout mPassword;
     private Button mCreateBtn;
     private Toolbar mToolbar;
 
+    private ProgressDialog mRegProgress;
+
+    // Firebase
+    private FirebaseAuth mAuth;
     private DatabaseReference mDatabase;
 
-    private ProgressDialog mRegProgress;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,10 +65,11 @@ public class RegisterActivity extends AppCompatActivity {
         // to complete when they register and the data needs to be sent to the database
         mRegProgress = new ProgressDialog(this);
 
-        mDisplayName = (TextInputLayout) findViewById(R.id.reg_display_name);
-        mEmail = (TextInputLayout) findViewById(R.id.login_email);
-        mPassword = (TextInputLayout) findViewById(R.id.login_password);
-        mCreateBtn = (Button) findViewById(R.id.reg_create_btn);
+        // Setting up the UI
+        mDisplayName = findViewById(R.id.reg_display_name);
+        mEmail = findViewById(R.id.login_email);
+        mPassword = findViewById(R.id.login_password);
+        mCreateBtn = findViewById(R.id.reg_create_btn);
 
         // Here we make a listener for the create account button, so that when it is tapped we can
         // start to proceed with the data the user has put into our form
@@ -90,6 +96,11 @@ public class RegisterActivity extends AppCompatActivity {
                     registerUser(display_name,email,password);
 
                 }
+
+                else {
+                    // If there are any empty fields, a toast is shown
+                    Toast.makeText(RegisterActivity.this, "Please fill out all fields", Toast.LENGTH_LONG).show();
+                }
             }
         });
     }
@@ -102,7 +113,7 @@ public class RegisterActivity extends AppCompatActivity {
             @Override
             public void onComplete(@NonNull Task<AuthResult> task) {
 
-                // If we created our user entry succesfully we continue
+                // If we created our user entry successfully we continue
                 if(task.isSuccessful()) {
 
                     // First we need the unique user ID for the new account
@@ -142,10 +153,24 @@ public class RegisterActivity extends AppCompatActivity {
                         }
                     });
                 } else {
-                    // If we are NOT successful we hide the progress dialog and give an error message through a toast.
+                    // If we are NOT successful we give an error message through a toast
+                    // We set the error message based on what exception was thrown
+                    String error;
+                    try {
+                        throw task.getException();
+                    } catch (FirebaseAuthWeakPasswordException e) {
+                        error = "Weak password";
+                    } catch (FirebaseAuthInvalidCredentialsException e) {
+                        error = "Invalid email";
+                    } catch (FirebaseAuthUserCollisionException e) {
+                        error = "Account already exists";
+                    } catch (Exception e) {
+                        error = "Account could not be created";
+                        e.printStackTrace();
+                    }
+                    // We hide the progress dialog and show the error toast
                     mRegProgress.hide();
-                    Toast.makeText(RegisterActivity.this, "Account could not be created, " +
-                            "please check the form and try again", Toast.LENGTH_LONG).show();
+                    Toast.makeText(RegisterActivity.this, error, Toast.LENGTH_LONG).show();
                 }
             }
         });
