@@ -7,7 +7,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-
+// This fragment is meant for showing pending friend requests (Not implemented yet).
 /**
  * A simple {@link Fragment} subclass.
  */

@@ -2,8 +2,6 @@ package org.nozzy.android.AAU_Chat;
 
 
 
-import android.app.PendingIntent;
-import android.content.Intent;
 import android.support.v4.app.NotificationCompat;
 
 import com.google.firebase.messaging.RemoteMessage;
@@ -37,7 +35,7 @@ public class FirebaseMessagingService extends com.google.firebase.messaging.Fire
 
         // Here we create a new NotificationHelper object from a class we've built to deal with our notifications
         mNotificationHelper = new NotificationHelper(this);
-        NotificationCompat.Builder nb = mNotificationHelper.getChannnel1Notification(title, message, click_action, from_user_id);
+        NotificationCompat.Builder nb = mNotificationHelper.getChannel1Notification(title, message, click_action, from_user_id);
         mNotificationHelper.getManager().notify(1, nb.build());
 
     }

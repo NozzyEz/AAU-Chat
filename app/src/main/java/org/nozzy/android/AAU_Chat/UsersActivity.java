@@ -107,7 +107,6 @@ public class UsersActivity extends AppCompatActivity {
     public static class UsersViewHolder extends RecyclerView.ViewHolder {
 
         View mView;
-        private String mStatus;
 
         public UsersViewHolder(View itemView) {
             super(itemView);
