@@ -1,12 +1,9 @@
 package org.nozzy.android.AAU_Chat;
 
-import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
-import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.net.Uri;
-import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBar;
@@ -59,14 +56,17 @@ import id.zelory.compressor.Compressor;
 // This activity is used for chatting with other users.
 public class ChatActivity extends AppCompatActivity {
 
+    // ID and name of the user being chatted with
     private String mChatUser;
     private String mUserName;
 
+    private DatabaseReference mRootRef;
+    private StorageReference mImageStorage;
+
+    // UI
     private Toolbar mChatToolbar;
 
-    private DatabaseReference mRootRef;
-
-    private TextView mTiltleView;
+    private TextView mTitleView;
     private TextView mLastSeenView;
     private CircleImageView mProfileImage;
     private FirebaseAuth mAuth;
@@ -76,42 +76,44 @@ public class ChatActivity extends AppCompatActivity {
     private ImageButton mChatSendBtn;
     private EditText mChatMessageView;
 
-    private RecyclerView mMesssagesList;
+    private RecyclerView mMessagesList;
     private SwipeRefreshLayout mRefreshLayout;
 
     private final List<Messages> messagesList = new ArrayList<>();
     private LinearLayoutManager mLinearLayout;
     private MessageAdapter mAdapter;
 
+    // Variables for displaying messages
     private static final int  TOTAL_ITEMS_TO_LOAD = 10;
-    private int mCurrentPage = 1;
-
-    private static final int GALLERY_PICK = 1;
-
-    private StorageReference mImageStorage;
-
-
     private int itemPos = 0;
     private String mLastKey = "";
     private String mPreviousLastKey = "";
+
+    // Variable for detecting a gallery pick result
+    private static final int GALLERY_PICK = 1;
+
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat);
+
+        // Setting up the Firebase references
         mRootRef = FirebaseDatabase.getInstance().getReference();
         mAuth = FirebaseAuth.getInstance();
         mCurrentUserID = mAuth.getCurrentUser().getUid();
 
         mImageStorage = FirebaseStorage.getInstance().getReference();
 
+        // Setting up the UI and other variables, such as user ID and name
         mChatToolbar = findViewById(R.id.chat_app_bar);
         setSupportActionBar(mChatToolbar);
 
         ActionBar actionBar = getSupportActionBar();
         actionBar.setDisplayHomeAsUpEnabled(true);
         actionBar.setDisplayShowCustomEnabled(true);
-
 
         mChatUser = getIntent().getStringExtra("user_id");
         mUserName = getIntent().getStringExtra("user_name");
@@ -121,7 +123,7 @@ public class ChatActivity extends AppCompatActivity {
 
         actionBar.setCustomView(action_bar_view);
 
-        mTiltleView = findViewById(R.id.custom_bar_title);
+        mTitleView = findViewById(R.id.custom_bar_title);
         mLastSeenView = findViewById(R.id.custom_bar_seen);
         mProfileImage = findViewById(R.id.custom_bar_image);
 
@@ -131,24 +133,25 @@ public class ChatActivity extends AppCompatActivity {
 
         mAdapter = new MessageAdapter(messagesList);
 
-        mMesssagesList = findViewById(R.id.chat_messages_list);
+        mMessagesList = findViewById(R.id.chat_messages_list);
         mRefreshLayout = findViewById(R.id.message_swipe_layout);
         mLinearLayout = new LinearLayoutManager(this);
 
-        mMesssagesList.setHasFixedSize(true);
-        mMesssagesList.setLayoutManager(mLinearLayout);
+        mMessagesList.setHasFixedSize(true);
+        mMessagesList.setLayoutManager(mLinearLayout);
 
-        mMesssagesList.setAdapter(mAdapter);
+        mMessagesList.setAdapter(mAdapter);
 
+        mTitleView.setText(mUserName);
+
+        // Loads the first messages
         loadMessages();
 
-        mTiltleView.setText(mUserName);
 
         // Adds a listener to the user being chatted with for setting their current online state
         mRootRef.child("Users").child(mChatUser).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-
                 // Gets either a true value or the timestamp of the last time the user was online
                 String online = dataSnapshot.child("online").getValue().toString();
                 // Gets the thumbnail image
@@ -184,7 +187,10 @@ public class ChatActivity extends AppCompatActivity {
         mRootRef.child("Chat").child(mCurrentUserID).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                if (!dataSnapshot.hasChild(mChatUser)) {
+                ////
+                Toast.makeText(ChatActivity.this, "Test", Toast.LENGTH_LONG).show();
+                ////
+                if (dataSnapshot.hasChild(mChatUser)) {
                     // If the current user does not have a Chat with the selected user, create one
                     Map chatAddMap = new HashMap();
                     chatAddMap.put("seen", false);
@@ -228,15 +234,14 @@ public class ChatActivity extends AppCompatActivity {
             }
         });
 
+        // Sets a listener whenever we refresh for older messages
         mRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-
-                mCurrentPage ++;
+                // Increments current page of messages loaded
                 itemPos = 0;
-
+                // Loads older messages
                 loadMoreMessages();
-
             }
         });
     }
@@ -250,8 +255,7 @@ public class ChatActivity extends AppCompatActivity {
         // Checks if the activity was the default gallery picker - if so, start the cropper
         if (requestCode == GALLERY_PICK && resultCode == RESULT_OK) {
             Uri imageUri = data.getData();
-            CropImage.activity(imageUri)
-                    .start(this);
+            CropImage.activity(imageUri).start(this);
         }
 
         // Checks if the activity was the image cropper
@@ -267,7 +271,6 @@ public class ChatActivity extends AppCompatActivity {
 
             // StorageReference filepath = mImageStorage.child("message_images").child(push_id + ".jpg");
 
-
             // Gets the result from the image cropper activity
             CropImage.ActivityResult result = CropImage.getActivityResult(data);
 
@@ -275,6 +278,7 @@ public class ChatActivity extends AppCompatActivity {
             Uri imageUri = result.getUri();
             // Creates an image file (with the path of the cropped one) for compression
             final File imageToCompress = new File(imageUri.getPath());
+
             // A byte array for storing the image
             byte[] imageByteArray = new byte[0];
             try {
@@ -333,56 +337,31 @@ public class ChatActivity extends AppCompatActivity {
                     }
                 }
             });
-
-            // Unused code for sending an uncompressed image
-            /*
-            filepath.putFile(imageUri).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
-                @Override
-                public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
-                    if (task.isSuccessful()) {
-                        String download_url = task.getResult().getDownloadUrl().toString();
-                        Map messageMap = new HashMap();
-                        messageMap.put("message", download_url);
-                        messageMap.put("seen", false);
-                        messageMap.put("type", "image");
-                        messageMap.put("time", ServerValue.TIMESTAMP);
-                        messageMap.put("from", mCurrentUserID);
-                        Map messageUserMap = new HashMap();
-                        messageUserMap.put(current_user_ref + "/" + push_id, messageMap);
-                        messageUserMap.put(chat_user_ref + "/" + push_id, messageMap);
-                        mChatMessageView.setText("");
-                        mRootRef.updateChildren(messageUserMap, new DatabaseReference.CompletionListener() {
-                            @Override
-                            public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
-                                if (databaseError != null) {
-                                    Log.d("CHAT_LOG", databaseError.getMessage().toString());
-                                }
-                            }
-                        });
-                    }
-                }
-            });
-            */
         }
 
     }
 
+    // Method for loading in older messages when refreshing
     private void loadMoreMessages() {
 
+        // Reference for getting messages
         DatabaseReference messageRef = mRootRef.child("Messages").child(mCurrentUserID).child(mChatUser);
 
-        Query messageQuery = messageRef.orderByKey().endAt(mLastKey).limitToLast(10);
+        // Query for getting the specific 10 messages which end at the oldest currently displayed message
+        // Note - actually loads in 11 messages, but the last one is a repeat, so it isn't shown.
+        Query messageQuery = messageRef.orderByKey().endAt(mLastKey).limitToLast(11);
 
+        // For each of these messages
         messageQuery.addChildEventListener(new ChildEventListener() {
-
             @Override
+            // When each message is added
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-
+                // Get the text and id of the message
                 Messages message = dataSnapshot.getValue(Messages.class);
                 String messageKey = dataSnapshot.getKey();
 
                 if (!mPreviousLastKey.equals(messageKey)) {
-
+                    // Add the message to position itemPos and increment it
                     messagesList.add(itemPos++, message);
 
                 } else {
@@ -397,44 +376,34 @@ public class ChatActivity extends AppCompatActivity {
 
                 mAdapter.notifyDataSetChanged();
 
+                // Stops the refreshing from continuing
                 mRefreshLayout.setRefreshing(false);
-                mLinearLayout.scrollToPositionWithOffset(8,0);
-                mCurrentPage++;
-
+                // Scrolls to the bottom of older messages, effectively showing you the first message
+                mLinearLayout.scrollToPositionWithOffset(9,0);
             }
-
             @Override
-            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-
-            }
-
+            public void onChildChanged(DataSnapshot dataSnapshot, String s) { }
             @Override
-            public void onChildRemoved(DataSnapshot dataSnapshot) {
-
-            }
-
+            public void onChildRemoved(DataSnapshot dataSnapshot) { }
             @Override
-            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
-
-            }
-
+            public void onChildMoved(DataSnapshot dataSnapshot, String s) { }
             @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
+            public void onCancelled(DatabaseError databaseError) { }
         });
-
     }
 
 
+    // Method for loading in the first messages
     private void loadMessages() {
 
         DatabaseReference messageRef = mRootRef.child("Messages").child(mCurrentUserID).child(mChatUser);
 
-        Query messageQuery = messageRef.limitToLast(mCurrentPage * TOTAL_ITEMS_TO_LOAD);
+        Query messageQuery = messageRef.limitToLast(TOTAL_ITEMS_TO_LOAD);
 
+        // Adds a listener to messages
         messageQuery.addChildEventListener(new ChildEventListener() {
             @Override
+            // Triggers whenever a new message is added
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
 
                 Messages message = dataSnapshot.getValue(Messages.class);
@@ -448,36 +417,26 @@ public class ChatActivity extends AppCompatActivity {
                     mPreviousLastKey = messageKey;
 
                 }
-
+                // Adds the new message to the list
                 messagesList.add(message);
                 mAdapter.notifyDataSetChanged();
 
                 // Scroll the view to the bottom when a message is sent or received.
-                mMesssagesList.scrollToPosition(messagesList.size() - 1);
+                mMessagesList.scrollToPosition(messagesList.size() - 1);
 
+                // Stops the refreshing
                 mRefreshLayout.setRefreshing(false);
 
             }
 
             @Override
-            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-
-            }
-
+            public void onChildChanged(DataSnapshot dataSnapshot, String s) { }
             @Override
-            public void onChildRemoved(DataSnapshot dataSnapshot) {
-
-            }
-
+            public void onChildRemoved(DataSnapshot dataSnapshot) { }
             @Override
-            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
-
-            }
-
+            public void onChildMoved(DataSnapshot dataSnapshot, String s) { }
             @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
+            public void onCancelled(DatabaseError databaseError) { }
         });
 
     }

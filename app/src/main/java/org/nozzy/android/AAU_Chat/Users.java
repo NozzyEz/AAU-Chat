@@ -4,7 +4,8 @@ package org.nozzy.android.AAU_Chat;
  * Created by Nozzy on 29/03/2018.
  */
 
-// Class to set and get the values for the users. Used for displaying all users in a RecyclerView.
+// Class to set and get the values for the users.
+// Used for displaying all users in a RecyclerView in UsersActivity.
 public class Users {
 
     public String name;

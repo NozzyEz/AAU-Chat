@@ -65,10 +65,11 @@ public class RegisterActivity extends AppCompatActivity {
         // to complete when they register and the data needs to be sent to the database
         mRegProgress = new ProgressDialog(this);
 
-        mDisplayName = (TextInputLayout) findViewById(R.id.reg_display_name);
-        mEmail = (TextInputLayout) findViewById(R.id.login_email);
-        mPassword = (TextInputLayout) findViewById(R.id.login_password);
-        mCreateBtn = (Button) findViewById(R.id.reg_create_btn);
+        // Setting up the UI
+        mDisplayName = findViewById(R.id.reg_display_name);
+        mEmail = findViewById(R.id.login_email);
+        mPassword = findViewById(R.id.login_password);
+        mCreateBtn = findViewById(R.id.reg_create_btn);
 
         // Here we make a listener for the create account button, so that when it is tapped we can
         // start to proceed with the data the user has put into our form
@@ -81,7 +82,7 @@ public class RegisterActivity extends AppCompatActivity {
                 String password = mPassword.getEditText().getText().toString();
 
                 // Here we check to make sure that all the text fields has information put in so that the app does not crash
-                if (!TextUtils.isEmpty(display_name) || !TextUtils.isEmpty(email) || !TextUtils.isEmpty(password)) {
+                if (!TextUtils.isEmpty(display_name) && !TextUtils.isEmpty(email) && !TextUtils.isEmpty(password)) {
 
                     // Then we start our progress dialog with some information for the user so that
                     // they know that we are actively working in the background
@@ -95,6 +96,11 @@ public class RegisterActivity extends AppCompatActivity {
                     registerUser(display_name,email,password);
 
                 }
+
+                else {
+                    // If there are any empty fields, a toast is shown
+                    Toast.makeText(RegisterActivity.this, "Please fill out all fields", Toast.LENGTH_LONG).show();
+                }
             }
         });
     }
@@ -107,7 +113,7 @@ public class RegisterActivity extends AppCompatActivity {
             @Override
             public void onComplete(@NonNull Task<AuthResult> task) {
 
-                // If we created our user entry succesfully we continue
+                // If we created our user entry successfully we continue
                 if(task.isSuccessful()) {
 
                     // First we need the unique user ID for the new account
