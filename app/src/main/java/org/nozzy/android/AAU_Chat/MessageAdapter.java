@@ -1,9 +1,11 @@
 package org.nozzy.android.AAU_Chat;
 
+import android.app.Application;
 import android.content.Context;
 import android.graphics.Color;
 import android.support.v7.widget.RecyclerView;
 import android.text.Layout;
+import android.text.format.DateUtils;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -34,9 +36,11 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
     private List<Messages> mMessageList;
     private FirebaseAuth mAuth;
     private DatabaseReference mUsersDatabase;
+    private Context context;
 
-    public MessageAdapter(List<Messages> mMessageList) {
+    public MessageAdapter(List<Messages> mMessageList, Context context) {
         this.mMessageList = mMessageList;
+        this.context = context;
     }
 
     @Override
@@ -56,6 +60,8 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
         public CircleImageView profileImage;
         public ImageView messageImage;
         public View messageView;
+
+
 
         public MessageViewHolder(View itemView) {
             super(itemView);
@@ -157,6 +163,16 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
 
         }
         holder.displayName.setText(c.getFrom());
+
+        // To show the time the message has been sent we first have to retrieve the value from firebase,
+        // we do that through our messages class, like any other entry
+        Long time = c.getTime();
+
+        // This long we can then convert to the apropiate string to show the clock
+        String convertedTime = DateUtils.formatDateTime(context, time, DateUtils.FORMAT_SHOW_TIME);
+
+        // And finally we can assign that string to the viewholder's text field
+        holder.messageTime.setText(convertedTime);
     }
 
     @Override
