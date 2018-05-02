@@ -190,7 +190,7 @@ public class ChatActivity extends AppCompatActivity {
                 ////
                 Toast.makeText(ChatActivity.this, "Test", Toast.LENGTH_LONG).show();
                 ////
-                if (dataSnapshot.hasChild(mChatUser)) {
+                if (!dataSnapshot.hasChild(mChatUser)) {
                     // If the current user does not have a Chat with the selected user, create one
                     Map chatAddMap = new HashMap();
                     chatAddMap.put("seen", false);
