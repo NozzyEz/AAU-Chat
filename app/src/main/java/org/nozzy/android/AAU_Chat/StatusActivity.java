@@ -2,6 +2,7 @@ package org.nozzy.android.AAU_Chat;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.os.ResultReceiver;
 import android.support.annotation.NonNull;
 import android.support.design.widget.TextInputLayout;
 import android.support.v7.app.AppCompatActivity;
@@ -83,6 +84,7 @@ public class StatusActivity extends AppCompatActivity {
 
                             // Sending the user back to the settings activity once the task is successful
                             Intent settingsIntent = new Intent(StatusActivity.this, SettingsActivity.class);
+                            ((ResultReceiver)getIntent().getParcelableExtra("finisher")).send(1, new Bundle());
                             startActivity(settingsIntent);
                             finish();
 

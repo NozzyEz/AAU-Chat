@@ -5,6 +5,7 @@ import android.app.ProgressDialog;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
+import android.os.ResultReceiver;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -132,7 +133,14 @@ public class SettingsActivity extends AppCompatActivity {
                 Intent statusIntent = new Intent(SettingsActivity.this, StatusActivity.class);
                 String statusValue = mStatus.getText().toString();
                 statusIntent.putExtra("statusValue", statusValue);
-                startActivity(statusIntent);
+                statusIntent.putExtra("finisher", new ResultReceiver(null) {
+                    @Override
+                    protected void onReceiveResult(int resultCode, Bundle resultData) {
+                        SettingsActivity.this.finish();
+                    }
+                });
+                startActivityForResult(statusIntent,1);
+//                startActivity(statusIntent);
 
             }
         });
