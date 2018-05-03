@@ -51,6 +51,7 @@ public class MainActivity extends AppCompatActivity {
         getSupportActionBar().setTitle("AAU Chat");
 
         if (mAuth.getCurrentUser() != null) {
+            // Point our database reference to the current user's ID, so that we can manipulate fields within
             mUserRef = FirebaseDatabase.getInstance().getReference().child("Users").child(mAuth.getCurrentUser().getUid());
 
             // Get the device token from firebase
@@ -59,7 +60,6 @@ public class MainActivity extends AppCompatActivity {
             mUserRef.child("device_token").setValue(deviceToken).addOnCompleteListener(new OnCompleteListener<Void>() {
                 @Override
                 public void onComplete(@NonNull Task<Void> task) {
-                    Log.d("string", "onComplete: Works");
 
                 }
             });
