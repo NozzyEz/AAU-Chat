@@ -7,14 +7,22 @@ import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.text.Editable;
+import android.text.TextUtils;
+import android.text.TextWatcher;
+import android.view.KeyEvent;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ServerValue;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.NetworkPolicy;
@@ -33,6 +41,9 @@ public class UsersActivity extends AppCompatActivity {
     private DatabaseReference mUsersDatabase;
     private FirebaseAuth mAuth;
     private String mCurrentUserID;
+    private EditText etSearch;
+
+    public static String searchString = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,6 +67,9 @@ public class UsersActivity extends AppCompatActivity {
 
         mAuth = FirebaseAuth.getInstance();
         mCurrentUserID = mAuth.getCurrentUser().getUid();
+
+        etSearch = findViewById(R.id.etSearch);
+        setupSearchInput();
     }
 
     @Override
@@ -64,42 +78,7 @@ public class UsersActivity extends AppCompatActivity {
 
         mUsersDatabase.child(mCurrentUserID).child("online").setValue("true");
 
-        // We setup our Firebase recycler adapter with help from our Users class, a UsersViewHolder class, and the layout we have created to show users.
-        FirebaseRecyclerAdapter<Users, UsersViewHolder> firebaseRecyclerAdapter = new FirebaseRecyclerAdapter<Users, UsersViewHolder>(
-                Users.class,
-                R.layout.users_single_layout,
-                UsersViewHolder.class,
-                mUsersDatabase
-        ) {
-            @Override
-            // This method is used to populate our RecyclerView with each of our users
-            protected void populateViewHolder(UsersViewHolder viewHolder, Users model, int position) {
-
-                // Inside each view we retrieve the value for name, status and image with our Users class, and set it to the view as needed
-                viewHolder.setName(model.getName());
-                viewHolder.setStatus(model.getStatus());
-                viewHolder.setUserImage(model.getThumbImage(), getApplicationContext());
-
-                // Then we get the user ID for the view
-                final String user_id = getRef(position).getKey();
-
-                // When the user clicks on the view, we then pass the correct user ID to the intent
-                // that leads them to the ProfileActivity, so that we can show the correct information
-                // in that Activity
-                viewHolder.mView.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        Intent profileIntent = new Intent(UsersActivity.this, ProfileActivity.class);
-                        profileIntent.putExtra("user_id", user_id);
-                        startActivity(profileIntent);
-
-                    }
-                });
-            }
-        };
-
-        // Finally we set the adapter for our recycler view
-        mUsersList.setAdapter(firebaseRecyclerAdapter);
+        searchUser(searchString);
 
     }
 
@@ -143,5 +122,66 @@ public class UsersActivity extends AppCompatActivity {
         super.onPause();
         mUsersDatabase.child(mCurrentUserID).child("online").setValue(ServerValue.TIMESTAMP);
 
+    }
+
+    private void setupSearchInput() {
+        //Allows to search by pressing enter button on keyboard
+        etSearch.clearFocus();
+        etSearch.setOnKeyListener(new View.OnKeyListener() {
+            @Override
+            public boolean onKey(View view, int i, KeyEvent keyEvent) {
+                if ((keyEvent.getAction() == KeyEvent.ACTION_DOWN) && (keyEvent.getKeyCode() == KeyEvent.KEYCODE_ENTER)) {
+                    searchString = etSearch.getText().toString();
+                    searchUser(searchString);
+                    // Hides the keyboard
+                    if (getWindow() != null && getWindow().getDecorView() != null && getWindow().getDecorView().getWindowToken() != null) {
+                        InputMethodManager mgr = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                        mgr.hideSoftInputFromWindow(getWindow().getDecorView().getWindowToken(), 0);
+                    }
+                    return true;
+                }
+                return false;
+            }
+        });
+    }
+    private void searchUser(String searchString) {
+        // Query is being passed with information from edittext
+        Query searchQuery = mUsersDatabase.orderByChild("name").startAt(searchString).endAt(searchString + "\uf8ff");
+
+        // We setup our Firebase recycler adapter with help from our Users class, a UsersViewHolder class, and the layout we have created to show users.
+        FirebaseRecyclerAdapter<Users, UsersViewHolder> firebaseRecyclerAdapter = new FirebaseRecyclerAdapter<Users, UsersViewHolder>(
+                Users.class,
+                R.layout.users_single_layout,
+                UsersViewHolder.class,
+                searchQuery
+        ) {
+            @Override
+            // This method is used to populate our RecyclerView with each of our users
+            protected void populateViewHolder(UsersViewHolder viewHolder, Users model, int position) {
+
+                // Inside each view we retrieve the value for name, status and image with our Users class, and set it to the view as needed
+                viewHolder.setName(model.getName());
+                viewHolder.setStatus(model.getStatus());
+                viewHolder.setUserImage(model.getThumbImage(), getApplicationContext());
+
+                // Then we get the user ID for the view
+                final String user_id = getRef(position).getKey();
+
+                // When the user clicks on the view, we then pass the correct user ID to the intent
+                // that leads them to the ProfileActivity, so that we can show the correct information
+                // in that Activity
+                viewHolder.mView.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        Intent profileIntent = new Intent(UsersActivity.this, ProfileActivity.class);
+                        profileIntent.putExtra("user_id", user_id);
+                        startActivity(profileIntent);
+
+                    }
+                });
+            }
+        };
+        // Finally we set the adapter for our recycler view
+        mUsersList.setAdapter(firebaseRecyclerAdapter);
     }
 }
