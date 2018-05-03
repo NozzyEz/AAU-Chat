@@ -444,19 +444,17 @@ public class ChatActivity extends AppCompatActivity {
     // Method for sending a simple text message
     private void sendMessage() {
 
-        // Gets the message text
         String message = mChatMessageView.getText().toString();
-        // Checks if the message isn't empty
+
         if (!TextUtils.isEmpty(message)) {
-            // References to the Messages table in the database
+
             String current_user_ref = "Messages/" + mCurrentUserID + "/" + mChatUser;
             String chat_user_ref = "Messages/" + mChatUser + "/" + mCurrentUserID;
+            String notification_ref = "Notifications/" + mChatUser;
 
-            // Gets the ID of the message itself (pushing gives a random value)
             DatabaseReference user_message_push = mRootRef.child("Messages").child(mCurrentUserID).child(mChatUser).push();
             String push_id = user_message_push.getKey();
 
-            // A hashmap for storing a message
             Map messageMap = new HashMap();
             messageMap.put("message", message);
             messageMap.put("seen", false);
@@ -464,19 +462,21 @@ public class ChatActivity extends AppCompatActivity {
             messageMap.put("time", ServerValue.TIMESTAMP);
             messageMap.put("from", mCurrentUserID);
 
-            // A hashmap for storing two instances of this message -
-            // One for the current user, another one - for the user being chatted with
+            Map notificationMap = new HashMap();
+            notificationMap.put("from", mCurrentUserID);
+            notificationMap.put("type", "message");
+
             Map messageUserMap = new HashMap();
             messageUserMap.put(current_user_ref + "/" + push_id, messageMap);
             messageUserMap.put(chat_user_ref + "/" + push_id, messageMap);
+            messageUserMap.put(notification_ref + "/" + push_id, notificationMap);
 
-            // Refreshes the text window to be empty
             mChatMessageView.setText("");
 
-            // Attempts to put all data into the database
             mRootRef.updateChildren(messageUserMap, new DatabaseReference.CompletionListener() {
                 @Override
                 public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
+
                     if (databaseError != null) {
                         Log.d("CHAT_LOG", databaseError.getMessage());
                     }
