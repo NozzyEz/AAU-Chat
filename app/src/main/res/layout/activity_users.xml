@@ -16,13 +16,20 @@
         android:layout_marginTop="0dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"/>
+
+    <EditText
+        android:id="@+id/search_user"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/users_appBar"
+        android:hint="Search for people..."/>
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/users_list"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@+id/users_appBar"></android.support.v7.widget.RecyclerView>
+        android:layout_below="@+id/search_user"></android.support.v7.widget.RecyclerView>
 
 
 
