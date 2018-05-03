@@ -7,6 +7,7 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
@@ -89,6 +90,26 @@ public class MainActivity extends AppCompatActivity {
 
             mUserRef.child("online").setValue("true");
 
+        }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        if (mAuth.getCurrentUser() != null) {
+            mUserRef = FirebaseDatabase.getInstance().getReference().child("Users").child(mAuth.getCurrentUser().getUid());
+
+            // Get the device token from firebase
+            String deviceToken = FirebaseInstanceId.getInstance().getToken();
+            // And put that token into the current users database entry, so that it is updated whenever the user opens the app
+            mUserRef.child("device_token").setValue(deviceToken).addOnCompleteListener(new OnCompleteListener<Void>() {
+                @Override
+                public void onComplete(@NonNull Task<Void> task) {
+                    Log.d("string", "onComplete: Works");
+
+                }
+            });
         }
     }
 
