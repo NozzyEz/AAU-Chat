@@ -187,9 +187,6 @@ public class ChatActivity extends AppCompatActivity {
         mRootRef.child("Chat").child(mCurrentUserID).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                ////
-                Toast.makeText(ChatActivity.this, "Test", Toast.LENGTH_LONG).show();
-                ////
                 if (!dataSnapshot.hasChild(mChatUser)) {
                     // If the current user does not have a Chat with the selected user, create one
                     Map chatAddMap = new HashMap();
