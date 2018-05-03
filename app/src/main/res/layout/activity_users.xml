@@ -25,7 +25,6 @@
         android:layout_below="@id/users_appBar"
         android:layout_margin="15dp"
         android:imeOptions="actionSearch"
-        android:inputType="text"
         android:drawableLeft="@drawable/ic_search"
         android:drawablePadding="10dp"
         android:background="@null"
