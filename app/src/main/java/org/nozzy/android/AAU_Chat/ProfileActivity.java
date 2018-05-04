@@ -41,7 +41,7 @@ public class ProfileActivity extends AppCompatActivity {
 
     private ProgressDialog mProgressDialog;
 
-    // This time we need two database references, one to fetch profile in, and one to manipulate friend requests
+    // Firebase references to fetch profile in and manipulate friend requests
     private DatabaseReference mUsersDatabase;
     private DatabaseReference mFriendReqDatabase;
     private DatabaseReference mFriendsDatabase;
@@ -50,7 +50,6 @@ public class ProfileActivity extends AppCompatActivity {
 
     // Firebase user so we can get the users uid for sending and receiving friend requests.
     private FirebaseUser mCurrent_user;
-
 
     // The current state which lets us know whether the profile viewed is of a user that is also a friend
     private int mCurrent_state;

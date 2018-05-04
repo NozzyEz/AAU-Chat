@@ -22,12 +22,15 @@ import com.google.firebase.iid.FirebaseInstanceId;
 
 public class LoginActivity extends AppCompatActivity {
 
-    // Initializing UI and authentication
+    // UI
     private Toolbar mToolbar;
     private TextInputLayout mLoginEmail;
     private TextInputLayout mLoginPassword;
     private Button mLogin_btn;
+
     private ProgressDialog mLoginProgress;
+
+    // Firebase
     private FirebaseAuth mAuth;
     private DatabaseReference mUserDatabase;
 
@@ -36,63 +39,66 @@ public class LoginActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
-        // Declaring UI and auth
-        mAuth = FirebaseAuth.getInstance();
-
+        // Setting up the UI
         mToolbar = findViewById(R.id.login_toolbar);
         setSupportActionBar(mToolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setTitle("Login");
 
-        mLoginProgress = new ProgressDialog(this);
-
         mLoginEmail = findViewById(R.id.login_email);
         mLoginPassword = findViewById(R.id.login_password);
         mLogin_btn = findViewById(R.id.login_btn);
 
-        mUserDatabase = FirebaseDatabase.getInstance().getReference().child("Users");
+        mLoginProgress = new ProgressDialog(this);
 
-        // Logging in with the input the user has typed in
+        // Setting up Firebase references
+        mUserDatabase = FirebaseDatabase.getInstance().getReference().child("Users");
+        mAuth = FirebaseAuth.getInstance();
+
+        // Button action for logging in with the input the user has typed in
         mLogin_btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 
+                // Gets the typed in email and password
                 String email = mLoginEmail.getEditText().getText().toString();
                 String password = mLoginPassword.getEditText().getText().toString();
 
                 if (!TextUtils.isEmpty(email) || !TextUtils.isEmpty(password)) {
-
+                    // If both fields are filled in, shows a progress dialog (loading screen)
                     mLoginProgress.setTitle("Logging in");
                     mLoginProgress.setMessage("Please wait while logging in");
                     mLoginProgress.setCanceledOnTouchOutside(false);
                     mLoginProgress.show();
-
+                    // Logs the user in
                     loginUser(email, password);
-
+                }
+                else {
+                    // If at least one of the fields is left empty, show a message to the user
+                    Toast.makeText(LoginActivity.this, "Please fill in both fields", Toast.LENGTH_LONG).show();
                 }
 
             }
         });
     }
 
+    // Method for logging the user in
     private void loginUser(String email, String password) {
-
-        mAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener(
-                new OnCompleteListener<AuthResult>() {
+        mAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
             @Override
             public void onComplete(@NonNull Task<AuthResult> task) {
                 if (task.isSuccessful()) {
-
+                    // Hides the progress dialog
                     mLoginProgress.dismiss();
 
                     // Adding the device token to the user upon logging in
                     String user_id = mAuth.getCurrentUser().getUid();
                     String deviceToken = FirebaseInstanceId.getInstance().getToken();
 
+                    // Starts the MainActivity
                     mUserDatabase.child(user_id).child("device_token").setValue(deviceToken).addOnCompleteListener(new OnCompleteListener<Void>() {
                         @Override
                         public void onComplete(@NonNull Task<Void> task) {
-
                             Intent mainIntent = new Intent(LoginActivity.this, MainActivity.class);
                             mainIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                             startActivity(mainIntent);
@@ -101,14 +107,13 @@ public class LoginActivity extends AppCompatActivity {
                         }
                     });
 
-
                 } else {
+                    // If there is an error while logging in, hide the progress dialog and show the error
                     mLoginProgress.hide();
                     Toast.makeText(LoginActivity.this, "user could not be logged in," +
                             " please check and try again", Toast.LENGTH_LONG).show();
                 }
             }
         });
-
     }
 }

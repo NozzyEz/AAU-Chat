@@ -9,7 +9,7 @@ import com.google.firebase.messaging.RemoteMessage;
 /**
  * Created by Nozzy on 11/04/2018.
  */
-
+// This class is used for dealing with notifications received from Firebase
 public class FirebaseMessagingService extends com.google.firebase.messaging.FirebaseMessagingService {
 
     private NotificationHelper mNotificationHelper;

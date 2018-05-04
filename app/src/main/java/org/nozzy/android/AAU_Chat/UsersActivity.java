@@ -62,6 +62,7 @@ public class UsersActivity extends AppCompatActivity {
     protected void onStart() {
         super.onStart();
 
+        // Sets the online value of the user back to true
         mUsersDatabase.child(mCurrentUserID).child("online").setValue("true");
 
         // We setup our Firebase recycler adapter with help from our Users class, a UsersViewHolder class, and the layout we have created to show users.
@@ -138,6 +139,7 @@ public class UsersActivity extends AppCompatActivity {
     }
 
     @Override
+    // Sets the online value to the current timestamp if the activity is paused
     protected void onPause() {
         super.onPause();
         mUsersDatabase.child(mCurrentUserID).child("online").setValue(ServerValue.TIMESTAMP);
