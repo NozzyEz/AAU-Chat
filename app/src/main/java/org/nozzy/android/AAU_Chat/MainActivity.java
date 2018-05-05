@@ -2,8 +2,11 @@ package org.nozzy.android.AAU_Chat;
 
 import android.content.Intent;
 import android.support.annotation.NonNull;
+import android.support.design.widget.NavigationView;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
@@ -23,12 +26,12 @@ import com.google.firebase.iid.FirebaseInstanceId;
 
 // This is our main activity, where most of the app foundation is laid down, we have our toolbar
 // with an options menu, a tabview where we can switch between different tabs.
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
     // Initializing the Firebase Authentication, the default toolbar, the viewpager 'toolbar' as
     // well as the tab layout for Requests, Chats and friends.
     private FirebaseAuth mAuth;
-    private Toolbar mToolbar;
+    private Toolbar toolbar;
 
     private ViewPager mViewPager;
     private SectionsPagerAdapter mSectionsPagerAdapter;
@@ -46,9 +49,20 @@ public class MainActivity extends AppCompatActivity {
         mAuth = FirebaseAuth.getInstance();
 
         // Toolbar setup
-        mToolbar = findViewById(R.id.main_page_toolbar);
-        setSupportActionBar(mToolbar);
+        toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
         getSupportActionBar().setTitle("AAU Chat");
+
+
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
+                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        drawer.addDrawerListener(toggle);
+        toggle.syncState();
+
+        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+
+        navigationView.setNavigationItemSelectedListener(this);
 
         if (mAuth.getCurrentUser() != null) {
             // Point our database reference to the current user's ID, so that we can manipulate fields within
@@ -65,7 +79,7 @@ public class MainActivity extends AppCompatActivity {
             });
         }
 
-        // Setting up our tabs
+         //Setting up our tabs
         mViewPager = findViewById(R.id.main_tabpager);
         mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
 
@@ -171,6 +185,11 @@ public class MainActivity extends AppCompatActivity {
         }
 
         return true;
+    }
+
+    @Override
+    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+        return false;
     }
 }
 
