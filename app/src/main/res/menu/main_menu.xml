@@ -11,8 +11,8 @@
         android:id="@+id/main_logout_btn"
         android:title="@string/log_out" />
     <item
-        android:id="@+id/main_requests"
-        android:title="Frag Requests test"/>
+        android:id="@+id/main_settings"
+        android:title="Frag Settings test"/>
     <item
         android:id="@+id/main_chats"
         android:title="Frag Chats test"/>

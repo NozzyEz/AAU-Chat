@@ -44,7 +44,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        changeContentFragment(getSupportFragmentManager(), RequestsFragment.getFragmentTag(),new RequestsFragment(),R.id.flFragmentsContainer,false);
+        changeContentFragment(getSupportFragmentManager(), ChatsFragment.getFragmentTag(),new ChatsFragment(),R.id.flFragmentsContainer,false);
 
 
         // Get the current instance of our authentication system
@@ -170,8 +170,8 @@ public class MainActivity extends AppCompatActivity {
                 FirebaseAuth.getInstance().signOut();
                 sendToStart();
                 break;
-            case R.id.main_requests:
-                changeContentFragment(getSupportFragmentManager(), RequestsFragment.getFragmentTag(),new RequestsFragment(),R.id.flFragmentsContainer,false);
+            case R.id.main_settings:
+                changeContentFragment(getSupportFragmentManager(), SettingsFragment.getFragmentTag(),new SettingsFragment(),R.id.flFragmentsContainer,false);
                 break;
             case R.id.main_chats:
                 changeContentFragment(getSupportFragmentManager(), ChatsFragment.getFragmentTag(),new ChatsFragment(),R.id.flFragmentsContainer,false);
