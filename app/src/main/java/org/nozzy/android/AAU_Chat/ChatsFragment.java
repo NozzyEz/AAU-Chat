@@ -3,7 +3,6 @@ package org.nozzy.android.AAU_Chat;
 
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
@@ -13,7 +12,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.google.firebase.auth.FirebaseAuth;
@@ -26,10 +24,10 @@ import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
 
-
 import de.hdodenhof.circleimageview.CircleImageView;
 
 // This fragment shows all current conversations in order of recency
+
 /**
  * A simple {@link Fragment} subclass.
  */
@@ -44,6 +42,7 @@ public class ChatsFragment extends Fragment {
     private DatabaseReference mConvDatabase;
     private DatabaseReference mMessageDatabase;
     private DatabaseReference mUsersDatabase;
+    private DatabaseReference mMembersDatabase;
     private FirebaseAuth mAuth;
     private String mCurrent_user_id;
 
@@ -70,10 +69,9 @@ public class ChatsFragment extends Fragment {
         mCurrent_user_id = mAuth.getCurrentUser().getUid();
 
         // Database reference setup, keeps them synced for offline use
-        mConvDatabase = FirebaseDatabase.getInstance().getReference().child("Chat").child(mCurrent_user_id);
+        mConvDatabase = FirebaseDatabase.getInstance().getReference().child("Users").child(mCurrent_user_id).child("chats");
         mConvDatabase.keepSynced(true);
         mUsersDatabase = FirebaseDatabase.getInstance().getReference().child("Users");
-        mMessageDatabase = FirebaseDatabase.getInstance().getReference().child("messages").child(mCurrent_user_id);
         mUsersDatabase.keepSynced(true);
 
         // Inflate the layout for this fragment
@@ -85,8 +83,8 @@ public class ChatsFragment extends Fragment {
     public void onStart() {
         super.onStart();
 
-        // Query to get the conversations ordered by timestamp
-        Query conversationQuery = mConvDatabase.orderByChild("timestamp");
+        // Query to get the conversations
+        Query conversationQuery = mConvDatabase;
 
         // We setup our Firebase recycler adapter with help from our Conv class, a ConvViewHolder class, and the layout we have created to show conversations.
         FirebaseRecyclerAdapter<Conv, ConvViewHolder> firebaseConvAdapter = new FirebaseRecyclerAdapter<Conv, ConvViewHolder>(
@@ -99,54 +97,97 @@ public class ChatsFragment extends Fragment {
             // This method is used to populate our RecyclerView with each of our conversations
             protected void populateViewHolder(final ConvViewHolder convViewHolder, final Conv conv, int i) {
 
-                // Gets the key of the user in the conversation
-                final String list_user_id = getRef(i).getKey();
-                // Query to get the last conversation
-                Query lastMessageQuery = mMessageDatabase.child(list_user_id).limitToLast(1);
-                // For the conversation that we just got
-                lastMessageQuery.addChildEventListener(new ChildEventListener() {
-                    @Override
-                    public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                        // Gets the conversation and puts it into the RecyclerView
-                        String data = dataSnapshot.child("message").getValue().toString();
-                        convViewHolder.setMessage(data, conv.isSeen());
-                    }
-                    @Override
-                    public void onChildChanged(DataSnapshot dataSnapshot, String s) { }
-                    @Override
-                    public void onChildRemoved(DataSnapshot dataSnapshot) { }
-                    @Override
-                    public void onChildMoved(DataSnapshot dataSnapshot, String s) { }
-                    @Override
-                    public void onCancelled(DatabaseError databaseError) { }
-                });
+                // Gets the id of the chat
+                final String list_chat_id = getRef(i).getKey();
 
-                // Adds a listener to each from the conversations
-                mUsersDatabase.child(list_user_id).addValueEventListener(new ValueEventListener() {
+
+                // Database reference to the messages
+//                mMessageDatabase = FirebaseDatabase.getInstance().getReference().child("Chats").child(list_chat_id).child("messages");
+
+                // Query to get the last message in a conversation
+//                Query lastMessageQuery = mMessageDatabase.limitToLast(1);
+//                lastMessageQuery.addChildEventListener(new ChildEventListener() {
+//                    @Override
+//                    public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+//                        // Gets the last message and puts it into the RecyclerView
+//                        String data = dataSnapshot.child("message").getValue().toString();
+//                        convViewHolder.setMessage(data);
+//                    }
+//                    @Override
+//                    public void onChildChanged(DataSnapshot dataSnapshot, String s) { }
+//                    @Override
+//                    public void onChildRemoved(DataSnapshot dataSnapshot) { }
+//                    @Override
+//                    public void onChildMoved(DataSnapshot dataSnapshot, String s) { }
+//                    @Override
+//                    public void onCancelled(DatabaseError databaseError) { }
+//                });
+
+
+                // Adds a listener to get the type of the chat
+                getRef(i).child("type").addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
-                        // Gets the name and image of the user
-                        final String userName = dataSnapshot.child("name").getValue().toString();
-                        String userThumb = dataSnapshot.child("thumb_image").getValue().toString();
-                        // Sets the name and image fields to those from the database
-                        convViewHolder.setName(userName);
-                        convViewHolder.setUserImage(userThumb, getContext());
+                        // Gets the type of the chat
+                        final String type = dataSnapshot.getValue(String.class);
 
-                        // Get the online status of the user and set the online indicator accordingly
-                        if(dataSnapshot.hasChild("online")) {
-                            String userOnline = dataSnapshot.child("online").getValue().toString();
-                            convViewHolder.setUserOnline(userOnline);
-                        }
+                        // Temporary - set the message to the chat ID
+                        convViewHolder.setMessage(list_chat_id);
 
-                        // Whenever a conversation is clicked, it should lead to that chat
-                        convViewHolder.mView.setOnClickListener(new View.OnClickListener() {
+                        // Reference to all of the members in the conversation
+                        mMembersDatabase = FirebaseDatabase.getInstance().getReference().child("Chats").child(list_chat_id).child("members");
+
+                        // Query to get all member IDs
+                        Query lastUserQuery = mMembersDatabase;
+                        lastUserQuery.addChildEventListener(new ChildEventListener() {
                             @Override
-                            public void onClick(View view) {
-                                Intent chatIntent = new Intent(getContext(), ChatActivity.class);
-                                chatIntent.putExtra("user_id", list_user_id);
-                                chatIntent.putExtra("user_name", userName);
-                                startActivity(chatIntent);
+                            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                                // Gets the id of each member
+                                final String memberId = dataSnapshot.getKey();
+                                // Checks if that member is not the current user
+                                if (!memberId.equals(mCurrent_user_id)) {
+                                    // Goes to the Users reference for that specific user
+                                    mUsersDatabase.child(memberId).addValueEventListener(new ValueEventListener() {
+                                        @Override
+                                        public void onDataChange(DataSnapshot dataSnapshot) {
+                                            // Gets the name and image of the user
+                                            final String userName = dataSnapshot.child("name").getValue().toString();
+                                            String userThumb = dataSnapshot.child("thumb_image").getValue().toString();
+
+                                            // Sets the name and image fields to those from the database
+                                            convViewHolder.setName(userName);
+                                            convViewHolder.setUserImage(userThumb, getContext());
+
+                                            // Get the online status of the user and set the online indicator accordingly
+                                            String userOnline = dataSnapshot.child("online").getValue().toString();
+                                            convViewHolder.setUserOnline(userOnline);
+
+                                            // Whenever a conversation is clicked, it should lead to that chat
+                                            convViewHolder.mView.setOnClickListener(new View.OnClickListener() {
+                                                @Override
+                                                public void onClick(View view) {
+                                                    Intent chatIntent = new Intent(getContext(), ChatActivity.class);
+                                                    chatIntent.putExtra("chat_id", list_chat_id);
+                                                    chatIntent.putExtra("chat_type", type);
+                                                    chatIntent.putExtra("user_id", memberId);
+                                                    chatIntent.putExtra("user_name", userName);
+                                                    startActivity(chatIntent);
+                                                }
+                                            });
+                                        }
+                                        @Override
+                                        public void onCancelled(DatabaseError databaseError) { }
+                                    });
+                                }
                             }
+                            @Override
+                            public void onChildChanged(DataSnapshot dataSnapshot, String s) { }
+                            @Override
+                            public void onChildRemoved(DataSnapshot dataSnapshot) { }
+                            @Override
+                            public void onChildMoved(DataSnapshot dataSnapshot, String s) { }
+                            @Override
+                            public void onCancelled(DatabaseError databaseError) { }
                         });
                     }
                     @Override
@@ -170,15 +211,9 @@ public class ChatsFragment extends Fragment {
         }
 
         // Sets the message for the message text field
-        public void setMessage(String message, boolean isSeen){
+        public void setMessage(String message){
             TextView userStatusView = mView.findViewById(R.id.user_single_status);
             userStatusView.setText(message);
-            // If the message wasn't seen, makes it bold
-            if(!isSeen){
-                userStatusView.setTypeface(userStatusView.getTypeface(), Typeface.BOLD);
-            } else {
-                userStatusView.setTypeface(userStatusView.getTypeface(), Typeface.NORMAL);
-            }
         }
 
         // Sets the name for the name text field

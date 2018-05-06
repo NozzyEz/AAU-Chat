@@ -22,7 +22,7 @@ class SectionsPagerAdapter extends FragmentPagerAdapter{
                 RequestsFragment requestsFragment = new RequestsFragment();
                 return requestsFragment;
             case 1:
-                ChatsFragmentNew chatsFragment = new ChatsFragmentNew();
+                ChatsFragment chatsFragment = new ChatsFragment();
                 return chatsFragment;
             case 2:
                 FriendsFragment friendsFragment = new FriendsFragment();
