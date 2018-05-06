@@ -83,8 +83,8 @@ public class ChatsFragment extends Fragment {
     public void onStart() {
         super.onStart();
 
-        // Query to get the conversations
-        Query conversationQuery = mConvDatabase;
+        // Query to get the conversations in order of last activity
+        Query conversationQuery = mConvDatabase.orderByChild("timestamp");
 
         // We setup our Firebase recycler adapter with help from our Conv class, a ConvViewHolder class, and the layout we have created to show conversations.
         FirebaseRecyclerAdapter<Conv, ConvViewHolder> firebaseConvAdapter = new FirebaseRecyclerAdapter<Conv, ConvViewHolder>(
@@ -129,66 +129,87 @@ public class ChatsFragment extends Fragment {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
                         // Gets the type of the chat
-                        final String type = dataSnapshot.getValue(String.class);
+                        final String chatType = dataSnapshot.getValue(String.class);
 
                         // Temporary - set the message to the chat ID
                         convViewHolder.setMessage(list_chat_id);
 
-                        // Reference to all of the members in the conversation
-                        mMembersDatabase = FirebaseDatabase.getInstance().getReference().child("Chats").child(list_chat_id).child("members");
-
-                        // Query to get all member IDs
-                        Query lastUserQuery = mMembersDatabase;
-                        lastUserQuery.addChildEventListener(new ChildEventListener() {
+                        // Reference to the chat name
+                        DatabaseReference chatNameRef = FirebaseDatabase.getInstance().getReference().child("Chats").child(list_chat_id).child("chatName");
+                        chatNameRef.addListenerForSingleValueEvent(new ValueEventListener() {
                             @Override
-                            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                                // Gets the id of each member
-                                final String memberId = dataSnapshot.getKey();
-                                // Checks if that member is not the current user
-                                if (!memberId.equals(mCurrent_user_id)) {
-                                    // Goes to the Users reference for that specific user
-                                    mUsersDatabase.child(memberId).addValueEventListener(new ValueEventListener() {
-                                        @Override
-                                        public void onDataChange(DataSnapshot dataSnapshot) {
-                                            // Gets the name and image of the user
-                                            final String userName = dataSnapshot.child("name").getValue().toString();
-                                            String userThumb = dataSnapshot.child("thumb_image").getValue().toString();
+                            public void onDataChange(DataSnapshot dataSnapshot) {
+                                    // Gets the name of the chat
+                                    final String chatName = dataSnapshot.getValue().toString();
+//                                    convViewHolder.setName(chatName);
 
-                                            // Sets the name and image fields to those from the database
-                                            convViewHolder.setName(userName);
-                                            convViewHolder.setUserImage(userThumb, getContext());
-
-                                            // Get the online status of the user and set the online indicator accordingly
-                                            String userOnline = dataSnapshot.child("online").getValue().toString();
-                                            convViewHolder.setUserOnline(userOnline);
-
-                                            // Whenever a conversation is clicked, it should lead to that chat
-                                            convViewHolder.mView.setOnClickListener(new View.OnClickListener() {
+                                // Reference to all of the members in the conversation
+                                mMembersDatabase = FirebaseDatabase.getInstance().getReference().child("Chats").child(list_chat_id).child("members");
+                                mMembersDatabase.addChildEventListener(new ChildEventListener() {
+                                    @Override
+                                    public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                                        // Gets the id of each member
+                                        final String memberId = dataSnapshot.getKey();
+                                        // Checks if that member is not the current user
+                                        if (!memberId.equals(mCurrent_user_id)) {
+                                            // Goes to the Users reference for that specific user
+                                            mUsersDatabase.child(memberId).addValueEventListener(new ValueEventListener() {
                                                 @Override
-                                                public void onClick(View view) {
-                                                    Intent chatIntent = new Intent(getContext(), ChatActivity.class);
-                                                    chatIntent.putExtra("chat_id", list_chat_id);
-                                                    chatIntent.putExtra("chat_type", type);
-                                                    chatIntent.putExtra("user_id", memberId);
-                                                    chatIntent.putExtra("user_name", userName);
-                                                    startActivity(chatIntent);
+                                                public void onDataChange(DataSnapshot dataSnapshot) {
+                                                    // Gets the name and image of the user
+                                                    final String userName = dataSnapshot.child("name").getValue().toString();
+                                                    String userThumb = dataSnapshot.child("thumb_image").getValue().toString();
+
+                                                    // Sets the name and image fields to those from the database
+                                                    if (chatType.equals("direct"))
+                                                        convViewHolder.setName(userName);
+                                                    else convViewHolder.setName(chatName);
+
+                                                    convViewHolder.setUserImage(userThumb, getContext());
+
+                                                    // Get the online status of the user and set the online indicator accordingly
+                                                    String userOnline = dataSnapshot.child("online").getValue().toString();
+                                                    convViewHolder.setUserOnline(userOnline);
+
+                                                    // Whenever a conversation is clicked, it should lead to that chat
+                                                    convViewHolder.mView.setOnClickListener(new View.OnClickListener() {
+                                                        @Override
+                                                        public void onClick(View view) {
+                                                            Intent chatIntent = new Intent(getContext(), ChatActivity.class);
+                                                            chatIntent.putExtra("chat_id", list_chat_id);
+                                                            chatIntent.putExtra("chat_type", chatType);
+                                                            chatIntent.putExtra("chat_name", chatName);
+                                                            chatIntent.putExtra("user_id", memberId);
+                                                            chatIntent.putExtra("user_name", userName);
+                                                            startActivity(chatIntent);
+                                                        }
+                                                    });
                                                 }
+                                                @Override
+                                                public void onCancelled(DatabaseError databaseError) { }
                                             });
                                         }
-                                        @Override
-                                        public void onCancelled(DatabaseError databaseError) { }
-                                    });
-                                }
+                                    }
+                                    @Override
+                                    public void onChildChanged(DataSnapshot dataSnapshot, String s) { }
+                                    @Override
+                                    public void onChildRemoved(DataSnapshot dataSnapshot) { }
+                                    @Override
+                                    public void onChildMoved(DataSnapshot dataSnapshot, String s) { }
+                                    @Override
+                                    public void onCancelled(DatabaseError databaseError) { }
+                                });
+
+
                             }
-                            @Override
-                            public void onChildChanged(DataSnapshot dataSnapshot, String s) { }
-                            @Override
-                            public void onChildRemoved(DataSnapshot dataSnapshot) { }
-                            @Override
-                            public void onChildMoved(DataSnapshot dataSnapshot, String s) { }
                             @Override
                             public void onCancelled(DatabaseError databaseError) { }
                         });
+
+
+
+
+
                     }
                     @Override
                     public void onCancelled(DatabaseError databaseError) { }

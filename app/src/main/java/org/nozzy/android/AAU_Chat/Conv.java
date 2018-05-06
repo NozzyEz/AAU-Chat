@@ -5,13 +5,15 @@ package org.nozzy.android.AAU_Chat;
 public class Conv {
 
     public String type;
+    public Long timestamp;
 
     public Conv(){
 
     }
 
-    public Conv(String type) {
+    public Conv(String type, Long timestamp) {
         this.type = type;
+        this.timestamp = timestamp;
     }
 
     public String getType() {
@@ -20,5 +22,13 @@ public class Conv {
 
     public void setType(String type) {
         this.type = type;
+    }
+
+    public Long getTimestamp() {
+        return timestamp;
+    }
+
+    public void setTimestamp(Long timestamp) {
+        this.timestamp = timestamp;
     }
 }

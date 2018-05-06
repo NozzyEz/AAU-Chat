@@ -21,6 +21,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ServerValue;
 import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.NetworkPolicy;
@@ -161,18 +162,22 @@ public class FriendsFragment extends Fragment {
         DatabaseReference chat_push = mRootRef.child("Chats").push();
         final String push_id = chat_push.getKey();
 
-        // Adding the chat to the Users table
+        // Adding the chat with type and timestamp to the Users table
         mRootRef.child("Users").child(mCurrent_user_id).child("chats").child(push_id).child("type").setValue("direct");
+        mRootRef.child("Users").child(mCurrent_user_id).child("chats").child(push_id).child("timestamp").setValue(ServerValue.TIMESTAMP);
         mRootRef.child("Users").child(list_user_id).child("chats").child(push_id).child("type").setValue("direct");
+        mRootRef.child("Users").child(list_user_id).child("chats").child(push_id).child("timestamp").setValue(ServerValue.TIMESTAMP);
 
-        // Creating the chat in the Chats table with members
+        // Creating the chat in the Chats table with members and name
         mRootRef.child("Chats").child(push_id).child("members").child(mCurrent_user_id).setValue("user");
         mRootRef.child("Chats").child(push_id).child("members").child(list_user_id).setValue("user");
+        mRootRef.child("Chats").child(push_id).child("chatName").setValue("New Chat");
 
         // Passing variables and starting ChatActivity
         Intent chatIntent = new Intent(getContext(), ChatActivity.class);
         chatIntent.putExtra("chat_id", push_id);
         chatIntent.putExtra("chat_type", "direct");
+        chatIntent.putExtra("chat_name", "New Chat");
         chatIntent.putExtra("user_id", list_user_id);
         chatIntent.putExtra("user_name", userName);
         startActivity(chatIntent);

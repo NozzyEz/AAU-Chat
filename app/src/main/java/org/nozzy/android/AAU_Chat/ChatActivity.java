@@ -64,6 +64,7 @@ public class ChatActivity extends AppCompatActivity {
     // ID and type of the chat
     private String mChatID;
     private String mChatType;
+    private String mChatName;
 
     private DatabaseReference mRootRef;
     private StorageReference mImageStorage;
@@ -117,6 +118,7 @@ public class ChatActivity extends AppCompatActivity {
         mDirectUserName = getIntent().getStringExtra("user_name");
         mChatID = getIntent().getStringExtra("chat_id");
         mChatType = getIntent().getStringExtra("chat_type");
+        mChatName = getIntent().getStringExtra("chat_name");
 
         // Setting up the UI
         mChatToolbar = findViewById(R.id.chat_app_bar);
@@ -153,6 +155,7 @@ public class ChatActivity extends AppCompatActivity {
         // If the chat type is direct, set the title of the conversation to the other user
         if (mChatType.equals("direct"))
             mTitleView.setText(mDirectUserName);
+        else mTitleView.setText(mChatName);
 
         // Loads the first messages
         loadMessages();
@@ -309,6 +312,9 @@ public class ChatActivity extends AppCompatActivity {
                                 }
                             }
                         });
+
+                        // Updates the chat's timestamp for each user
+                        updateChatTimestamp();
                     }
                 }
             });
@@ -450,6 +456,9 @@ public class ChatActivity extends AppCompatActivity {
                     }
                 }
             });
+
+            // Updates the chat's timestamp for each user
+            updateChatTimestamp();
         }
     }
 
@@ -476,4 +485,30 @@ public class ChatActivity extends AppCompatActivity {
             mRootRef.child("Users").child(mCurrentUserID).child("online").setValue(ServerValue.TIMESTAMP);
         }
     }
+
+    // Method used for updating the chat's timestamp for each user
+    private void updateChatTimestamp() {
+        // Reference for getting members
+        DatabaseReference membersRef = mRootRef.child("Chats").child(mChatID).child("members");
+
+        // For each user, update this chat's timestamp value
+        membersRef.addChildEventListener(new ChildEventListener() {
+            @Override
+            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                // Gets the ID of each user
+                String userID = dataSnapshot.getKey();
+                // Updates the timestamp value representing recent activity
+                mRootRef.child("Users").child(userID).child("chats").child(mChatID).child("timestamp").setValue(ServerValue.TIMESTAMP);
+            }
+            @Override
+            public void onChildChanged(DataSnapshot dataSnapshot, String s) { }
+            @Override
+            public void onChildRemoved(DataSnapshot dataSnapshot) { }
+            @Override
+            public void onChildMoved(DataSnapshot dataSnapshot, String s) { }
+            @Override
+            public void onCancelled(DatabaseError databaseError) { }
+        });
+    }
+
 }
