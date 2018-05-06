@@ -25,16 +25,18 @@ import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
 
-
 import de.hdodenhof.circleimageview.CircleImageView;
 
 
 /**
  * A simple {@link Fragment} subclass.
  */
-public class ChatsFragment extends Fragment {
+public class ChatsFragment extends BaseFragment {
 
     private RecyclerView mConvList;
+
+    private static final String TAG = ChatsFragment.class.getSimpleName();
+
 
     private DatabaseReference mConvDatabase;
     private DatabaseReference mMessageDatabase;
@@ -51,6 +53,19 @@ public class ChatsFragment extends Fragment {
         // Required empty public constructor
     }
 
+    @Override
+    protected int getCurrentFragmentLayout() {
+        return R.layout.fragment_requests;
+    }
+    public static String getFragmentTag() {
+        return TAG;
+    }
+
+    @Override
+    public String getFragmentTitle() {
+        return "Requests";
+    }
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -58,7 +73,7 @@ public class ChatsFragment extends Fragment {
 
         mMainView = inflater.inflate(R.layout.fragment_chats, container, false);
 
-        mConvList = (RecyclerView) mMainView.findViewById(R.id.conv_list);
+        mConvList = mMainView.findViewById(R.id.conv_list);
         mAuth = FirebaseAuth.getInstance();
 
         mCurrent_user_id = mAuth.getCurrentUser().getUid();
@@ -194,7 +209,7 @@ public class ChatsFragment extends Fragment {
 
         public void setMessage(String message, boolean isSeen){
 
-            TextView userStatusView = (TextView) mView.findViewById(R.id.user_single_status);
+            TextView userStatusView = mView.findViewById(R.id.user_single_status);
             userStatusView.setText(message);
 
             if(!isSeen){
@@ -207,21 +222,21 @@ public class ChatsFragment extends Fragment {
 
         public void setName(String name){
 
-            TextView userNameView = (TextView) mView.findViewById(R.id.user_single_name);
+            TextView userNameView = mView.findViewById(R.id.user_single_name);
             userNameView.setText(name);
 
         }
 
         public void setUserImage(String thumb_image, Context ctx){
 
-            CircleImageView userImageView = (CircleImageView) mView.findViewById(R.id.user_single_image);
+            CircleImageView userImageView = mView.findViewById(R.id.user_single_image);
             Picasso.with(ctx).load(thumb_image).placeholder(R.drawable.generic).into(userImageView);
 
         }
 
         public void setUserOnline(String online_status) {
 
-            ImageView userOnlineView = (ImageView) mView.findViewById(R.id.user_online_indicator);
+            ImageView userOnlineView = mView.findViewById(R.id.user_online_indicator);
 
             if(online_status.equals("true")){
 

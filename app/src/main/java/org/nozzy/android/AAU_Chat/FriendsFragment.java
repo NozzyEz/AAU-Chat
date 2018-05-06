@@ -33,7 +33,7 @@ import de.hdodenhof.circleimageview.CircleImageView;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class FriendsFragment extends Fragment {
+public class FriendsFragment extends BaseFragment {
 
     // UI
     private RecyclerView mFriendsList;
@@ -49,6 +49,23 @@ public class FriendsFragment extends Fragment {
     public FriendsFragment() {
         // Required empty public constructor
     }
+
+    private static final String TAG = FriendsFragment.class.getSimpleName();
+
+
+    @Override
+    public String getFragmentTitle() {
+        return "Friends";
+    }
+
+    @Override
+    protected int getCurrentFragmentLayout() {
+        return R.layout.fragment_friends;
+    }
+    public static String getFragmentTag() {
+        return TAG;
+    }
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {

@@ -1,16 +1,17 @@
 package org.nozzy.android.AAU_Chat;
 
 import android.content.Intent;
+import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.TabLayout;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -37,10 +38,14 @@ public class MainActivity extends AppCompatActivity {
 
     private TabLayout mTabLayout;
 
+    private BaseFragment currentFragment;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        changeContentFragment(getSupportFragmentManager(), RequestsFragment.getFragmentTag(),new RequestsFragment(),R.id.flFragmentsContainer,false);
+
 
         // Get the current instance of our authentication system
         mAuth = FirebaseAuth.getInstance();
@@ -66,12 +71,12 @@ public class MainActivity extends AppCompatActivity {
         }
 
         // Setting up our tabs
-        mViewPager = findViewById(R.id.main_tabpager);
-        mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
+        //mViewPager = findViewById(R.id.main_tabpager);
+        //mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
 
-        mViewPager.setAdapter(mSectionsPagerAdapter);
-        mTabLayout = findViewById(R.id.main_tabs);
-        mTabLayout.setupWithViewPager(mViewPager);
+        //mViewPager.setAdapter(mSectionsPagerAdapter);
+        //mTabLayout = findViewById(R.id.main_tabs);
+        //mTabLayout.setupWithViewPager(mViewPager);
 
     }
 
@@ -165,12 +170,40 @@ public class MainActivity extends AppCompatActivity {
                 FirebaseAuth.getInstance().signOut();
                 sendToStart();
                 break;
+            case R.id.main_requests:
+                changeContentFragment(getSupportFragmentManager(), RequestsFragment.getFragmentTag(),new RequestsFragment(),R.id.flFragmentsContainer,false);
+                break;
+            case R.id.main_chats:
+                changeContentFragment(getSupportFragmentManager(), ChatsFragment.getFragmentTag(),new ChatsFragment(),R.id.flFragmentsContainer,false);
+                break;
+            case R.id.main_friends:
+                changeContentFragment(getSupportFragmentManager(), FriendsFragment.getFragmentTag(),new FriendsFragment(),R.id.flFragmentsContainer,false);
+                break;
+
             default:
                 break;
 
         }
 
         return true;
+    }
+
+
+
+    public void changeContentFragment(FragmentManager fm, String fragmentTag, BaseFragment frag, int containerId, boolean shouldAddToBackStack) {
+
+        // Check fragment manager to see if fragment exists
+        currentFragment = fm.popBackStackImmediate(fragmentTag, 0)
+                ? (BaseFragment) fm.findFragmentByTag(fragmentTag)
+                : frag;
+
+        FragmentTransaction transaction = fm.beginTransaction();
+        transaction.replace(containerId, frag, fragmentTag);
+        if (shouldAddToBackStack) {
+            transaction.addToBackStack(fragmentTag);
+        }
+
+        transaction.commitAllowingStateLoss();
     }
 }
 
