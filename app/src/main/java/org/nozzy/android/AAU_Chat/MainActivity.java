@@ -153,23 +153,16 @@ public class MainActivity extends AppCompatActivity {
 
         switch (item.getItemId()) {
             // If the Account Settings button was pressed, go to the SettingsActivity
-            case R.id.main_settings_btn:
-                Intent settingsIntent = new Intent(MainActivity.this, SettingsActivity.class);
-                startActivity(settingsIntent);
-                break;
-            // If the All Users button was pressed, go to the UsersActivity
-            case R.id.main_users_btn:
-                Intent usersIntent = new Intent(MainActivity.this, UsersActivity.class);
-                startActivity(usersIntent);
-                break;
+//            case R.id.main_settings_btn:
+//                Intent settingsIntent = new Intent(MainActivity.this, SettingsActivity.class);
+//                startActivity(settingsIntent);
+//                break;
+//            // If the All Users button was pressed, go to the UsersActivity
+//            case R.id.main_users_btn:
+//                Intent usersIntent = new Intent(MainActivity.this, UsersActivity.class);
+//                startActivity(usersIntent);
+//                break;
             // If the Log Out button was pressed, log the user out and go to the StartActivity
-            case R.id.main_logout_btn:
-                if (mAuth.getCurrentUser() != null) {
-                    mUserRef.child("online").setValue(ServerValue.TIMESTAMP);
-                }
-                FirebaseAuth.getInstance().signOut();
-                sendToStart();
-                break;
             case R.id.main_settings:
                 changeContentFragment(getSupportFragmentManager(), SettingsFragment.getFragmentTag(),new SettingsFragment(),R.id.flFragmentsContainer,false);
                 break;
@@ -178,6 +171,16 @@ public class MainActivity extends AppCompatActivity {
                 break;
             case R.id.main_friends:
                 changeContentFragment(getSupportFragmentManager(), FriendsFragment.getFragmentTag(),new FriendsFragment(),R.id.flFragmentsContainer,false);
+                break;
+            case R.id.main_users:
+                changeContentFragment(getSupportFragmentManager(), UsersFragment.getFragmentTag(),new UsersFragment(),R.id.flFragmentsContainer,false);
+                break;
+            case R.id.main_logout_btn:
+                if (mAuth.getCurrentUser() != null) {
+                    mUserRef.child("online").setValue(ServerValue.TIMESTAMP);
+                }
+                FirebaseAuth.getInstance().signOut();
+                sendToStart();
                 break;
 
             default:
