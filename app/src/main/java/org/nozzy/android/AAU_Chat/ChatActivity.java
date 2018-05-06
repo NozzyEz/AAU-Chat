@@ -59,6 +59,7 @@ public class ChatActivity extends AppCompatActivity {
     // ID and name of the user being chatted with
     private String mChatUser;
     private String mUserName;
+    private String mChatID;
 
     private DatabaseReference mRootRef;
     private StorageReference mImageStorage;
@@ -116,6 +117,7 @@ public class ChatActivity extends AppCompatActivity {
 
         mChatUser = getIntent().getStringExtra("user_id");
         mUserName = getIntent().getStringExtra("user_name");
+        mChatID = getIntent().getStringExtra("chat_id");
 
         LayoutInflater inflater = (LayoutInflater) this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View action_bar_view = inflater.inflate(R.layout.chat_custom_bar, null);

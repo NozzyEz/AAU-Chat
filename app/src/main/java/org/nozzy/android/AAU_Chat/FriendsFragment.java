@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -26,6 +27,9 @@ import com.squareup.picasso.Callback;
 import com.squareup.picasso.NetworkPolicy;
 import com.squareup.picasso.Picasso;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import de.hdodenhof.circleimageview.CircleImageView;
 
 
@@ -41,6 +45,7 @@ public class FriendsFragment extends Fragment {
     private View mMainView;
 
     // Firebase
+    private DatabaseReference mRootRef;
     private DatabaseReference mFriendsDatabase;
     private DatabaseReference mUsersDatabase;
     private FirebaseAuth mAuth;
@@ -152,10 +157,28 @@ public class FriendsFragment extends Fragment {
     }
 
     // Sends the user to the ChatActivity where they can chat with the selected friend
+    // Creates a chat room with the user
     private void sendToChat(String list_user_id, String userName) {
+
+        //-----//
+        // Generates chat ID
+        mRootRef = FirebaseDatabase.getInstance().getReference();
+        DatabaseReference chat_push = mRootRef.child("Chats").push();
+        final String push_id = chat_push.getKey();
+
+        // Adding the chat to the Users table
+        mRootRef.child("Users").child(mCurrent_user_id).child("chats").child(push_id).child("type").setValue("direct");
+        mRootRef.child("Users").child(list_user_id).child("chats").child(push_id).child("type").setValue("direct");
+
+        // Creating the chat in the Chats table with members
+        mRootRef.child("Chats").child(push_id).child("members").child(mCurrent_user_id).setValue("user");
+        mRootRef.child("Chats").child(push_id).child("members").child(list_user_id).setValue("user");
+        //-----//
+
         Intent chatIntent = new Intent(getContext(), ChatActivity.class);
         chatIntent.putExtra("user_id", list_user_id);
         chatIntent.putExtra("user_name", userName);
+        chatIntent.putExtra("chat_id", push_id);
         startActivity(chatIntent);
     }
 
