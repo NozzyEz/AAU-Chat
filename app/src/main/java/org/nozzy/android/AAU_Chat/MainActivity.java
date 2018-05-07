@@ -4,16 +4,14 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
-import android.support.design.widget.TabLayout;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v4.view.ViewPager;
+import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.view.Menu;
 import android.view.MenuItem;
 
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -34,12 +32,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private FirebaseAuth mAuth;
     private Toolbar toolbar;
 
-    private ViewPager mViewPager;
-    private SectionsPagerAdapter mSectionsPagerAdapter;
+//    private ViewPager mViewPager;
+//    private SectionsPagerAdapter mSectionsPagerAdapter;
 
     private DatabaseReference mUserRef;
 
-    private TabLayout mTabLayout;
+  //  private TabLayout mTabLayout;
 
     private BaseFragment currentFragment;
 
@@ -150,65 +148,65 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         finish();
     }
 
-    @Override
-    // Inflating our options menu in the toolbar
-    public boolean onCreateOptionsMenu(Menu menu) {
-        super.onCreateOptionsMenu(menu);
-        getMenuInflater().inflate(R.menu.main_menu, menu);
+//    @Override
+//    // Inflating our options menu in the toolbar
+//    public boolean onCreateOptionsMenu(Menu menu) {
+//        super.onCreateOptionsMenu(menu);
+//        getMenuInflater().inflate(R.menu.main_menu, menu);
+//
+//        return true;
+//    }
 
-        return true;
-    }
-
-    @Override
-    // After inflation of the options menu, we use a switch statement to determine which option the
-    // user selects, and depending on which one, we act accordingly
-    public boolean onOptionsItemSelected(MenuItem item) {
-        super.onOptionsItemSelected(item);
-
-        switch (item.getItemId()) {
-            // If the Account Settings button was pressed, go to the SettingsActivity
-//            case R.id.main_settings_btn:
-//                Intent settingsIntent = new Intent(MainActivity.this, SettingsActivity.class);
-//                startActivity(settingsIntent);
+//    @Override
+//    // After inflation of the options menu, we use a switch statement to determine which option the
+//    // user selects, and depending on which one, we act accordingly
+//    public boolean onOptionsItemSelected(MenuItem item) {
+//        super.onOptionsItemSelected(item);
+//
+//        switch (item.getItemId()) {
+//            // If the Account Settings button was pressed, go to the SettingsActivity
+////            case R.id.main_settings_btn:
+////                Intent settingsIntent = new Intent(MainActivity.this, SettingsActivity.class);
+////                startActivity(settingsIntent);
+////                break;
+////            // If the All Users button was pressed, go to the UsersActivity
+////            case R.id.main_users_btn:
+////                Intent usersIntent = new Intent(MainActivity.this, UsersActivity.class);
+////                startActivity(usersIntent);
+////                break;
+//            // If the Log Out button was pressed, log the user out and go to the StartActivity
+//            case R.id.main_settings:
+//                changeContentFragment(getSupportFragmentManager(), SettingsFragment.getFragmentTag(),new SettingsFragment(),R.id.flFragmentsContainer,false);
 //                break;
-//            // If the All Users button was pressed, go to the UsersActivity
-//            case R.id.main_users_btn:
-//                Intent usersIntent = new Intent(MainActivity.this, UsersActivity.class);
-//                startActivity(usersIntent);
+//            case R.id.main_chats:
+//                changeContentFragment(getSupportFragmentManager(), ChatsFragment.getFragmentTag(),new ChatsFragment(),R.id.flFragmentsContainer,false);
 //                break;
-            // If the Log Out button was pressed, log the user out and go to the StartActivity
-            case R.id.main_settings:
-                changeContentFragment(getSupportFragmentManager(), SettingsFragment.getFragmentTag(),new SettingsFragment(),R.id.flFragmentsContainer,false);
-                break;
-            case R.id.main_chats:
-                changeContentFragment(getSupportFragmentManager(), ChatsFragment.getFragmentTag(),new ChatsFragment(),R.id.flFragmentsContainer,false);
-                break;
-            case R.id.main_friends:
-                changeContentFragment(getSupportFragmentManager(), FriendsFragment.getFragmentTag(),new FriendsFragment(),R.id.flFragmentsContainer,false);
-                break;
-            case R.id.main_users:
-                changeContentFragment(getSupportFragmentManager(), UsersFragment.getFragmentTag(),new UsersFragment(),R.id.flFragmentsContainer,false);
-                break;
-            case R.id.main_logout_btn:
-                if (mAuth.getCurrentUser() != null) {
-                    mUserRef.child("online").setValue(ServerValue.TIMESTAMP);
-                }
-                FirebaseAuth.getInstance().signOut();
-                sendToStart();
-                break;
+//            case R.id.main_friends:
+//                changeContentFragment(getSupportFragmentManager(), FriendsFragment.getFragmentTag(),new FriendsFragment(),R.id.flFragmentsContainer,false);
+//                break;
+//            case R.id.main_users:
+//                changeContentFragment(getSupportFragmentManager(), UsersFragment.getFragmentTag(),new UsersFragment(),R.id.flFragmentsContainer,false);
+//                break;
+//            case R.id.main_logout_btn:
+//                if (mAuth.getCurrentUser() != null) {
+//                    mUserRef.child("online").setValue(ServerValue.TIMESTAMP);
+//                }
+//                FirebaseAuth.getInstance().signOut();
+//                sendToStart();
+//                break;
+//
+//            default:
+//                break;
+//
+//        }
+//
+//        return true;
+//    }
 
-            default:
-                break;
-
-        }
-
-        return true;
-    }
-
-    @Override
-    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-        return false;
-    }
+//    @Override
+//    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+//        return false;
+//    }
     public void changeContentFragment(FragmentManager fm, String fragmentTag, BaseFragment frag, int containerId, boolean shouldAddToBackStack) {
 
         // Check fragment manager to see if fragment exists
@@ -223,6 +221,31 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
 
         transaction.commitAllowingStateLoss();
+    }
+    @Override
+    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+        // Handle navigation view item clicks here.
+        int id = item.getItemId();
+
+        if (id == R.id.email_burger_menu) {
+            changeContentFragment(getSupportFragmentManager(), FriendsFragment.getFragmentTag(),new FriendsFragment(),R.id.flFragmentsContainer,false);
+        } else if (id == R.id.all_users_burger_menu) {
+            changeContentFragment(getSupportFragmentManager(), UsersFragment.getFragmentTag(),new UsersFragment(),R.id.flFragmentsContainer,false);
+        } else if (id == R.id.chats_burger_menu) {
+            changeContentFragment(getSupportFragmentManager(), ChatsFragment.getFragmentTag(),new ChatsFragment(),R.id.flFragmentsContainer,false);
+        } else if (id == R.id.settings_profile_burger_menu) {
+            changeContentFragment(getSupportFragmentManager(), SettingsFragment.getFragmentTag(),new SettingsFragment(),R.id.flFragmentsContainer,false);
+        } else if (id == R.id.log_out_burger_menu) {
+            if (mAuth.getCurrentUser() != null) {
+                mUserRef.child("online").setValue(ServerValue.TIMESTAMP);
+            }
+            FirebaseAuth.getInstance().signOut();
+            sendToStart();
+        }
+
+        DrawerLayout drawer = findViewById(R.id.drawer_layout);
+        drawer.closeDrawer(GravityCompat.START);
+        return true;
     }
 }
 
