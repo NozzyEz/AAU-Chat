@@ -56,7 +56,7 @@ public class NotificationHelper extends ContextWrapper{
     }
 
     // This is how the actual notification is set up
-    public NotificationCompat.Builder getChannnel1Notification(String title, String message, String click_action, String from_user_id) {
+    public NotificationCompat.Builder getChannel1Notification(String title, String message, String click_action, String from_user_id) {
 
         // Here we create an intent to send the user to the profile activity of whom sent them a request
         Intent resultIntent = new Intent(click_action);

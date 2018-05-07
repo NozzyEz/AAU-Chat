@@ -87,7 +87,6 @@ public class ChatActivity extends AppCompatActivity {
     private static final int  TOTAL_ITEMS_TO_LOAD = 10;
     private int itemPos = 0;
     private String mLastKey = "";
-    private String mPreviousLastKey = "";
 
     // Variable for detecting a gallery pick result
     private static final int GALLERY_PICK = 1;
@@ -183,7 +182,7 @@ public class ChatActivity extends AppCompatActivity {
             public void onCancelled(DatabaseError databaseError) { }
         });
 
-        // Adds a listener to the Chat of the current user
+        // Adds a listener to the Chat of the current user for creating the chat if it doesn't exist
         mRootRef.child("Chat").child(mCurrentUserID).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -262,11 +261,9 @@ public class ChatActivity extends AppCompatActivity {
             final String current_user_ref = "Messages/" + mCurrentUserID + "/" + mChatUser;
             final String chat_user_ref = "Messages/" + mChatUser + "/" + mCurrentUserID;
 
+            // Gets the semi-random key of the message
             DatabaseReference user_message_push = mRootRef.child("Messages").child(mCurrentUserID).child(mChatUser).push();
-
             final String push_id = user_message_push.getKey();
-
-            // StorageReference filepath = mImageStorage.child("message_images").child(push_id + ".jpg");
 
             // Gets the result from the image cropper activity
             CropImage.ActivityResult result = CropImage.getActivityResult(data);
@@ -303,12 +300,11 @@ public class ChatActivity extends AppCompatActivity {
             uploadTask.addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
                 @Override
                 public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
-                    // And in it's onCompleteListener we retrieve the URL of the image if the task was successful
+                    // And in its onCompleteListener we retrieve the URL of the image if the task was successful
                     if (task.isSuccessful()) {
-
                         String download_url = task.getResult().getDownloadUrl().toString();
 
-                        // which we then store in the database entry for the message that is being sent
+                        // Which we then store in the database entry for the message that is being sent
                         Map messageMap = new HashMap();
                         messageMap.put("message", download_url);
                         messageMap.put("seen", false);
@@ -316,16 +312,16 @@ public class ChatActivity extends AppCompatActivity {
                         messageMap.put("time", ServerValue.TIMESTAMP);
                         messageMap.put("from", mCurrentUserID);
 
+                        // Put an instance of the message for both users
                         Map messageUserMap = new HashMap();
                         messageUserMap.put(current_user_ref + "/" + push_id, messageMap);
                         messageUserMap.put(chat_user_ref + "/" + push_id, messageMap);
 
-                        mChatMessageView.setText("");
-
+                        // Attempts to store all data in the database
                         mRootRef.updateChildren(messageUserMap, new DatabaseReference.CompletionListener() {
                             @Override
                             public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
-
+                                // If there is an error, output it into the log
                                 if (databaseError != null) {
                                     Log.d("CHAT_LOG", databaseError.getMessage().toString());
                                 }
@@ -335,7 +331,6 @@ public class ChatActivity extends AppCompatActivity {
                 }
             });
         }
-
     }
 
     // Method for loading in older messages when refreshing
@@ -357,18 +352,15 @@ public class ChatActivity extends AppCompatActivity {
                 Messages message = dataSnapshot.getValue(Messages.class);
                 String messageKey = dataSnapshot.getKey();
 
-                if (!mPreviousLastKey.equals(messageKey)) {
-                    // Add the message to position itemPos and increment it
-                    messagesList.add(itemPos++, message);
-
-                } else {
-                    mPreviousLastKey = mLastKey;
+                // If it's the first message, set the new last key to that message's key
+                // Note - this does not affect the current query which goes until the last key, only the next one
+                if (itemPos == 0) {
+                    mLastKey = messageKey;
                 }
 
-                if (itemPos == 1) {
-
-                    mLastKey = messageKey;
-
+                // Loads the message if it's not the last one (since that one is already on the screen)
+                if (itemPos != TOTAL_ITEMS_TO_LOAD) {
+                    messagesList.add(itemPos++, message);
                 }
 
                 mAdapter.notifyDataSetChanged();
@@ -395,6 +387,7 @@ public class ChatActivity extends AppCompatActivity {
 
         DatabaseReference messageRef = mRootRef.child("Messages").child(mCurrentUserID).child(mChatUser);
 
+        // A query to load the last 10 messages, from the oldest to the newest one
         Query messageQuery = messageRef.limitToLast(TOTAL_ITEMS_TO_LOAD);
 
         // Adds a listener to messages
@@ -402,17 +395,16 @@ public class ChatActivity extends AppCompatActivity {
             @Override
             // Triggers whenever a new message is added
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-
                 Messages message = dataSnapshot.getValue(Messages.class);
 
+                // Increment the position
                 itemPos++;
 
+                // If it's the first (oldest) message in that set
                 if (itemPos == 1) {
-
+                    // Set the last key to that message's key
                     String messageKey = dataSnapshot.getKey();
                     mLastKey = messageKey;
-                    mPreviousLastKey = messageKey;
-
                 }
                 // Adds the new message to the list
                 messagesList.add(message);
@@ -423,7 +415,6 @@ public class ChatActivity extends AppCompatActivity {
 
                 // Stops the refreshing
                 mRefreshLayout.setRefreshing(false);
-
             }
 
             @Override
@@ -441,17 +432,21 @@ public class ChatActivity extends AppCompatActivity {
     // Method for sending a simple text message
     private void sendMessage() {
 
+        // Gets the message text
         String message = mChatMessageView.getText().toString();
-
+        // Checks if the message isn't empty
         if (!TextUtils.isEmpty(message)) {
-
+            // References to the Messages table in the database
             String current_user_ref = "Messages/" + mCurrentUserID + "/" + mChatUser;
             String chat_user_ref = "Messages/" + mChatUser + "/" + mCurrentUserID;
-            String notification_ref = "Notifications/" + mChatUser;
+            String current_update_ref = "Chat/" + mCurrentUserID + "/" + mChatUser;
+            String chat_update_ref = "Chat/" + mChatUser + "/" + mCurrentUserID;
 
+            // Gets the ID of the message itself (pushing gives a random value)
             DatabaseReference user_message_push = mRootRef.child("Messages").child(mCurrentUserID).child(mChatUser).push();
             String push_id = user_message_push.getKey();
 
+            // A hashmap for storing a message
             Map messageMap = new HashMap();
             messageMap.put("message", message);
             messageMap.put("seen", false);
@@ -459,21 +454,26 @@ public class ChatActivity extends AppCompatActivity {
             messageMap.put("time", ServerValue.TIMESTAMP);
             messageMap.put("from", mCurrentUserID);
 
-            Map notificationMap = new HashMap();
-            notificationMap.put("from", mCurrentUserID);
-            notificationMap.put("type", "message");
+            // A hashmap for updating the timestamp value
+            Map updateChatMap = new HashMap();
+            updateChatMap.put("seen", false);
+            updateChatMap.put("timestamp", ServerValue.TIMESTAMP);
 
+            // A hashmap for storing two instances of this message -
+            // One for the current user, another one - for the user being chatted with
             Map messageUserMap = new HashMap();
             messageUserMap.put(current_user_ref + "/" + push_id, messageMap);
             messageUserMap.put(chat_user_ref + "/" + push_id, messageMap);
-            messageUserMap.put(notification_ref + "/" + push_id, notificationMap);
+            messageUserMap.put(current_update_ref, updateChatMap);
+            messageUserMap.put(chat_update_ref, updateChatMap);
 
+            // Refreshes the text window to be empty
             mChatMessageView.setText("");
 
+            // Attempts to put all data into the database
             mRootRef.updateChildren(messageUserMap, new DatabaseReference.CompletionListener() {
                 @Override
                 public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
-
                     if (databaseError != null) {
                         Log.d("CHAT_LOG", databaseError.getMessage());
                     }

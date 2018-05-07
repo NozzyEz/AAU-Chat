@@ -55,9 +55,5 @@ public class AAUChat extends Application {
             });
 
         }
-
-
     }
-
-
 }
