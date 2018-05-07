@@ -20,4 +20,6 @@
     <string name="accept_friend_req">Accept Friend Request</string>
     <string name="unfriend">Unfriend this person</string>
     <string name="enter_message">Enter Message…</string>
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
 </resources>
