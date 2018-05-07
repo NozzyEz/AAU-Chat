@@ -100,29 +100,32 @@ public class ChatsFragment extends Fragment {
                 // Gets the id of the chat
                 final String list_chat_id = getRef(i).getKey();
 
-
                 // Database reference to the messages
-//                mMessageDatabase = FirebaseDatabase.getInstance().getReference().child("Chats").child(list_chat_id).child("messages");
+                mMessageDatabase = FirebaseDatabase.getInstance().getReference().child("Chats").child(list_chat_id).child("messages");
 
+                // By default, the message box will say that there are no messages
+                // This gets replaced by the following query which tries to get the last message
+                convViewHolder.setMessage("No messages yet.");
+                
                 // Query to get the last message in a conversation
-//                Query lastMessageQuery = mMessageDatabase.limitToLast(1);
-//                lastMessageQuery.addChildEventListener(new ChildEventListener() {
-//                    @Override
-//                    public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-//                        // Gets the last message and puts it into the RecyclerView
-//                        String data = dataSnapshot.child("message").getValue().toString();
-//                        convViewHolder.setMessage(data);
-//                    }
-//                    @Override
-//                    public void onChildChanged(DataSnapshot dataSnapshot, String s) { }
-//                    @Override
-//                    public void onChildRemoved(DataSnapshot dataSnapshot) { }
-//                    @Override
-//                    public void onChildMoved(DataSnapshot dataSnapshot, String s) { }
-//                    @Override
-//                    public void onCancelled(DatabaseError databaseError) { }
-//                });
+                Query lastMessageQuery = mMessageDatabase.limitToLast(1);
+                lastMessageQuery.addChildEventListener(new ChildEventListener() {
+                    @Override
+                    public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                        // Gets the last message and puts it into the RecyclerView
+                        String message = dataSnapshot.child("message").getValue().toString();
+                        convViewHolder.setMessage(message);
 
+                    }
+                    @Override
+                    public void onChildChanged(DataSnapshot dataSnapshot, String s) { }
+                    @Override
+                    public void onChildRemoved(DataSnapshot dataSnapshot) { }
+                    @Override
+                    public void onChildMoved(DataSnapshot dataSnapshot, String s) { }
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) { }
+                });
 
                 // Adds a listener to get the type of the chat
                 getRef(i).child("type").addListenerForSingleValueEvent(new ValueEventListener() {
@@ -130,9 +133,6 @@ public class ChatsFragment extends Fragment {
                     public void onDataChange(DataSnapshot dataSnapshot) {
                         // Gets the type of the chat
                         final String chatType = dataSnapshot.getValue(String.class);
-
-                        // Temporary - set the message to the chat ID
-                        convViewHolder.setMessage(list_chat_id);
 
                         // Reference to the chat name
                         DatabaseReference chatNameRef = FirebaseDatabase.getInstance().getReference().child("Chats").child(list_chat_id).child("chatName");

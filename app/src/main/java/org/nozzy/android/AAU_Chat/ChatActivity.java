@@ -93,6 +93,7 @@ public class ChatActivity extends AppCompatActivity {
     private static final int  TOTAL_ITEMS_TO_LOAD = 10;
     private int itemPos = 0;
     private String mLastKey = "";
+    private String mPrevKey = "";
 
     // Variable for detecting a gallery pick result
     private static final int GALLERY_PICK = 1;
@@ -160,7 +161,7 @@ public class ChatActivity extends AppCompatActivity {
         // Loads the first messages
         loadMessages();
 
-        // If the chat is direct
+        // If the chat is direct, sets the image and profile pic at the top accordingly
         if (mChatType.equals("direct")) {
             // Adds a listener to the user being chatted with for setting their current online state
             mRootRef.child("Users").child(mDirectUserID).addValueEventListener(new ValueEventListener() {
@@ -329,7 +330,7 @@ public class ChatActivity extends AppCompatActivity {
 
         // Query for getting the specific 10 messages which end at the oldest currently displayed message
         // Note - actually loads in 11 messages, but the last one is a repeat, so it isn't shown.
-        Query messageQuery = messagesRef.orderByKey().endAt(mLastKey).limitToLast(11);
+        Query messageQuery = messagesRef.orderByKey().endAt(mLastKey).limitToLast(TOTAL_ITEMS_TO_LOAD+1);
 
         // For each of these messages
         messageQuery.addChildEventListener(new ChildEventListener() {
@@ -340,15 +341,18 @@ public class ChatActivity extends AppCompatActivity {
                 Messages message = dataSnapshot.getValue(Messages.class);
                 String messageKey = dataSnapshot.getKey();
 
-                // If it's the first message, set the new last key to that message's key
-                // Note - this does not affect the current query which goes until the last key, only the next one
-                if (itemPos == 0) {
-                    mLastKey = messageKey;
+                // Loads the message if it's not the last one (since that one is already on the screen)
+                if (!messageKey.equals(mPrevKey)) {
+                    messagesList.add(itemPos++, message);
+                } else {
+                    mPrevKey = mLastKey;
                 }
 
-                // Loads the message if it's not the last one (since that one is already on the screen)
-                if (itemPos != TOTAL_ITEMS_TO_LOAD) {
-                    messagesList.add(itemPos++, message);
+                // If it's the first message, set the new last key to that message's key
+                // Note - this does not affect the current query which goes until the last key, only the next one
+                if (itemPos == 1) {
+                    mLastKey = messageKey;
+
                 }
 
                 mAdapter.notifyDataSetChanged();
@@ -386,15 +390,17 @@ public class ChatActivity extends AppCompatActivity {
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                 Messages message = dataSnapshot.getValue(Messages.class);
 
-                // Increment the position
-                itemPos++;
-
                 // If it's the first (oldest) message in that set
-                if (itemPos == 1) {
+                if (itemPos == 0) {
                     // Set the last key to that message's key
                     String messageKey = dataSnapshot.getKey();
                     mLastKey = messageKey;
+                    mPrevKey = messageKey;
                 }
+
+                // Increment the position
+                itemPos++;
+
                 // Adds the new message to the list
                 messagesList.add(message);
                 mAdapter.notifyDataSetChanged();
