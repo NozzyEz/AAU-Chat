@@ -172,7 +172,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
         // And finally we can assign that string to the viewholder's text field
         holder.messageTime.setText(convertedTime);
 
-        // TODO: Check if time is yesterday or more, then show different information to the user
+        // TODO: Check if time is yesterday or more, then show different information to the user.
     }
 
     @Override
