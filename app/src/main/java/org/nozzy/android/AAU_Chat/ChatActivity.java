@@ -130,7 +130,7 @@ public class ChatActivity extends AppCompatActivity {
         mChatSendBtn = findViewById(R.id.chat_send_btn);
         mChatMessageView = findViewById(R.id.chat_message_view);
 
-        mAdapter = new MessageAdapter(messagesList);
+        mAdapter = new MessageAdapter(messagesList, this);
 
         mMessagesList = findViewById(R.id.chat_messages_list);
         mRefreshLayout = findViewById(R.id.message_swipe_layout);
@@ -368,7 +368,7 @@ public class ChatActivity extends AppCompatActivity {
                 // Stops the refreshing from continuing
                 mRefreshLayout.setRefreshing(false);
                 // Scrolls to the bottom of older messages, effectively showing you the first message
-                mLinearLayout.scrollToPositionWithOffset(9,0);
+                mLinearLayout.scrollToPositionWithOffset(10,0);
             }
             @Override
             public void onChildChanged(DataSnapshot dataSnapshot, String s) { }
