@@ -1,7 +1,6 @@
 package org.nozzy.android.AAU_Chat;
 
 import android.content.Intent;
-import android.net.Uri;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -13,28 +12,30 @@ import android.widget.Button;
 
 public class StartActivity extends AppCompatActivity {
 
+    // UI
     private Button mRegBtn;
-    private Button mLogingBtn;
+    private Button mLoggingBtn;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_start);
 
+        // Two buttons in our UI for creating an account or logging in
         mRegBtn = findViewById(R.id.start_reg_button);
-        mLogingBtn = findViewById(R.id.start_login_btn);
+        mLoggingBtn = findViewById(R.id.start_login_btn);
 
+        // The register button starts the RegisterActivity
         mRegBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
                 Intent reg_intent = new Intent(StartActivity.this, RegisterActivity.class);
                 startActivity(reg_intent);
-
             }
         });
 
-        mLogingBtn.setOnClickListener(new View.OnClickListener() {
+        // The log in button starts the LoginActivity
+        mLoggingBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Intent login_intent = new Intent(StartActivity.this, LoginActivity.class);

@@ -160,15 +160,6 @@ public class SettingsActivity extends AppCompatActivity {
                 // Starts the activity with the request code GALLERY_PICK, which is caught in the onActivityResult method
                 startActivityForResult(Intent.createChooser(galleryIntent, "SELECT IMAGE"), GALLERY_PICK);
 
-                // start picker to get image for cropping and then use the image in cropping
-                // activity, this one allows for the user to pick the app they want to use to select the image,
-                // including the camera
-                /*
-                CropImage.activity()
-                        .setGuidelines(CropImageView.Guidelines.ON)
-                        .start(SettingsActivity.this);
-                */
-
             }
         });
     }
@@ -296,12 +287,14 @@ public class SettingsActivity extends AppCompatActivity {
     }
 
     @Override
+    // Sets the online value back to true
     public void onStart() {
         super.onStart();
         mUserDatabase.child("online").setValue("true");
     }
 
     @Override
+    // Sets the online value to the current timestamp if the activity is paused
     protected void onPause() {
         super.onPause();
         mUserDatabase.child("online").setValue(ServerValue.TIMESTAMP);
