@@ -96,7 +96,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     public void onStart() {
         super.onStart();
 
-        // Check if user is signed in (non-null) and update UI accordingly.
+        // Gets the current user
         FirebaseUser currentUser = mAuth.getCurrentUser();
 
         // Checks to see if a user is logged in, if not, send user to the start page for
@@ -104,19 +104,17 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         if (currentUser == null) {
             sendToStart();
         } else {
-
+            // If the user is online, set his online value to true
             mUserRef.child("online").setValue("true");
-
         }
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-
         if (mAuth.getCurrentUser() != null) {
+            // Gets the user ID
             mUserRef = FirebaseDatabase.getInstance().getReference().child("Users").child(mAuth.getCurrentUser().getUid());
-
             // Get the device token from firebase
             String deviceToken = FirebaseInstanceId.getInstance().getToken();
             // And put that token into the current users database entry, so that it is updated whenever the user opens the app
@@ -124,17 +122,17 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 @Override
                 public void onComplete(@NonNull Task<Void> task) {
                     Log.d("string", "onComplete: Works");
-
                 }
             });
         }
     }
 
     @Override
+    // Whenever the app is paused (closed), set the online value to the timestamp corresponding to
+    // the last date the user was online
     protected void onPause() {
         super.onPause();
         FirebaseUser currentUser = mAuth.getCurrentUser();
-
         if (currentUser != null) {
             mUserRef.child("online").setValue(ServerValue.TIMESTAMP);
         }

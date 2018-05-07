@@ -41,7 +41,7 @@ public class ProfileActivity extends AppCompatActivity {
 
     private ProgressDialog mProgressDialog;
 
-    // This time we need two database references, one to fetch profile in, and one to manipulate friend requests
+    // Firebase references to fetch profile in and manipulate friend requests
     private DatabaseReference mUsersDatabase;
     private DatabaseReference mFriendReqDatabase;
     private DatabaseReference mFriendsDatabase;
@@ -50,7 +50,6 @@ public class ProfileActivity extends AppCompatActivity {
 
     // Firebase user so we can get the users uid for sending and receiving friend requests.
     private FirebaseUser mCurrent_user;
-
 
     // The current state which lets us know whether the profile viewed is of a user that is also a friend
     private int mCurrent_state;
@@ -91,7 +90,7 @@ public class ProfileActivity extends AppCompatActivity {
         mDeclineBtn = findViewById(R.id.profile_decline_req_btn);
 
         // Here we set the current state, meaning friends state:
-        // 0 = not friends, 1 = friends, 2 = request sent and pending, 3 = request received
+        // 0 = Not friends, 1 = Friends, 2 = Friend Request sent, 3 = Friend Request received
         mCurrent_state = 0;
         // By default, the Decline button is invisible - it is only used when a request is received
         mDeclineBtn.setVisibility(View.INVISIBLE);
@@ -109,10 +108,12 @@ public class ProfileActivity extends AppCompatActivity {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
 
+                // Gets the current user's name, status and image
                 String display_name = dataSnapshot.child("name").getValue().toString();
                 String status = dataSnapshot.child("status").getValue().toString();
                 final String image = dataSnapshot.child("image").getValue().toString();
 
+                // Sets the name and status in the text fields
                 mProfileName.setText(display_name);
                 mProfileStatus.setText(status);
 
@@ -120,11 +121,10 @@ public class ProfileActivity extends AppCompatActivity {
                 Picasso.with(ProfileActivity.this).load(image).networkPolicy(NetworkPolicy.OFFLINE)
                         .placeholder(R.drawable.generic).into(mProfileImage, new Callback() {
                     @Override
-                    public void onSuccess() {
-
-                    }
+                    public void onSuccess() { }
                     @Override
                     public void onError() {
+                        // If the image fails to load, set it to the default profile image
                         Picasso.with(ProfileActivity.this).load(image).placeholder(R.drawable.generic).into(mProfileImage);
                     }
                 });
@@ -140,25 +140,14 @@ public class ProfileActivity extends AppCompatActivity {
                             String request_type = dataSnapshot.child(profile_id).child("request_type").getValue().toString();
                             if(request_type.equals("received")){
                                 // If the current user has received a friend request from the user being viewed,
-                                // Change the current status to 3
-                                mCurrent_state = 3;
-                                // Set the Request button text to 'Accept Friend Request'
-                                mProfileSendReqBtn.setText(R.string.accept_friend_req);
-                                // Also make the Decline button visible, so the user can decline the received request
-                                mDeclineBtn.setVisibility(View.VISIBLE);
-                                mDeclineBtn.setEnabled(true);
+                                // Sets the current state to "Friend Request received"
+                                setCurrentState(3);
 
                             } else if(request_type.equals("sent")) {
                                 // If the current user has sent a friend request to the user being viewed,
-                                // Change the current status to 2
-                                mCurrent_state = 2;
-                                // Set the Request button text to 'Cancel Friend Request'
-                                mProfileSendReqBtn.setText(R.string.cancel_friend_req);
-                                // Also make the Decline button invisible - nothing to decline
-                                mDeclineBtn.setVisibility(View.INVISIBLE);
-                                mDeclineBtn.setEnabled(false);
+                                // Sets the current state to "Friend Request sent"
+                                setCurrentState(2);
                             }
-
                             mProgressDialog.dismiss();
 
                         } else {
@@ -169,10 +158,8 @@ public class ProfileActivity extends AppCompatActivity {
                                 public void onDataChange(DataSnapshot dataSnapshot) {
                                     if (dataSnapshot.hasChild(profile_id)) {
                                         // If the current user is already friends with the user being viewed,
-                                        // Change the current status to 1
-                                        mCurrent_state = 1;
-                                        // Set the Request button text to 'Unfriend User'
-                                        mProfileSendReqBtn.setText(R.string.unfriend);
+                                        // Sets the current state to "Friends"
+                                        setCurrentState(1);
                                     }
                                     mProgressDialog.dismiss();
                                 }
@@ -226,14 +213,8 @@ public class ProfileActivity extends AppCompatActivity {
                         @Override
                         public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
                             if(databaseError == null) {
-                                // Change the current status to 2, which means a request is now sent and pending
-                                mCurrent_state = 2;
-                                // Set the Request button text to 'Cancel Friend Request'
-                                mProfileSendReqBtn.setText(R.string.cancel_friend_req);
-                                mProfileSendReqBtn.setEnabled(true);
-                                // Make the Decline button invisible
-                                mDeclineBtn.setVisibility(View.INVISIBLE);
-                                mDeclineBtn.setEnabled(false);
+                                // Sets the current state to "Friend Request sent"
+                                setCurrentState(2);
                                 // Shows a toast that a request has been sent
                                 Toast.makeText(ProfileActivity.this, "Friend Request sent", Toast.LENGTH_LONG).show();
                             } else {
@@ -259,14 +240,8 @@ public class ProfileActivity extends AppCompatActivity {
                         @Override
                         public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
                             if (databaseError == null) {
-                                // Change the current status to 0, which means that the users are not friends
-                                mCurrent_state = 0;
-                                // Set the Request button text to 'Send Friend Request'
-                                mProfileSendReqBtn.setText(R.string.send_friend_req);
-                                mProfileSendReqBtn.setEnabled(true);
-                                // Make the Decline button invisible
-                                mDeclineBtn.setVisibility(View.INVISIBLE);
-                                mDeclineBtn.setEnabled(false);
+                                // Sets the current state to "Not Friends"
+                                setCurrentState(0);
                                 // Shows a toast that the users are no longer friends
                                 Toast.makeText(ProfileActivity.this, "You are no longer friends", Toast.LENGTH_LONG).show();
                             } else {
@@ -293,14 +268,8 @@ public class ProfileActivity extends AppCompatActivity {
                         @Override
                         public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
                             if (databaseError == null) {
-                                // Change the current status to 0, which means that the request has been canceled
-                                mCurrent_state = 0;
-                                // Set the Request button text to 'Send Friend Request'
-                                mProfileSendReqBtn.setText(R.string.send_friend_req);
-                                mProfileSendReqBtn.setEnabled(true);
-                                // Make the Decline button invisible
-                                mDeclineBtn.setVisibility(View.INVISIBLE);
-                                mDeclineBtn.setEnabled(false);
+                                // Sets the current state to "Not Friends"
+                                setCurrentState(0);
                                 // Shows a toast that the request has been canceled
                                 Toast.makeText(ProfileActivity.this, "Friend Request Cancelled", Toast.LENGTH_LONG).show();
                             } else {
@@ -332,14 +301,8 @@ public class ProfileActivity extends AppCompatActivity {
                         @Override
                         public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
                             if (databaseError == null) {
-                                // Change the current status to 1, which means that the two users are now friends
-                                mCurrent_state = 1;
-                                // Set the Request button text to 'Unfriend User'
-                                mProfileSendReqBtn.setText(R.string.unfriend);
-                                mProfileSendReqBtn.setEnabled(true);
-                                // Make the Decline button invisible
-                                mDeclineBtn.setVisibility(View.INVISIBLE);
-                                mDeclineBtn.setEnabled(false);
+                                // Sets the current status to "Friends"
+                                setCurrentState(1);
                                 // Shows a toast that the users have now become friends
                                 Toast.makeText(ProfileActivity.this, "You are now friends", Toast.LENGTH_LONG).show();
                             }
@@ -370,14 +333,8 @@ public class ProfileActivity extends AppCompatActivity {
                     @Override
                     public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
                         if (databaseError == null) {
-                            // Change the current status to 0, which means that the two users are not friends
-                            mCurrent_state = 0;
-                            // Set the Request button text to 'Send Friend Request'
-                            mProfileSendReqBtn.setText(R.string.send_friend_req);
-                            mProfileSendReqBtn.setEnabled(true);
-                            // Make the Decline button invisible
-                            mDeclineBtn.setVisibility(View.INVISIBLE);
-                            mDeclineBtn.setEnabled(false);
+                            // Sets the current state to "Not Friends"
+                            setCurrentState(0);
                             // Shows a toast that the user has declined the friend request
                             Toast.makeText(ProfileActivity.this, "You have declined the friend request", Toast.LENGTH_LONG).show();
                         } else {
@@ -392,13 +349,62 @@ public class ProfileActivity extends AppCompatActivity {
         });
     }
 
+    // This method sets the current state and changes the UI accordingly
+    private void setCurrentState(int state) {
+        // Set the current status
+        mCurrent_state = state;
+        switch (state) {
+            // "Not Friends"
+            case 0:
+                // Set the Request button text to 'Send Friend Request'
+                mProfileSendReqBtn.setText(R.string.send_friend_req);
+                mProfileSendReqBtn.setEnabled(true);
+                // Make the Decline button invisible
+                mDeclineBtn.setVisibility(View.INVISIBLE);
+                mDeclineBtn.setEnabled(false);
+                break;
+            // "Friends"
+            case 1:
+                // Set the Request button text to 'Unfriend User'
+                mProfileSendReqBtn.setText(R.string.unfriend);
+                mProfileSendReqBtn.setEnabled(true);
+                // Make the Decline button invisible
+                mDeclineBtn.setVisibility(View.INVISIBLE);
+                mDeclineBtn.setEnabled(false);
+                break;
+            // "Friend request sent"
+            case 2:
+                // Set the Request button text to 'Cancel Friend Request'
+                mProfileSendReqBtn.setText(R.string.cancel_friend_req);
+                mProfileSendReqBtn.setEnabled(true);
+                // Make the Decline button invisible
+                mDeclineBtn.setVisibility(View.INVISIBLE);
+                mDeclineBtn.setEnabled(false);
+                break;
+            // "Friend request received"
+            case 3:
+                // Set the Request button text to 'Accept Friend Request'
+                mProfileSendReqBtn.setText(R.string.accept_friend_req);
+                mProfileSendReqBtn.setEnabled(true);
+                // Decline button visible, so the user can decline the received request
+                mDeclineBtn.setVisibility(View.VISIBLE);
+                mDeclineBtn.setEnabled(true);
+                break;
+
+            default:
+                Toast.makeText(ProfileActivity.this, "Invalid state", Toast.LENGTH_LONG).show();
+        }
+    }
+
     @Override
+    // Sets the online value of the user back to true
     public void onStart() {
         super.onStart();
         mRootRef.child("Users").child(mCurrent_user.getUid()).child("online").setValue("true");
     }
 
     @Override
+    // Sets the online value to the current timestamp if the activity is paused
     protected void onPause() {
         super.onPause();
         mRootRef.child("Users").child(mCurrent_user.getUid()).child("online").setValue(ServerValue.TIMESTAMP);

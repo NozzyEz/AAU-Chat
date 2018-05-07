@@ -31,7 +31,7 @@ import com.squareup.picasso.Picasso;
 import de.hdodenhof.circleimageview.CircleImageView;
 
 
-// This fragment shows all of the user's friends in a recycler view.
+// This fragment shows all of the user's friends in a recycler view
 /**
  * A simple {@link Fragment} subclass.
  */
@@ -101,6 +101,7 @@ public class FriendsFragment extends BaseFragment {
         mUsersDatabase = FirebaseDatabase.getInstance().getReference().child("Users");
         mUsersDatabase.keepSynced(true);
 
+        // Inflate the layout for this fragment
         return mMainView;
     }
 

@@ -9,6 +9,7 @@ import android.support.v4.app.FragmentPagerAdapter;
  */
 
 // Class to facilitate our fragments on the main activity.
+// 0 - RequestsFragment, 1 - ChatsFragment, 2 - FriendsFragment
 class SectionsPagerAdapter extends FragmentPagerAdapter{
     public SectionsPagerAdapter(FragmentManager fm) {
         super(fm);
@@ -16,7 +17,6 @@ class SectionsPagerAdapter extends FragmentPagerAdapter{
 
     @Override
     public Fragment getItem(int position) {
-
         switch (position) {
             case 0:
                 ChatsFragment chatsFragment = new ChatsFragment();
@@ -25,7 +25,6 @@ class SectionsPagerAdapter extends FragmentPagerAdapter{
             case 1:
                 FriendsFragment friendsFragment = new FriendsFragment();
                 return friendsFragment;
-
             default:
                 return null;
         }
@@ -37,7 +36,6 @@ class SectionsPagerAdapter extends FragmentPagerAdapter{
     }
 
     public CharSequence getPageTitle(int position){
-
         switch (position) {
             case 0:
                 return "CHATS";
@@ -47,8 +45,6 @@ class SectionsPagerAdapter extends FragmentPagerAdapter{
 
             default:
                 return null;
-
         }
-
     }
 }

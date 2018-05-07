@@ -81,6 +81,7 @@ public class UsersActivity extends AppCompatActivity {
     protected void onStart() {
         super.onStart();
 
+        // Sets the online value of the user back to true
         mUsersDatabase.child(mCurrentUserID).child("online").setValue("true");
 
         //username =  mUsersDatabase.child(mCurrentUserID).child("name");
@@ -115,9 +116,6 @@ public class UsersActivity extends AppCompatActivity {
         public UsersViewHolder(View itemView) {
             super(itemView);
             mView = itemView;
-
-
-
 
             rlSingleUser = itemView.findViewById(R.id.rlSingleUser);
             params = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
@@ -160,6 +158,7 @@ public class UsersActivity extends AppCompatActivity {
     }
 
     @Override
+    // Sets the online value to the current timestamp if the activity is paused
     protected void onPause() {
         super.onPause();
         mUsersDatabase.child(mCurrentUserID).child("online").setValue(ServerValue.TIMESTAMP);
