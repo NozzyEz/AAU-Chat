@@ -125,7 +125,7 @@ public class RegisterActivity extends AppCompatActivity {
 
                     String deviceToken = FirebaseInstanceId.getInstance().getToken();
 
-                    //Then we create a HashMap and and fill in the users information for that
+                    // Then we create a HashMap and and fill in the users information for that
                     // account, everything but the display name is default values
                     HashMap<String, String> userMap = new HashMap<>();
                     userMap.put("device_token", deviceToken);

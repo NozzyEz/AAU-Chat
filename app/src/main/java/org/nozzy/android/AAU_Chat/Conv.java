@@ -4,31 +4,31 @@ package org.nozzy.android.AAU_Chat;
 // Used for displaying all conversations in a RecyclerView in ChatsFragment.
 public class Conv {
 
-    public boolean seen;
-    public long timestamp;
+    public String type;
+    public Long timestamp;
 
     public Conv(){
 
     }
 
-    public boolean isSeen() {
-        return seen;
-    }
-
-    public void setSeen(boolean seen) {
-        this.seen = seen;
-    }
-
-    public long getTimestamp() {
-        return timestamp;
-    }
-
-    public void setTimestamp(long timestamp) {
+    public Conv(String type, Long timestamp) {
+        this.type = type;
         this.timestamp = timestamp;
     }
 
-    public Conv(boolean seen, long timestamp) {
-        this.seen = seen;
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    public Long getTimestamp() {
+        return timestamp;
+    }
+
+    public void setTimestamp(Long timestamp) {
         this.timestamp = timestamp;
     }
 }
