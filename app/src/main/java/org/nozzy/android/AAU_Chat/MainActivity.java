@@ -45,11 +45,16 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        changeContentFragment(getSupportFragmentManager(), ChatsFragment.getFragmentTag(),new ChatsFragment(),R.id.flFragmentsContainer,false);
-
-
         // Get the current instance of our authentication system
         mAuth = FirebaseAuth.getInstance();
+
+        if (mAuth.getCurrentUser() == null) {
+            sendToStart();
+        } else {
+            changeContentFragment(getSupportFragmentManager(), ChatsFragment.getFragmentTag(), new ChatsFragment(), R.id.flFragmentsContainer, false);
+        }
+
+
 
         // Toolbar setup
         toolbar = findViewById(R.id.toolbar);
