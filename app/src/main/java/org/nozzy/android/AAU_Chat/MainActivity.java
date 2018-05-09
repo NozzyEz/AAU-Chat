@@ -13,6 +13,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.TextView;
 
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -26,6 +27,9 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ServerValue;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.iid.FirebaseInstanceId;
+import com.squareup.picasso.Callback;
+import com.squareup.picasso.NetworkPolicy;
+import com.squareup.picasso.Picasso;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
@@ -79,15 +83,16 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         drawer.addDrawerListener(toggle);
         toggle.syncState();
 
-        // Assigning our nav bar items to their views in the side nav bar
-        mProfileThumb = findViewById(R.id.nav_bar_profile_image);
-        mProfileName = findViewById(R.id.nav_profile_name);
-        mProfileInfo = findViewById(R.id.nav_profile_info);
-
-        mProfileInfo.setText("Test");
 
         // TODO: Comemnting
         NavigationView navigationView = findViewById(R.id.nav_view);
+
+        View header = navigationView.getHeaderView(0);
+
+        // Assigning our nav bar items to their views in the side nav bar
+        mProfileThumb = header.findViewById(R.id.nav_bar_profile_image);
+        mProfileName = header.findViewById(R.id.nav_profile_name);
+        mProfileInfo = header.findViewById(R.id.nav_profile_info);
 
         navigationView.setNavigationItemSelectedListener(this);
 
@@ -103,11 +108,26 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     String name = dataSnapshot.child("name").getValue().toString();
                     final String image = dataSnapshot.child("image").getValue().toString();
                     String info = dataSnapshot.child("status").getValue().toString();
-                    String thumbnail = dataSnapshot.child("thumb_image").getValue().toString();
+                    final String thumbnail = dataSnapshot.child("thumb_image").getValue().toString();
 
                     // Updates the name and info fields based on information in the database
-//                    mProfileName.setText(name);
-//                    mProfileInfo.setText(info);
+                    mProfileName.setText(name);
+                    mProfileInfo.setText(info);
+
+                    // If the user's database entry for image is not 'default' we load their image into the UI, but with our generic image in place as a placeholder
+                    if(!image.equals("default")) {
+                        // We use the Picasso library to do the image loading, this way we can store the image offline for faster loading
+                        Picasso.with(getApplicationContext()).load(thumbnail).networkPolicy(NetworkPolicy.OFFLINE)
+                                .placeholder(R.drawable.generic).into(mProfileThumb, new Callback() {
+                            @Override
+                            public void onSuccess() { }
+                            @Override
+                            public void onError() {
+                                // If the image fails to load, set the image to the default one
+                                Picasso.with(getApplicationContext()).load(thumbnail).placeholder(R.drawable.generic).into(mProfileThumb);
+                            }
+                        });
+                    }
 
                 }
 
