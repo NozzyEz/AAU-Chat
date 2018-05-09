@@ -360,7 +360,7 @@ public class ChatActivity extends AppCompatActivity {
                 // Stops the refreshing from continuing
                 mRefreshLayout.setRefreshing(false);
                 // Scrolls to the bottom of older messages, effectively showing you the first message
-                mLinearLayout.scrollToPositionWithOffset(10,0);
+                mLinearLayout.scrollToPositionWithOffset(itemPos - 1,0);
             }
             @Override
             public void onChildChanged(DataSnapshot dataSnapshot, String s) { }
