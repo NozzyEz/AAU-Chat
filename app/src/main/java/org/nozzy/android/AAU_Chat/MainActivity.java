@@ -13,15 +13,21 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
+import android.widget.TextView;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ServerValue;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.iid.FirebaseInstanceId;
+
+import de.hdodenhof.circleimageview.CircleImageView;
 
 // This is our main activity, where most of the app foundation is laid down, we have our toolbar
 // with an options menu, a tabview where we can switch between different tabs.
@@ -40,6 +46,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
   //  private TabLayout mTabLayout;
 
     private BaseFragment currentFragment;
+
+    // Nav bar initialization
+    private CircleImageView mProfileThumb;
+    private TextView mProfileName;
+    private TextView mProfileInfo;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,6 +79,14 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         drawer.addDrawerListener(toggle);
         toggle.syncState();
 
+        // Assigning our nav bar items to their views in the side nav bar
+        mProfileThumb = findViewById(R.id.nav_bar_profile_image);
+        mProfileName = findViewById(R.id.nav_profile_name);
+        mProfileInfo = findViewById(R.id.nav_profile_info);
+
+        mProfileInfo.setText("Test");
+
+        // TODO: Comemnting
         NavigationView navigationView = findViewById(R.id.nav_view);
 
         navigationView.setNavigationItemSelectedListener(this);
@@ -75,6 +94,28 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         if (mAuth.getCurrentUser() != null) {
             // Point our database reference to the current user's ID, so that we can manipulate fields within
             mUserRef = FirebaseDatabase.getInstance().getReference().child("Users").child(mAuth.getCurrentUser().getUid());
+
+            mUserRef.addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+
+                    // Gets all the relevant user's data from the database
+                    String name = dataSnapshot.child("name").getValue().toString();
+                    final String image = dataSnapshot.child("image").getValue().toString();
+                    String info = dataSnapshot.child("status").getValue().toString();
+                    String thumbnail = dataSnapshot.child("thumb_image").getValue().toString();
+
+                    // Updates the name and info fields based on information in the database
+//                    mProfileName.setText(name);
+//                    mProfileInfo.setText(info);
+
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+
+                }
+            });
 
             // Get the device token from firebase
             String deviceToken = FirebaseInstanceId.getInstance().getToken();
