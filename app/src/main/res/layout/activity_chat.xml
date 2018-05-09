@@ -16,7 +16,8 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_above="@+id/chat_bottom_bar"
-        android:layout_below="@+id/chat_app_bar">
+        android:layout_below="@+id/chat_app_bar"
+        >
 
         <android.support.v7.widget.RecyclerView
         android:id="@+id/chat_messages_list"
@@ -55,7 +56,7 @@
             android:layout_weight="8"
             android:ems="10"
             android:hint="@string/enter_message"
-            android:inputType="textPersonName" />
+            android:inputType="textCapSentences" />
 
         <ImageButton
             android:id="@+id/chat_send_btn"

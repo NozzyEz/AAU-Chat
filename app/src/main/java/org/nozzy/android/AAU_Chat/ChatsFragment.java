@@ -31,10 +31,13 @@ import de.hdodenhof.circleimageview.CircleImageView;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class ChatsFragment extends Fragment {
+public class ChatsFragment extends BaseFragment {
 
     // UI
     private RecyclerView mConvList;
+
+    private static final String TAG = ChatsFragment.class.getSimpleName();
+
 
     private View mMainView;
 
@@ -51,6 +54,20 @@ public class ChatsFragment extends Fragment {
     }
 
     @Override
+    protected int getCurrentFragmentLayout() {
+        return R.layout.fragment_requests;
+    }
+    public static String getFragmentTag() {
+        return TAG;
+    }
+
+    @Override
+    public String getFragmentTitle() {
+        return "Requests";
+    }
+
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
         // The main view which holds all the fragments
@@ -65,6 +82,7 @@ public class ChatsFragment extends Fragment {
         mConvList.setLayoutManager(linearLayoutManager);
 
         // Authentication to get current user
+        mConvList = mMainView.findViewById(R.id.conv_list);
         mAuth = FirebaseAuth.getInstance();
         mCurrent_user_id = mAuth.getCurrentUser().getUid();
 
@@ -239,6 +257,7 @@ public class ChatsFragment extends Fragment {
 
         // Sets the name for the name text field
         public void setName(String name){
+
             TextView userNameView = mView.findViewById(R.id.user_single_name);
             userNameView.setText(name);
         }
@@ -254,11 +273,20 @@ public class ChatsFragment extends Fragment {
         public void setUserOnline(String online_status) {
             ImageView userOnlineView = mView.findViewById(R.id.user_online_indicator);
             if(online_status.equals("true")){
+
                 userOnlineView.setVisibility(View.VISIBLE);
+
             } else {
+
                 userOnlineView.setVisibility(View.INVISIBLE);
+
             }
+
         }
+
+
     }
+
+
 
 }
