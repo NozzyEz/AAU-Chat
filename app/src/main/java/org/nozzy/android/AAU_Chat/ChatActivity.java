@@ -342,6 +342,7 @@ public class ChatActivity extends AppCompatActivity {
                 String messageKey = dataSnapshot.getKey();
 
                 // Loads the message if it's not the last one (since that one is already on the screen)
+                // If it is the last one, set the previous last key to the new last one
                 if (!messageKey.equals(mPrevKey)) {
                     messagesList.add(itemPos++, message);
                 } else {
@@ -352,7 +353,6 @@ public class ChatActivity extends AppCompatActivity {
                 // Note - this does not affect the current query which goes until the last key, only the next one
                 if (itemPos == 1) {
                     mLastKey = messageKey;
-
                 }
 
                 mAdapter.notifyDataSetChanged();
@@ -392,13 +392,13 @@ public class ChatActivity extends AppCompatActivity {
 
                 // If it's the first (oldest) message in that set
                 if (itemPos == 0) {
-                    // Set the last key to that message's key
+                    // Set the last key and previous key to that message's key
                     String messageKey = dataSnapshot.getKey();
                     mLastKey = messageKey;
                     mPrevKey = messageKey;
                 }
 
-                // Increment the position
+                // Increment the position so that other messages don't get counted as first
                 itemPos++;
 
                 // Adds the new message to the list
