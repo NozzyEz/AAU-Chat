@@ -62,7 +62,6 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
         public View messageView;
 
 
-
         public MessageViewHolder(View itemView) {
             super(itemView);
             // Setting up the UI
@@ -134,10 +133,12 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
             if(message_type.equals("text")) {
                 // If it's a text message, set the text and hide the image view
                 holder.messageText.setText(c.getMessage());
+                holder.messageText.setVisibility(View.VISIBLE);
                 holder.messageImage.setVisibility(View.GONE);
             } else if (message_type.equals("image")) {
                 // If it's an image, hide the text and load in the image
                 holder.messageText.setVisibility(View.GONE);
+                holder.messageImage.setVisibility(View.VISIBLE);
                 Picasso.with(holder.profileImage.getContext()).load(c.getMessage()).placeholder(R.drawable.generic).into(holder.messageImage);
             }
 
@@ -155,10 +156,12 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
             if(message_type.equals("text")) {
                 // If it's a text message, set the text and hide the image view
                 holder.messageText.setText(c.getMessage());
+                holder.messageText.setVisibility(View.VISIBLE);
                 holder.messageImage.setVisibility(View.GONE);
             } else if (message_type.equals("image")) {
                 // If it's an image, hide the text and load in the image
                 holder.messageText.setVisibility(View.GONE);
+                holder.messageImage.setVisibility(View.VISIBLE);
                 Picasso.with(holder.profileImage.getContext()).load(c.getMessage()).placeholder(R.drawable.generic).into(holder.messageImage);
             }
 
@@ -169,7 +172,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
         // we do that through our messages class, like any other entry
         Long time = c.getTime();
 
-        // This long we can then convert to the apropiate string to show the clock
+        // This long we can then convert to the appropriate string to show the clock
         String convertedTime = DateUtils.formatDateTime(context, time, DateUtils.FORMAT_SHOW_TIME);
 
         // And finally we can assign that string to the viewholder's text field
