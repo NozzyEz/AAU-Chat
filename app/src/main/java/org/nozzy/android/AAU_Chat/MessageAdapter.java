@@ -62,7 +62,6 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
         public View messageView;
 
 
-
         public MessageViewHolder(View itemView) {
             super(itemView);
             // Setting up the UI
@@ -72,6 +71,8 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
             messageTime = itemView.findViewById(R.id.message_time_text);
             profileImage = itemView.findViewById(R.id.message_profile_image);
             displayName = itemView.findViewById(R.id.message_display_name);
+            // This is for making the image view rounded
+            messageImage.setClipToOutline(true);
         }
     }
 
@@ -80,18 +81,18 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
 
         // Gets the current user
         mAuth = FirebaseAuth.getInstance();
-        String current_user_id = mAuth.getCurrentUser().getUid();
+        final String current_user_id = mAuth.getCurrentUser().getUid();
 
         // Gets the current message from the list
         final Messages c = mMessageList.get(position);
 
         // Gets the sender and type of the message
-        String from_user = c.getFrom();
+        final String from_user = c.getFrom();
         String message_type = c.getType();
 
         // Adds a listener to the user who sent the message
         mUsersDatabase = FirebaseDatabase.getInstance().getReference().child("Users").child(from_user);
-        mUsersDatabase.addValueEventListener(new ValueEventListener() {
+        mUsersDatabase.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 // Sets the sender's user name in the message
@@ -99,17 +100,19 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
                 holder.displayName.setText(name);
 
                 // Sets the sender's profile image in the message
-                final String image = dataSnapshot.child("thumb_image").getValue().toString();
-                Picasso.with(holder.profileImage.getContext()).load(image).networkPolicy(NetworkPolicy.OFFLINE)
-                        .placeholder(R.drawable.generic).into(holder.profileImage, new Callback() {
-                    @Override
-                    public void onSuccess() { }
-                    @Override
-                    public void onError() {
-                        // If the profile image can't be set, set it to the default one
-                        Picasso.with(holder.profileImage.getContext()).load(image).placeholder(R.drawable.generic).into(holder.profileImage);
-                    }
-                });
+                if (!from_user.equals(current_user_id)) {
+                    final String image = dataSnapshot.child("thumb_image").getValue().toString();
+                    Picasso.with(holder.profileImage.getContext()).load(image).networkPolicy(NetworkPolicy.OFFLINE)
+                            .placeholder(R.drawable.generic).into(holder.profileImage, new Callback() {
+                        @Override
+                        public void onSuccess() { }
+                        @Override
+                        public void onError() {
+                            // If the profile image can't be set, set it to the default one
+                            Picasso.with(holder.profileImage.getContext()).load(image).placeholder(R.drawable.generic).into(holder.profileImage);
+                        }
+                    });
+                }
             }
             @Override
             public void onCancelled(DatabaseError databaseError) { }
@@ -119,7 +122,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
         if (from_user.equals(current_user_id)) {
             // If the message has been sent by the current user:
             // Hide the profile image
-            holder.profileImage.setVisibility(View.INVISIBLE);
+            holder.profileImage.setVisibility(View.GONE);
             // Move the message to the right
             ((LinearLayout) holder.messageView).setGravity(Gravity.END);
             // Sets the background of the message to white
@@ -130,10 +133,12 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
             if(message_type.equals("text")) {
                 // If it's a text message, set the text and hide the image view
                 holder.messageText.setText(c.getMessage());
-                holder.messageImage.setVisibility(View.INVISIBLE);
+                holder.messageText.setVisibility(View.VISIBLE);
+                holder.messageImage.setVisibility(View.GONE);
             } else if (message_type.equals("image")) {
                 // If it's an image, hide the text and load in the image
-                holder.messageText.setVisibility(View.INVISIBLE);
+                holder.messageText.setVisibility(View.GONE);
+                holder.messageImage.setVisibility(View.VISIBLE);
                 Picasso.with(holder.profileImage.getContext()).load(c.getMessage()).placeholder(R.drawable.generic).into(holder.messageImage);
             }
 
@@ -151,22 +156,23 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
             if(message_type.equals("text")) {
                 // If it's a text message, set the text and hide the image view
                 holder.messageText.setText(c.getMessage());
-                holder.messageImage.setVisibility(View.INVISIBLE);
+                holder.messageText.setVisibility(View.VISIBLE);
+                holder.messageImage.setVisibility(View.GONE);
             } else if (message_type.equals("image")) {
                 // If it's an image, hide the text and load in the image
-                holder.messageText.setVisibility(View.INVISIBLE);
+                holder.messageText.setVisibility(View.GONE);
+                holder.messageImage.setVisibility(View.VISIBLE);
                 Picasso.with(holder.profileImage.getContext()).load(c.getMessage()).placeholder(R.drawable.generic).into(holder.messageImage);
             }
 
         }
 
-        holder.displayName.setText(c.getFrom());
 
         // To show the time the message has been sent we first have to retrieve the value from firebase,
         // we do that through our messages class, like any other entry
         Long time = c.getTime();
 
-        // This long we can then convert to the apropiate string to show the clock
+        // This long we can then convert to the appropriate string to show the clock
         String convertedTime = DateUtils.formatDateTime(context, time, DateUtils.FORMAT_SHOW_TIME);
 
         // And finally we can assign that string to the viewholder's text field

@@ -178,12 +178,31 @@ public class ChatsFragment extends BaseFragment {
                                                     final String userName = dataSnapshot.child("name").getValue().toString();
                                                     String userThumb = dataSnapshot.child("thumb_image").getValue().toString();
 
-                                                    // Sets the name and image fields to those from the database
+                                                    // If the chat is direct, set the name to the other user's name
                                                     if (chatType.equals("direct"))
                                                         convViewHolder.setName(userName);
+                                                    // Else, set the name to the group chat's name
                                                     else convViewHolder.setName(chatName);
 
-                                                    convViewHolder.setUserImage(userThumb, getContext());
+                                                    // If the chat is direct, set the image to the other user's image
+                                                    if (chatType.equals("direct"))
+                                                        convViewHolder.setUserImage(userThumb, getContext());
+                                                    else {
+                                                        // Else, set the image to the group chat's image
+                                                        DatabaseReference chatImageRef = FirebaseDatabase.getInstance().getReference().child("Chats").child(list_chat_id).child("chatImage");
+                                                        chatImageRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                                                            @Override
+                                                            public void onDataChange(DataSnapshot dataSnapshot) {
+                                                                convViewHolder.setUserImage(dataSnapshot.getValue().toString(), getContext());
+                                                            }
+                                                            @Override
+                                                            public void onCancelled(DatabaseError databaseError) { }
+                                                        });
+                                                    }
+
+
+
+
 
                                                     // Get the online status of the user and set the online indicator accordingly
                                                     String userOnline = dataSnapshot.child("online").getValue().toString();
