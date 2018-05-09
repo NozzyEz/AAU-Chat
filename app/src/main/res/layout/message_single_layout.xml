@@ -49,17 +49,24 @@
             android:layout_height="wrap_content"
             android:background="@drawable/message_text_background"
             android:padding="10dp"
-            android:text="sample text"
+            android:layout_marginLeft="2dp"
+            android:text="loading message..."
             android:textColor="@android:color/white"
             android:textSize="14sp"
             android:maxWidth="250dp"/>
     </LinearLayout>
 
+
     <ImageView
         android:id="@+id/message_image_layout"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_margin="0dp"
-        android:scaleType="centerCrop"
-        android:maxWidth="250dp"/>
+        android:maxWidth="250dp"
+        android:maxHeight="350dp"
+        android:adjustViewBounds="true"
+        android:layout_marginTop="2dp"
+        android:scaleType="fitStart"
+        android:background="@drawable/round_outline"
+        android:outlineProvider="background"/>
+
 </LinearLayout>

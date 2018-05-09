@@ -72,6 +72,8 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
             messageTime = itemView.findViewById(R.id.message_time_text);
             profileImage = itemView.findViewById(R.id.message_profile_image);
             displayName = itemView.findViewById(R.id.message_display_name);
+            // This is for making the image view rounded
+            messageImage.setClipToOutline(true);
         }
     }
 
@@ -121,7 +123,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
         if (from_user.equals(current_user_id)) {
             // If the message has been sent by the current user:
             // Hide the profile image
-            holder.profileImage.setVisibility(View.INVISIBLE);
+            holder.profileImage.setVisibility(View.GONE);
             // Move the message to the right
             ((LinearLayout) holder.messageView).setGravity(Gravity.END);
             // Sets the background of the message to white
@@ -132,10 +134,10 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
             if(message_type.equals("text")) {
                 // If it's a text message, set the text and hide the image view
                 holder.messageText.setText(c.getMessage());
-                holder.messageImage.setVisibility(View.INVISIBLE);
+                holder.messageImage.setVisibility(View.GONE);
             } else if (message_type.equals("image")) {
                 // If it's an image, hide the text and load in the image
-                holder.messageText.setVisibility(View.INVISIBLE);
+                holder.messageText.setVisibility(View.GONE);
                 Picasso.with(holder.profileImage.getContext()).load(c.getMessage()).placeholder(R.drawable.generic).into(holder.messageImage);
             }
 
@@ -153,10 +155,10 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
             if(message_type.equals("text")) {
                 // If it's a text message, set the text and hide the image view
                 holder.messageText.setText(c.getMessage());
-                holder.messageImage.setVisibility(View.INVISIBLE);
+                holder.messageImage.setVisibility(View.GONE);
             } else if (message_type.equals("image")) {
                 // If it's an image, hide the text and load in the image
-                holder.messageText.setVisibility(View.INVISIBLE);
+                holder.messageText.setVisibility(View.GONE);
                 Picasso.with(holder.profileImage.getContext()).load(c.getMessage()).placeholder(R.drawable.generic).into(holder.messageImage);
             }
 
