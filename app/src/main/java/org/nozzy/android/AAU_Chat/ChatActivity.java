@@ -431,8 +431,9 @@ public class ChatActivity extends AppCompatActivity {
         String message = mChatMessageView.getText().toString();
         // Checks if the message isn't empty
         if (!TextUtils.isEmpty(message)) {
-            // Reference to the messages in the Chats table in the database
+            // Reference to the messages in the Chats table in the database and for the notifications table as well
             String messages_ref = "Chats/" + mChatID + "/" + "messages";
+            String notification_ref = "Notifications/" + mDirectUserID;
 
             // Gets the semi-random key of the message about to be stored
             DatabaseReference user_message_push = mRootRef.child("Chats").child(mChatID).child("messages").push();
@@ -446,9 +447,15 @@ public class ChatActivity extends AppCompatActivity {
             messageMap.put("time", ServerValue.TIMESTAMP);
             messageMap.put("from", mCurrentUserID);
 
+            // A Hashmap to store the notification
+            Map notifyMap = new HashMap();
+            notifyMap.put("from", mCurrentUserID);
+            notifyMap.put("type", "message");
+
             // Put this message into the messages table inside the current chat
             Map messageUserMap = new HashMap();
             messageUserMap.put(messages_ref + "/" + push_id, messageMap);
+            messageUserMap.put(notification_ref + "/" + push_id, notifyMap);
 
             // Refreshes the text window to be empty
             mChatMessageView.setText("");
