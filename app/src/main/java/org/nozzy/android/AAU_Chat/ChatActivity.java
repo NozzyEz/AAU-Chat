@@ -353,14 +353,23 @@ public class ChatActivity extends AppCompatActivity {
                 // Note - this does not affect the current query which goes until the last key, only the next one
                 if (itemPos == 1) {
                     mLastKey = messageKey;
+
+                    mAdapter.notifyDataSetChanged();
+
+                    // Stops the refreshing from continuing
+                    mRefreshLayout.setRefreshing(false);
+                    // Scrolls to the bottom of older messages, effectively showing you the first message
+                    mLinearLayout.scrollToPositionWithOffset(itemPos - 1,0);
+                } else {
+                    mAdapter.notifyDataSetChanged();
+
+                    // Stops the refreshing from continuing
+                    mRefreshLayout.setRefreshing(false);
+                    // Scrolls to the bottom of older messages, effectively showing you the first message
+                    mLinearLayout.scrollToPositionWithOffset(itemPos - 1,0);
                 }
 
-                mAdapter.notifyDataSetChanged();
 
-                // Stops the refreshing from continuing
-                mRefreshLayout.setRefreshing(false);
-                // Scrolls to the bottom of older messages, effectively showing you the first message
-                mLinearLayout.scrollToPositionWithOffset(itemPos - 1,0);
             }
             @Override
             public void onChildChanged(DataSnapshot dataSnapshot, String s) { }

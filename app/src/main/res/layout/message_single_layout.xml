@@ -18,9 +18,9 @@
             android:id="@+id/message_display_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Display Name"
             android:textSize="16sp"
             android:textStyle="bold" />
+        <!-- android:text="Display Name" -->
 
         <TextView
             android:id="@+id/message_time_text"
