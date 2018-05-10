@@ -199,6 +199,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         } else {
             // If the user is online, set his online value to true
             mUserRef.child("online").setValue("true");
+            // update the device token
+            setDeviceToken();
         }
     }
 
@@ -206,17 +208,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     protected void onResume() {
         super.onResume();
         if (mAuth.getCurrentUser() != null) {
-            // Gets the user ID
-            mUserRef = FirebaseDatabase.getInstance().getReference().child("Users").child(mAuth.getCurrentUser().getUid());
-            // Get the device token from firebase
-            String deviceToken = FirebaseInstanceId.getInstance().getToken();
-            // And put that token into the current users database entry, so that it is updated whenever the user opens the app
-            mUserRef.child("device_token").setValue(deviceToken).addOnCompleteListener(new OnCompleteListener<Void>() {
-                @Override
-                public void onComplete(@NonNull Task<Void> task) {
-                    Log.d("string", "onComplete: Works");
-                }
-            });
+            // If the user is online, set his online value to true
+            mUserRef.child("online").setValue("true");
+            // update the device token
+            setDeviceToken();
         }
     }
 
@@ -337,6 +332,21 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    public void setDeviceToken() {
+
+        mUserRef = FirebaseDatabase.getInstance().getReference().child("Users").child(mAuth.getCurrentUser().getUid());
+        // Get the device token from firebase
+        String deviceToken = FirebaseInstanceId.getInstance().getToken();
+        // And put that token into the current users database entry, so that it is updated whenever the user opens the app
+        mUserRef.child("device_token").setValue(deviceToken).addOnCompleteListener(new OnCompleteListener<Void>() {
+            @Override
+            public void onComplete(@NonNull Task<Void> task) {
+                Log.d("string", "onComplete: Works");
+            }
+        });
+
     }
 }
 
