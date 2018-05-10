@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#673BB7</color>
-    <color name="colorPrimaryDark">#512da7</color>
-    <color name="colorAccent">#ff5521</color>
+    <color name="colorPrimary">#05ab9d</color>
+    <color name="colorPrimaryDark">#0e4240</color>
+    <color name="colorAccent">#95014e</color>
     <color name="ColorProfile">#3f3e3e</color>
-    <color name="ColorChat">#9e9e9e</color>
+    <color name="ColorChat">#bcbcbc</color>
 
     <item name="visible" type="id"/>
     <item name="masked" type="id"/>
