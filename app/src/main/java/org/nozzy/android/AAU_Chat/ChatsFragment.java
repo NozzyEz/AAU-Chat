@@ -39,15 +39,13 @@ public class ChatsFragment extends BaseFragment {
 
     private static final String TAG = ChatsFragment.class.getSimpleName();
 
-
     private View mMainView;
 
     // Firebase
     private DatabaseReference mRootDatabase;
     private DatabaseReference mConvDatabase;
-    private DatabaseReference mMessageDatabase;
+    private DatabaseReference mChatsDatabase;
     private DatabaseReference mUsersDatabase;
-    private DatabaseReference mMembersDatabase;
     private FirebaseAuth mAuth;
     private String mCurrent_user_id;
 
@@ -65,9 +63,8 @@ public class ChatsFragment extends BaseFragment {
 
     @Override
     public String getFragmentTitle() {
-        return "Requests";
+        return "";
     }
-
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -90,10 +87,13 @@ public class ChatsFragment extends BaseFragment {
 
         // Database reference setup, keeps them synced for offline use
         mRootDatabase = FirebaseDatabase.getInstance().getReference();
-        mConvDatabase = FirebaseDatabase.getInstance().getReference().child("Users").child(mCurrent_user_id).child("chats");
+        mConvDatabase = mRootDatabase.child("Users").child(mCurrent_user_id).child("chats");
         mConvDatabase.keepSynced(true);
-        mUsersDatabase = FirebaseDatabase.getInstance().getReference().child("Users");
+        mUsersDatabase = mRootDatabase.child("Users");
         mUsersDatabase.keepSynced(true);
+        mChatsDatabase = mRootDatabase.child("Chats");
+        mChatsDatabase.keepSynced(true);
+
 
         // Inflate the layout for this fragment
         return mMainView;
@@ -122,25 +122,28 @@ public class ChatsFragment extends BaseFragment {
                 final String list_chat_id = getRef(i).getKey();
 
                 // Database reference to the messages
-                mMessageDatabase = FirebaseDatabase.getInstance().getReference().child("Chats").child(list_chat_id).child("messages");
+                DatabaseReference messageDatabase = mChatsDatabase.child(list_chat_id).child("messages");
 
                 // By default, the message box will say that there are no messages
                 // This gets replaced by the following query which tries to get the last message
                 convViewHolder.setMessage("No messages yet.", true);
                 
                 // Query to get the last message in a conversation
-                Query lastMessageQuery = mMessageDatabase.limitToLast(1);
+                Query lastMessageQuery = messageDatabase.limitToLast(1);
                 lastMessageQuery.addChildEventListener(new ChildEventListener() {
                     @Override
                     public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                         // Gets the last message text
-                        final String message = dataSnapshot.child("message").getValue().toString();
+                        final String message;
+                        if (dataSnapshot.child("message").getValue().toString().startsWith("https://firebasestorage.googleapis.com/")) {
+                            message = "Image uploaded.";
+                        } else  message = dataSnapshot.child("message").getValue().toString();
 
                         // Gets the key of the message
                         final String messageKey = dataSnapshot.getKey();
 
                         // Listener to check if the user has seen the last message
-                        final DatabaseReference seenDatabase = mRootDatabase.child("Chats").child(list_chat_id).child("seen");
+                        final DatabaseReference seenDatabase = mChatsDatabase.child(list_chat_id).child("seen");
                         seenDatabase.addListenerForSingleValueEvent(new ValueEventListener() {
                             @Override
                             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -179,17 +182,16 @@ public class ChatsFragment extends BaseFragment {
                         final String chatType = dataSnapshot.getValue(String.class);
 
                         // Reference to the chat name
-                        DatabaseReference chatNameRef = FirebaseDatabase.getInstance().getReference().child("Chats").child(list_chat_id).child("chatName");
+                        DatabaseReference chatNameRef = mChatsDatabase.child(list_chat_id).child("chatName");
                         chatNameRef.addListenerForSingleValueEvent(new ValueEventListener() {
                             @Override
                             public void onDataChange(DataSnapshot dataSnapshot) {
                                     // Gets the name of the chat
                                     final String chatName = dataSnapshot.getValue().toString();
-//                                    convViewHolder.setName(chatName);
 
                                 // Reference to all of the members in the conversation
-                                mMembersDatabase = FirebaseDatabase.getInstance().getReference().child("Chats").child(list_chat_id).child("members");
-                                mMembersDatabase.addChildEventListener(new ChildEventListener() {
+                                DatabaseReference membersDatabase = mChatsDatabase.child(list_chat_id).child("members");
+                                membersDatabase.addChildEventListener(new ChildEventListener() {
                                     @Override
                                     public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                                         // Gets the id of each member
@@ -228,7 +230,6 @@ public class ChatsFragment extends BaseFragment {
                                                             public void onCancelled(DatabaseError databaseError) { }
                                                         });
                                                     }
-
 
                                                     // Get the online status of the user and set the online indicator accordingly
                                                     String userOnline = dataSnapshot.child("online").getValue().toString();
