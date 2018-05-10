@@ -6,6 +6,8 @@
     <color name="ColorProfile">#3f3e3e</color>
     <color name="ColorChat">#bcbcbc</color>
 
+    <color name="LoginActivity">#34e7f6ee</color>
+
     <item name="visible" type="id"/>
     <item name="masked" type="id"/>
 </resources>
