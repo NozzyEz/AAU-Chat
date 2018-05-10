@@ -83,7 +83,7 @@ public class FriendsFragment extends BaseFragment {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Select Users to start a new group", Snackbar.LENGTH_LONG)
+                Snackbar.make(view, "Select Users to start a new newGroupChat", Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();
             }
         });

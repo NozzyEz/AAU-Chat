@@ -7,11 +7,33 @@
     tools:context="org.nozzy.android.AAU_Chat.UsersActivity">
 
 
+    <TextView
+        android:id="@+id/tvNoReporter"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
+        android:layout_below="@id/users_appBar"
+        android:padding="12dp"
+        android:visibility="gone"
+        android:text="Select users to start conversation"
+        android:textColor="@color/colorPrimaryDark" />
+
+    <!--<android.support.v7.widget.RecyclerView-->
+        <!--android:id="@+id/rvReporters"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="50dp"-->
+        <!--android:layout_marginBottom="8dp"-->
+        <!--android:orientation="horizontal"-->
+        <!--android:layout_below="@id/users_appBar"-->
+        <!--android:visibility="visible"-->
+        <!--app:layoutManager="android.support.v7.widget.LinearLayoutManager" />-->
+
+
     <EditText
         android:id="@+id/etSearch"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/users_appBar"
+        android:layout_below="@id/tvNoReporter"
         android:layout_margin="15dp"
         android:imeOptions="actionSearch"
         android:drawableLeft="@drawable/ic_search"

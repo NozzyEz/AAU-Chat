@@ -10,7 +10,6 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
@@ -181,14 +180,14 @@ public class ChatsFragment extends BaseFragment {
                                                     // If the chat is direct, set the name to the other user's name
                                                     if (chatType.equals("direct"))
                                                         convViewHolder.setName(userName);
-                                                    // Else, set the name to the group chat's name
+                                                    // Else, set the name to the newGroupChat chat's name
                                                     else convViewHolder.setName(chatName);
 
                                                     // If the chat is direct, set the image to the other user's image
                                                     if (chatType.equals("direct"))
                                                         convViewHolder.setUserImage(userThumb, getContext());
                                                     else {
-                                                        // Else, set the image to the group chat's image
+                                                        // Else, set the image to the newGroupChat chat's image
                                                         DatabaseReference chatImageRef = FirebaseDatabase.getInstance().getReference().child("Chats").child(list_chat_id).child("chatImage");
                                                         chatImageRef.addListenerForSingleValueEvent(new ValueEventListener() {
                                                             @Override
@@ -293,14 +292,14 @@ public class ChatsFragment extends BaseFragment {
 
         // Sets the online indicator's visibility
         public void setUserOnline(String online_status) {
-            ImageView userOnlineView = mView.findViewById(R.id.user_online_indicator);
+            //ImageView userOnlineView = mView.findViewById(R.id.user_online_indicator);
             if(online_status.equals("true")){
 
-                userOnlineView.setVisibility(View.VISIBLE);
+             //   userOnlineView.setVisibility(View.VISIBLE);
 
             } else {
 
-                userOnlineView.setVisibility(View.INVISIBLE);
+              //  userOnlineView.setVisibility(View.INVISIBLE);
 
             }
 

@@ -4,13 +4,14 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -28,6 +29,9 @@ import com.squareup.picasso.Callback;
 import com.squareup.picasso.NetworkPolicy;
 import com.squareup.picasso.Picasso;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+
 import de.hdodenhof.circleimageview.CircleImageView;
 
 
@@ -41,9 +45,14 @@ public class UsersFragment extends BaseFragment {
     private FirebaseAuth mAuth;
     private String mCurrentUserID;
     private EditText etSearch;
+    private TextView tvNoReporter;
 
     public static String searchString = "";
     public static String name;
+    public static Boolean newGroupChat = false;
+
+    private ArrayList<String> users = new ArrayList<>();
+
 
     @Override
     public String getFragmentTitle() {
@@ -65,16 +74,22 @@ public class UsersFragment extends BaseFragment {
 
         // Here we setup our RecyclerView which we use to show all the users, one by one
         mUsersList = getView().findViewById(R.id.users_list);
+        tvNoReporter = getView().findViewById(R.id.tvNoReporter);
 
 
 
 
-        FloatingActionButton fab = view.findViewById(R.id.fab);
+        final FloatingActionButton fab = view.findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Select Users to start a new group", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+//                Snackbar.make(view, "Select Users to start a new newGroupChat", Snackbar.LENGTH_LONG)
+//                        .setAction("Action", null).show();
+                tvNoReporter.setVisibility(View.VISIBLE);
+                fab.setImageResource(R.drawable.ic_next_white);
+               if(!newGroupChat){
+                   newGroupChat = true;
+               }
             }
         });
 
@@ -126,17 +141,23 @@ public class UsersFragment extends BaseFragment {
         View mView;
         RelativeLayout rlSingleUser;
         private String mStatus;
+        CheckBox checkBox;
 
         public UsersViewHolder(View itemView) {
             super(itemView);
             mView = itemView;
 
 
-
-
+            checkBox = itemView.findViewById(R.id.cbSelectUser);
             rlSingleUser = itemView.findViewById(R.id.rlSingleUser);
             params = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
                     ViewGroup.LayoutParams.WRAP_CONTENT);
+        }
+        private void changeState() {
+            if (checkBox.isChecked())
+                checkBox.setChecked(false);
+            else
+                checkBox.setChecked(true);
         }
 
         private void hideLayout() {
@@ -154,6 +175,21 @@ public class UsersFragment extends BaseFragment {
             TextView mUserNameView = mView.findViewById(R.id.user_single_name);
             mUserNameView.setText(name);
         }
+
+//        private void addUser(final String userId,final Context ctx){
+//            final CheckBox checkBox = mView.findViewById(R.id.cbSelectUser);
+//            checkBox.setOnClickListener(new View.OnClickListener() {
+//                @Override
+//                public void onClick(View arg0) {
+//                    final boolean isChecked = checkBox.isChecked();
+//                    if(isChecked) {
+//                        Toast.makeText(ctx, userId, Toast.LENGTH_SHORT).show();
+//
+//                    }
+//                }
+//            });
+//        }
+
         // Sets the status for the status text field
         public void setStatus(String status) {
             TextView mStatusView = mView.findViewById(R.id.user_single_status);
@@ -183,6 +219,7 @@ public class UsersFragment extends BaseFragment {
     @Override
     public void onResume(){
         super.onResume();
+        newGroupChat = false;
         searchUser(searchString);
     }
 
@@ -211,15 +248,15 @@ public class UsersFragment extends BaseFragment {
         Query searchQuery = mUsersDatabase.orderByChild("name").startAt(searchString).endAt(searchString + "\uf8ff");
 
         // We setup our Firebase recycler adapter with help from our Users class, a UsersViewHolder class, and the layout we have created to show users.
-        final FirebaseRecyclerAdapter<Users, UsersActivity.UsersViewHolder> firebaseRecyclerAdapter = new FirebaseRecyclerAdapter<Users, UsersActivity.UsersViewHolder>(
+        final FirebaseRecyclerAdapter<Users, UsersFragment.UsersViewHolder> firebaseRecyclerAdapter = new FirebaseRecyclerAdapter<Users, UsersFragment.UsersViewHolder>(
                 Users.class,
-                R.layout.users_single_layout,
-                UsersActivity.UsersViewHolder.class,
+                R.layout.users_single_layout_all_users,
+                UsersFragment.UsersViewHolder.class,
                 searchQuery
         ) {
             @Override
             // This method is used to populate our RecyclerView with each of our users
-            protected void populateViewHolder(UsersActivity.UsersViewHolder viewHolder, Users model, int position) {
+            protected void populateViewHolder(final UsersFragment.UsersViewHolder viewHolder, Users model, final int position) {
 
                 if (name.equals(model.getName())) {
                     viewHolder.hideLayout();
@@ -240,15 +277,30 @@ public class UsersFragment extends BaseFragment {
                     viewHolder.mView.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View view) {
-                            Intent profileIntent = new Intent(getActivity(), ProfileActivity.class);
-                            profileIntent.putExtra("user_id", user_id);
-                            startActivity(profileIntent);
+
+                            if (!newGroupChat) {
+                                Intent profileIntent = new Intent(getActivity(), ProfileActivity.class);
+                                profileIntent.putExtra("user_id", user_id);
+                                startActivity(profileIntent);
+                            } else {
+                                //Toast.makeText(getActivity(),user_id,Toast.LENGTH_SHORT).show();
+                                viewHolder.checkBox.setVisibility(View.VISIBLE);
+                                if(users.contains(user_id)){
+                                    users.remove(users.indexOf(user_id));
+                                } else {
+                                    users.add(user_id);
+                                }
+                               Log.e ("List",(Arrays.toString(users.toArray())));
+                                viewHolder.changeState();
+
+                            }
 
                         }
                     });
+
+
                 }
             }
-
         };
         // Finally we set the adapter for our recycler view
         mUsersList.setAdapter(firebaseRecyclerAdapter);
