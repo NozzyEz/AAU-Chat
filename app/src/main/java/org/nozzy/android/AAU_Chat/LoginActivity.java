@@ -10,6 +10,7 @@ import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -24,8 +25,8 @@ public class LoginActivity extends AppCompatActivity {
 
     // UI
     private Toolbar mToolbar;
-    private TextInputLayout mLoginEmail;
-    private TextInputLayout mLoginPassword;
+    private EditText mLoginEmail;
+    private EditText mLoginPassword;
     private Button mLogin_btn;
 
     private ProgressDialog mLoginProgress;
@@ -45,9 +46,9 @@ public class LoginActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setTitle("Login");
 
-        mLoginEmail = findViewById(R.id.login_email);
-        mLoginPassword = findViewById(R.id.login_password);
-        mLogin_btn = findViewById(R.id.login_btn);
+        mLoginEmail = findViewById(R.id.username_login_activity);
+        mLoginPassword = findViewById(R.id.password_login_activity);
+        mLogin_btn = findViewById(R.id.login_button);
 
         mLoginProgress = new ProgressDialog(this);
 
@@ -61,8 +62,8 @@ public class LoginActivity extends AppCompatActivity {
             public void onClick(View view) {
 
                 // Gets the typed in email and password
-                String email = mLoginEmail.getEditText().getText().toString();
-                String password = mLoginPassword.getEditText().getText().toString();
+                String email = mLoginEmail.getText().toString();
+                String password = mLoginPassword.getText().toString();
 
                 if (!TextUtils.isEmpty(email) || !TextUtils.isEmpty(password)) {
                     // If both fields are filled in, shows a progress dialog (loading screen)
