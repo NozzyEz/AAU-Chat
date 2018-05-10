@@ -69,6 +69,9 @@ public class ChatActivity extends AppCompatActivity {
     private DatabaseReference mRootRef;
     private StorageReference mImageStorage;
 
+    private ChildEventListener mMessageAddedListener;
+    private DatabaseReference mMessageRef;
+
     // UI
     private Toolbar mChatToolbar;
 
@@ -198,6 +201,8 @@ public class ChatActivity extends AppCompatActivity {
             });
         }
 
+        // Updates the last seen message of the current user
+        updateSeen();
 
         // Button event for sending a message
         mChatSendBtn.setOnClickListener(new View.OnClickListener() {
@@ -506,6 +511,8 @@ public class ChatActivity extends AppCompatActivity {
         if (currentUser != null) {
             mRootRef.child("Users").child(mCurrentUserID).child("online").setValue(ServerValue.TIMESTAMP);
         }
+
+        mMessageRef.removeEventListener(mMessageAddedListener);
     }
 
     // Method used for updating the chat's timestamp for each user
@@ -521,6 +528,34 @@ public class ChatActivity extends AppCompatActivity {
                 String userID = dataSnapshot.getKey();
                 // Updates the timestamp value representing recent activity
                 mRootRef.child("Users").child(userID).child("chats").child(mChatID).child("timestamp").setValue(ServerValue.TIMESTAMP);
+            }
+            @Override
+            public void onChildChanged(DataSnapshot dataSnapshot, String s) { }
+            @Override
+            public void onChildRemoved(DataSnapshot dataSnapshot) { }
+            @Override
+            public void onChildMoved(DataSnapshot dataSnapshot, String s) { }
+            @Override
+            public void onCancelled(DatabaseError databaseError) { }
+        });
+    }
+
+    // Method used for updating seen values
+    private void updateSeen() {
+        // Reference to the seen value of the current user
+        final DatabaseReference seenRef = mRootRef.child("Chats").child(mChatID).child("seen").child(mCurrentUserID);
+
+        // Reference to all messages of this chat
+        mMessageRef = mRootRef.child("Chats").child(mChatID).child("messages");
+
+        // Query to get the last message added
+        Query lastMessageQuery = mMessageRef.limitToLast(1);
+
+        mMessageAddedListener = lastMessageQuery.addChildEventListener(new ChildEventListener() {
+            @Override
+            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                // Set the seen value to that new message
+                seenRef.setValue(dataSnapshot.getKey());
             }
             @Override
             public void onChildChanged(DataSnapshot dataSnapshot, String s) { }
