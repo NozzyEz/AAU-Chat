@@ -1,6 +1,8 @@
 package org.nozzy.android.AAU_Chat;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.media.Image;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
@@ -11,17 +13,31 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.Layout;
 import android.util.Log;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ServerValue;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.iid.FirebaseInstanceId;
+import com.squareup.picasso.Callback;
+import com.squareup.picasso.NetworkPolicy;
+import com.squareup.picasso.Picasso;
+
+import de.hdodenhof.circleimageview.CircleImageView;
+import jp.wasabeef.picasso.transformations.BlurTransformation;
 
 // This is our main activity, where most of the app foundation is laid down, we have our toolbar
 // with an options menu, a tabview where we can switch between different tabs.
@@ -40,6 +56,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
   //  private TabLayout mTabLayout;
 
     private BaseFragment currentFragment;
+
+    // Nav bar initialization
+    private ImageView mHeaderBackground;
+    private CircleImageView mProfileThumb;
+    private TextView mProfileName;
+    private TextView mProfileInfo;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,19 +84,85 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         getSupportActionBar().setTitle("AAU Chat");
 
 
-        DrawerLayout drawer = findViewById(R.id.drawer_layout);
+        final DrawerLayout drawer = findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.addDrawerListener(toggle);
         toggle.syncState();
 
-        NavigationView navigationView = findViewById(R.id.nav_view);
+
+        // TODO: Comemnting
+        final NavigationView navigationView = findViewById(R.id.nav_view);
+
+        final View header = navigationView.getHeaderView(0);
+
+        // Assigning our nav bar items to their views in the side nav bar
+        mHeaderBackground = header.findViewById(R.id.nav_bar_background);
+        mProfileThumb = header.findViewById(R.id.nav_bar_profile_image);
+        mProfileName = header.findViewById(R.id.nav_profile_name);
+        mProfileInfo = header.findViewById(R.id.nav_profile_info);
+
 
         navigationView.setNavigationItemSelectedListener(this);
 
         if (mAuth.getCurrentUser() != null) {
             // Point our database reference to the current user's ID, so that we can manipulate fields within
             mUserRef = FirebaseDatabase.getInstance().getReference().child("Users").child(mAuth.getCurrentUser().getUid());
+
+            mUserRef.addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+
+                    // Gets all the relevant user's data from the database
+                    String name = dataSnapshot.child("name").getValue().toString();
+                    final String image = dataSnapshot.child("image").getValue().toString();
+                    String info = dataSnapshot.child("status").getValue().toString();
+                    final String thumbnail = dataSnapshot.child("thumb_image").getValue().toString();
+
+
+                    // Set the background to a blurred profile image
+                    Picasso.with(getApplicationContext()).load(image).transform(new BlurTransformation(getApplicationContext(), 10, 10))
+                            .networkPolicy(NetworkPolicy.OFFLINE).into(mHeaderBackground, new Callback() {
+                        @Override
+                        public void onSuccess() {
+
+                        }
+
+                        @Override
+                        public void onError() {
+                            Picasso.with(getApplicationContext()).load(image).transform(new BlurTransformation(getApplicationContext(), 10, 10)).into(mHeaderBackground);
+                        }
+                    });
+
+
+
+
+                    // Updates the name and info fields based on information in the database
+                    mProfileName.setText(name);
+                    mProfileInfo.setText(info);
+
+                    // If the user's database entry for image is not 'default' we load their image into the UI, but with our generic image in place as a placeholder
+                    if(!thumbnail.equals("default")) {
+                        // We use the Picasso library to do the image loading, this way we can store the image offline for faster loading
+                        Picasso.with(getApplicationContext()).load(thumbnail).networkPolicy(NetworkPolicy.OFFLINE)
+                                .placeholder(R.drawable.generic).into(mProfileThumb, new Callback() {
+                            @Override
+                            public void onSuccess() { }
+                            @Override
+                            public void onError() {
+                                // If the image fails to load, set the image to the default one
+                                Picasso.with(getApplicationContext()).load(thumbnail).placeholder(R.drawable.generic).into(mProfileThumb);
+                            }
+                        });
+                    }
+
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+
+                }
+            });
 
             // Get the device token from firebase
             String deviceToken = FirebaseInstanceId.getInstance().getToken();
