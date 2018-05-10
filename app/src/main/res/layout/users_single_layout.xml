@@ -33,7 +33,9 @@
         android:layout_alignStart="@+id/user_single_name"
         android:layout_below="@+id/user_single_name"
         android:layout_marginTop="10dp"
-        android:text="user default status" />
+        android:text="user default status"
+        android:maxLines="1"
+        android:ellipsize="end"/>
 
     <ImageView
         android:id="@+id/user_online_indicator"
