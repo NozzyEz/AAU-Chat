@@ -3,6 +3,7 @@ package org.nozzy.android.AAU_Chat;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
@@ -42,6 +43,7 @@ public class ChatsFragment extends BaseFragment {
     private View mMainView;
 
     // Firebase
+    private DatabaseReference mRootDatabase;
     private DatabaseReference mConvDatabase;
     private DatabaseReference mMessageDatabase;
     private DatabaseReference mUsersDatabase;
@@ -87,6 +89,7 @@ public class ChatsFragment extends BaseFragment {
         mCurrent_user_id = mAuth.getCurrentUser().getUid();
 
         // Database reference setup, keeps them synced for offline use
+        mRootDatabase = FirebaseDatabase.getInstance().getReference();
         mConvDatabase = FirebaseDatabase.getInstance().getReference().child("Users").child(mCurrent_user_id).child("chats");
         mConvDatabase.keepSynced(true);
         mUsersDatabase = FirebaseDatabase.getInstance().getReference().child("Users");
@@ -123,17 +126,40 @@ public class ChatsFragment extends BaseFragment {
 
                 // By default, the message box will say that there are no messages
                 // This gets replaced by the following query which tries to get the last message
-                convViewHolder.setMessage("No messages yet.");
+                convViewHolder.setMessage("No messages yet.", true);
                 
                 // Query to get the last message in a conversation
                 Query lastMessageQuery = mMessageDatabase.limitToLast(1);
                 lastMessageQuery.addChildEventListener(new ChildEventListener() {
                     @Override
                     public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                        // Gets the last message and puts it into the RecyclerView
-                        String message = dataSnapshot.child("message").getValue().toString();
-                        convViewHolder.setMessage(message);
+                        // Gets the last message text
+                        final String message = dataSnapshot.child("message").getValue().toString();
 
+                        // Gets the key of the message
+                        final String messageKey = dataSnapshot.getKey();
+
+                        // Listener to check if the user has seen the last message
+                        final DatabaseReference seenDatabase = mRootDatabase.child("Chats").child(list_chat_id).child("seen");
+                        seenDatabase.addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(DataSnapshot dataSnapshot) {
+                                // Checks if the seen table contains the current user
+                                if (dataSnapshot.hasChild(mCurrent_user_id)) {
+                                    // If the user's last seen message is equal to the last message in the chat, make it normal
+                                    if (dataSnapshot.child(mCurrent_user_id).getValue().toString().equals(messageKey))
+                                        convViewHolder.setMessage(message, true);
+                                        // Otherwise, make it bold
+                                    else convViewHolder.setMessage(message, false);
+                                } else {
+                                    // If the user doesn't have a seen value yet, create a blank one
+                                    seenDatabase.child(mCurrent_user_id).setValue("");
+                                    convViewHolder.setMessage(message, false);
+                                }
+                            }
+                            @Override
+                            public void onCancelled(DatabaseError databaseError) { }
+                        });
                     }
                     @Override
                     public void onChildChanged(DataSnapshot dataSnapshot, String s) { }
@@ -189,22 +215,19 @@ public class ChatsFragment extends BaseFragment {
                                                         convViewHolder.setUserImage(userThumb, getContext());
                                                     else {
                                                         // Else, set the image to the group chat's image
-                                                        DatabaseReference chatImageRef = FirebaseDatabase.getInstance().getReference().child("Chats").child(list_chat_id).child("chatImage");
+                                                        DatabaseReference chatImageRef = FirebaseDatabase.getInstance().getReference().child("Chats").child(list_chat_id);
                                                         chatImageRef.addListenerForSingleValueEvent(new ValueEventListener() {
                                                             @Override
                                                             public void onDataChange(DataSnapshot dataSnapshot) {
-                                                                // Chack to see if there is an image to assign before doing so
+                                                                // Check to see if there is an image to assign before doing so
                                                                 if (dataSnapshot.hasChild("chatImage")) {
-                                                                    convViewHolder.setUserImage(dataSnapshot.getValue().toString(), getContext());
+                                                                    convViewHolder.setUserImage(dataSnapshot.child("chatImage").getValue().toString(), getContext());
                                                                 }
                                                             }
                                                             @Override
                                                             public void onCancelled(DatabaseError databaseError) { }
                                                         });
                                                     }
-
-
-
 
 
                                                     // Get the online status of the user and set the online indicator accordingly
@@ -272,14 +295,19 @@ public class ChatsFragment extends BaseFragment {
         }
 
         // Sets the message for the message text field
-        public void setMessage(String message){
+        // If the message wasn't seen, set the text to bold
+        public void setMessage(String message, boolean isSeen){
             TextView userStatusView = mView.findViewById(R.id.user_single_status);
             userStatusView.setText(message);
+
+            if(!isSeen)
+                userStatusView.setTypeface(userStatusView.getTypeface(), Typeface.BOLD);
+            else
+                userStatusView.setTypeface(userStatusView.getTypeface(), Typeface.NORMAL);
         }
 
         // Sets the name for the name text field
         public void setName(String name){
-
             TextView userNameView = mView.findViewById(R.id.user_single_name);
             userNameView.setText(name);
         }
