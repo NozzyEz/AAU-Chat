@@ -6,12 +6,10 @@ public class Messages {
 
     private String message, type, from;
     private long time;
-    private boolean seen;
 
-    public Messages(String message, boolean seen, long time, String type, String from) {
+    public Messages(String message, long time, String type, String from) {
 
         this.message = message;
-        this.seen = seen;
         this.time = time;
         this.type = type;
         this.from = from;
@@ -28,14 +26,6 @@ public class Messages {
 
     public void setMessage(String message) {
         this.message = message;
-    }
-
-    public boolean isSeen() {
-        return seen;
-    }
-
-    public void setSeen(boolean seen) {
-        this.seen = seen;
     }
 
     public long getTime() {

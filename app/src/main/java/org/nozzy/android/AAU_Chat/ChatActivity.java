@@ -301,7 +301,6 @@ public class ChatActivity extends AppCompatActivity {
                         // Which we then store in the database entry for the message that is being sent
                         Map messageMap = new HashMap();
                         messageMap.put("message", download_url);
-                        messageMap.put("seen", false);
                         messageMap.put("type", "image");
                         messageMap.put("time", ServerValue.TIMESTAMP);
                         messageMap.put("from", mCurrentUserID);
@@ -382,8 +381,6 @@ public class ChatActivity extends AppCompatActivity {
                     // Scrolls to the bottom of older messages, effectively showing you the first message
                     mLinearLayout.scrollToPositionWithOffset(itemPos - 1,0);
                 }
-
-
             }
             @Override
             public void onChildChanged(DataSnapshot dataSnapshot, String s) { }
@@ -465,7 +462,6 @@ public class ChatActivity extends AppCompatActivity {
             // A hashmap for storing a message
             Map messageMap = new HashMap();
             messageMap.put("message", message);
-            messageMap.put("seen", false);
             messageMap.put("type", "text");
             messageMap.put("time", ServerValue.TIMESTAMP);
             messageMap.put("from", mCurrentUserID);
