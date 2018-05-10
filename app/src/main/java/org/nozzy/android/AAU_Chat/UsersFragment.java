@@ -3,6 +3,8 @@ package org.nozzy.android.AAU_Chat;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.KeyEvent;
@@ -63,6 +65,20 @@ public class UsersFragment extends BaseFragment {
 
         // Here we setup our RecyclerView which we use to show all the users, one by one
         mUsersList = getView().findViewById(R.id.users_list);
+
+
+
+
+        FloatingActionButton fab = view.findViewById(R.id.fab);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Snackbar.make(view, "Select Users to start a new group", Snackbar.LENGTH_LONG)
+                        .setAction("Action", null).show();
+            }
+        });
+
+
         mUsersList.setHasFixedSize(true);
         mUsersList.setLayoutManager(new LinearLayoutManager(getContext()));
 
