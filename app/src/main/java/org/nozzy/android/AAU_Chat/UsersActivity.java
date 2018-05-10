@@ -186,7 +186,7 @@ public class UsersActivity extends AppCompatActivity {
         });
     }
     private void searchUser(String searchString) {
-        // Query is being passed with information from edittext
+        // Query is being passed with information from edit text
         Query searchQuery = mUsersDatabase.orderByChild("name").startAt(searchString).endAt(searchString + "\uf8ff");
 
         // We setup our Firebase recycler adapter with help from our Users class, a UsersViewHolder class, and the layout we have created to show users.
