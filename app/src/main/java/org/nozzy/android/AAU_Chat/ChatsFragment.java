@@ -193,7 +193,10 @@ public class ChatsFragment extends BaseFragment {
                                                         chatImageRef.addListenerForSingleValueEvent(new ValueEventListener() {
                                                             @Override
                                                             public void onDataChange(DataSnapshot dataSnapshot) {
-                                                                convViewHolder.setUserImage(dataSnapshot.getValue().toString(), getContext());
+                                                                // Chack to see if there is an image to assign before doing so
+                                                                if (dataSnapshot.hasChild("chatImage")) {
+                                                                    convViewHolder.setUserImage(dataSnapshot.getValue().toString(), getContext());
+                                                                }
                                                             }
                                                             @Override
                                                             public void onCancelled(DatabaseError databaseError) { }
