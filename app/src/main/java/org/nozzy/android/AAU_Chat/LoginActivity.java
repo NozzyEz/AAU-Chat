@@ -100,8 +100,10 @@ public class LoginActivity extends AppCompatActivity {
                             @Override
                             public void onComplete(@NonNull Task<Void> task) {
                                 if (task.isSuccessful()) {
-                                    Log.d(TAG, "Email sent.");
+                                    Log.d(TAG, "Email not sent.");
                                 }
+                                else
+                                    Log.d(TAG, "email was sent");
                             }
                         });
 
