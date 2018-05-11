@@ -90,6 +90,15 @@ public class UsersFragment extends BaseFragment {
                if(!newGroupChat){
                    newGroupChat = true;
                }
+               if(!users.isEmpty()) {
+
+                   UsersFragment fragment = new UsersFragment();
+                   Bundle bundle = new Bundle();
+                   bundle.putString("users", Arrays.toString(users.toArray()));
+                   fragment.setArguments(bundle);
+                   ((MainActivity) getActivity()).changeContentFragment(getFragmentManager(), NewGroupChatFragment.getFragmentTag(), new NewGroupChatFragment(), R.id.flFragmentsContainer, true);
+
+               }
             }
         });
 
@@ -260,8 +269,9 @@ public class UsersFragment extends BaseFragment {
 
                 if (name.equals(model.getName())) {
                     viewHolder.hideLayout();
-                } else {
-                    viewHolder.showLayout();
+                }
+                //else {
+                    //viewHolder.showLayout();
 
                     // Inside each view we retrieve the value for name, status and image with our Users class, and set it to the view as needed
                     viewHolder.setName(model.getName());
@@ -299,7 +309,7 @@ public class UsersFragment extends BaseFragment {
                     });
 
 
-                }
+               // }
             }
         };
         // Finally we set the adapter for our recycler view

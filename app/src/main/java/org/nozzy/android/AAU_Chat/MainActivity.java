@@ -1,8 +1,6 @@
 package org.nozzy.android.AAU_Chat;
 
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.media.Image;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
@@ -13,12 +11,10 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.text.Layout;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -35,6 +31,8 @@ import com.google.firebase.iid.FirebaseInstanceId;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.NetworkPolicy;
 import com.squareup.picasso.Picasso;
+
+import java.util.ArrayList;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 import jp.wasabeef.picasso.transformations.BlurTransformation;
@@ -308,6 +306,25 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         transaction.commitAllowingStateLoss();
     }
+
+    public void changeContentFragment(FragmentManager fm, String fragmentTag, BaseFragment frag, int containerId, boolean shouldAddToBackStack, ArrayList<String> list) {
+
+        // Check fragment manager to see if fragment exists
+        currentFragment = fm.popBackStackImmediate(fragmentTag, 0)
+                ? (BaseFragment) fm.findFragmentByTag(fragmentTag)
+                : frag;
+
+        FragmentTransaction transaction = fm.beginTransaction();
+        transaction.replace(containerId, frag, fragmentTag);
+        if (shouldAddToBackStack) {
+            transaction.addToBackStack(fragmentTag);
+        }
+
+        transaction.commitAllowingStateLoss();
+    }
+
+
+
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         // Handle navigation view item clicks here.
