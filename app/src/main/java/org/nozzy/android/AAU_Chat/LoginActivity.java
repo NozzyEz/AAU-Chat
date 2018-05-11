@@ -8,9 +8,11 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -28,6 +30,9 @@ public class LoginActivity extends AppCompatActivity {
     private EditText mLoginEmail;
     private EditText mLoginPassword;
     private Button mLogin_btn;
+    private TextView mForgetPassword;
+    private Button mResetPassword;
+    private static final String TAG="Login Activity";
 
     private ProgressDialog mLoginProgress;
 
@@ -49,6 +54,8 @@ public class LoginActivity extends AppCompatActivity {
         mLoginEmail = findViewById(R.id.username_login_activity);
         mLoginPassword = findViewById(R.id.password_login_activity);
         mLogin_btn = findViewById(R.id.login_button);
+        mForgetPassword=findViewById(R.id.forgot_password_text_view);
+        mResetPassword=findViewById(R.id.reset_password_button);
 
         mLoginProgress = new ProgressDialog(this);
 
@@ -78,6 +85,27 @@ public class LoginActivity extends AppCompatActivity {
                     // If at least one of the fields is left empty, show a message to the user
                     Toast.makeText(LoginActivity.this, "Please fill in both fields", Toast.LENGTH_LONG).show();
                 }
+
+            }
+        });
+        //reset password with e-mail
+        mResetPassword.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                String emailAddress = mLoginEmail.getText().toString();
+
+                mAuth.sendPasswordResetEmail(emailAddress)
+                        .addOnCompleteListener(new OnCompleteListener<Void>() {
+                            @Override
+                            public void onComplete(@NonNull Task<Void> task) {
+                                if (task.isSuccessful()) {
+                                    Log.d(TAG, "Email sent.");
+                                }
+                            }
+                        });
+
+
 
             }
         });
@@ -117,4 +145,7 @@ public class LoginActivity extends AppCompatActivity {
             }
         });
     }
+
+
+
 }
