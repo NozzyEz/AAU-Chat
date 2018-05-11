@@ -499,14 +499,26 @@ public class ChatActivity extends AppCompatActivity {
             // A hashmap for storing a message
             Map messageMap = new HashMap();
             messageMap.put("message", message);
-            messageMap.put("type", "text");
+            if(message.startsWith("https://firebasestorage.googleapis.com/"))
+                messageMap.put("type", "image");
+            else
+                messageMap.put("type", "text");
             messageMap.put("time", ServerValue.TIMESTAMP);
             messageMap.put("from", mCurrentUserID);
 
             // A Hashmap to store the notification
             Map notifyMap = new HashMap();
             notifyMap.put("from", mCurrentUserID);
-            notifyMap.put("type", "message");
+
+            if(message.startsWith("https://firebasestorage.googleapis.com/"))
+                messageMap.put("type", "image");
+            else
+                notifyMap.put("type", "message");
+
+            notifyMap.put("message", message);
+            notifyMap.put("chat_id", mChatID);
+            notifyMap.put("chat_name", mChatName);
+            notifyMap.put("chat_image", mChatImage);
 
             // Put this message into the messages table inside the current chat
             Map messageUserMap = new HashMap();
