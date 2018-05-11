@@ -187,34 +187,34 @@ public class RegisterActivity extends AppCompatActivity {
 
     // Method to add all relevant channels for the newly registered user
     // TODO work in progress
-    private void addToChannels() {
+    private void addToChannels(final String currentUserID, final ArrayList<String> programmes) {
 
-        final DatabaseReference mRootRef = FirebaseDatabase.getInstance().getReference();
-        mAuth = FirebaseAuth.getInstance();
-        final String currentUserID = mAuth.getCurrentUser().getUid();
+        // Root reference
+        final DatabaseReference rootRef = FirebaseDatabase.getInstance().getReference();
 
-        // For every study programme that the user has,
-        DatabaseReference chatsRef = mRootRef.child("Chats");
+        // References to all chats and users
+        final DatabaseReference chatsRef = rootRef.child("Chats");
+        final DatabaseReference usersRef = rootRef.child("Users");
 
+        // A query to get all channels
         Query getChannels = chatsRef.orderByChild("chatType").equalTo("channel");
-
         getChannels.addChildEventListener(new ChildEventListener() {
             @Override
+            // For each channel
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                DatabaseReference userProgrammeRef = mRootRef.child("Users").child(currentUserID).child("programmes");
-
-                userProgrammeRef.addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(DataSnapshot dataSnapshot) {
-                        dataSnapshot.getChildren();
-                        Iterable<DataSnapshot> programmes = dataSnapshot.getChildren();
-                        for (DataSnapshot programme : programmes) {
-
-                        }
+                // Get the ID of the channel
+                String chatID = dataSnapshot.getKey();
+                // For each programme included in the channel
+                Iterable<DataSnapshot> includedProgrammes = dataSnapshot.child("includes").getChildren();
+                for (DataSnapshot programme : includedProgrammes) {
+                    // Check if the user's programmes contain that channel's programme
+                    if (programmes.contains(programme.getKey())) {
+                        // Add the channel into the chats of the user
+                        usersRef.child(currentUserID).child("chats").child(chatID).child("timestamp").setValue(ServerValue.TIMESTAMP);
+                        // Add the user into the members of the channel
+                        chatsRef.child(chatID).child("members").child(currentUserID).setValue("user");
                     }
-                    @Override
-                    public void onCancelled(DatabaseError databaseError) { }
-                });
+                }
             }
             @Override
             public void onChildChanged(DataSnapshot dataSnapshot, String s) { }
@@ -226,6 +226,8 @@ public class RegisterActivity extends AppCompatActivity {
             public void onCancelled(DatabaseError databaseError) { }
         });
     }
+
+
 
     // Method to create a channel and add all relevant users to it
     // TODO work in progress
@@ -249,38 +251,36 @@ public class RegisterActivity extends AppCompatActivity {
 
         // Reference to all the users
         final DatabaseReference usersRef = rootRef.child("Users");
+        Query getAllUsers = usersRef.orderByKey();
 
         // Check each user
-        usersRef.addListenerForSingleValueEvent(new ValueEventListener() {
+        getAllUsers.addChildEventListener(new ChildEventListener() {
             @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                // For each user
-                Iterable<DataSnapshot> allUsers = dataSnapshot.child("programmes").getChildren();
-                for (DataSnapshot user : allUsers) {
-                    // Gets the ID of the user
-                    final String userID = user.getKey();
-                    // For each programme that this user is in
-                    Iterable<DataSnapshot> programmes = user.getChildren();
-                    for (DataSnapshot programme : programmes) {
-                        // Gets the name of the programme
-                        String programmeName = programme.getKey();
-                        // If the programme name is one of those included in this channel
-                        if (includes.contains(programmeName)) {
-                            // Add the channel into the chats of the user
-                            usersRef.child("chats").child(chatID).child("timestamp").setValue(ServerValue.TIMESTAMP);
-                            // Add the user into the members of the channel
-                            chatRef.child("members").child(userID).setValue("user");
-                        }
+            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                // Get the ID of the user
+                final String userID = dataSnapshot.getKey();
+                // For each programme of that user
+                Iterable<DataSnapshot> userProgrammes = dataSnapshot.child("programmes").getChildren();
+                for (DataSnapshot programme : userProgrammes) {
+                    // If the programme name is one of those included in this channel
+                    if (includes.contains(programme.getKey())) {
+                        // Add the channel into the chats of the user
+                        usersRef.child(userID).child("chats").child(chatID).child("timestamp").setValue(ServerValue.TIMESTAMP);
+                        // Add the user into the members of the channel
+                        chatRef.child("members").child(userID).setValue("user");
                     }
                 }
             }
             @Override
+            public void onChildChanged(DataSnapshot dataSnapshot, String s) { }
+            @Override
+            public void onChildRemoved(DataSnapshot dataSnapshot) { }
+            @Override
+            public void onChildMoved(DataSnapshot dataSnapshot, String s) { }
+            @Override
             public void onCancelled(DatabaseError databaseError) { }
         });
     }
-
-
-
 
 
 }

@@ -65,6 +65,7 @@ public class ChatActivity extends AppCompatActivity {
     private String mChatType;
     private String mChatName;
     private String mChatImage;
+    private long mChatUserCount;
 
     private DatabaseReference mRootRef;
     private StorageReference mImageStorage;
@@ -152,24 +153,32 @@ public class ChatActivity extends AppCompatActivity {
 
 
         // Sets the name, image and online values
+        // Adds a listener to get all the chat values
         mRootRef.child("Chats").child(mChatID).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
+                // Gets the type of the chat
                 mChatType = dataSnapshot.child("chat_type").getValue(String.class);
+                // Checks if the chat is direct
                 if (mChatType.equals("direct")) {
+                    // Goes through all members of the chat to find the other member
                     Iterable<DataSnapshot> chatMembers = dataSnapshot.child("members").getChildren();
                     for (DataSnapshot member: chatMembers) {
+                        // If it's not the current user
                         if (!member.getKey().equals(mCurrentUserID)) {
                             // Gets the ID of that other member
                             mDirectUserID = member.getKey();
+                            // Reference to that user to get his data
                             DatabaseReference userRef = mRootRef.child("Users").child(mDirectUserID);
                             userRef.addListenerForSingleValueEvent(new ValueEventListener() {
                                 @Override
                                 public void onDataChange(DataSnapshot dataSnapshot) {
+                                    // Gets the name and image of the user
                                     mChatName = dataSnapshot.child("name").getValue(String.class);
                                     mChatImage = dataSnapshot.child("image").getValue(String.class);
+                                    // Sets the name of the user as the title of the chat
                                     mTitleView.setText(mChatName);
-                                    // Loads the thumbnail image to the top
+                                    // Loads the user's image to the top
                                     if (!mChatImage.equals("")) {
                                         Picasso.with(getApplicationContext()).load(mChatImage).networkPolicy(NetworkPolicy.OFFLINE)
                                                 .placeholder(R.drawable.generic).into(mProfileImage, new Callback() {
@@ -211,10 +220,13 @@ public class ChatActivity extends AppCompatActivity {
 
                 } else {
                     // Else, if it is a group chat or a channel
+                    // Gets the chat's name, image, as well as the count of all members
+                    mChatUserCount = dataSnapshot.child("members").getChildrenCount();
                     mChatName = dataSnapshot.child("chat_name").getValue(String.class);
                     mChatImage = dataSnapshot.child("chat_image").getValue(String.class);
+                    // Sets the title of the chat to the chat's name
                     mTitleView.setText(mChatName);
-                    // Loads the thumbnail image to the top
+                    // Loads the chat's image to the top
                     if (!mChatImage.equals("")) {
                         Picasso.with(getApplicationContext()).load(mChatImage).networkPolicy(NetworkPolicy.OFFLINE)
                                 .placeholder(R.drawable.generic).into(mProfileImage, new Callback() {
@@ -226,8 +238,8 @@ public class ChatActivity extends AppCompatActivity {
                             }
                         });
                     }
-                    // TODO set the text to the number of members in the group
-                    mLastSeenView.setText("Group chat");
+                    // The online indicator displays the number of members in the chat instead
+                    mLastSeenView.setText("Members: " + mChatUserCount);
                 }
             }
             @Override
