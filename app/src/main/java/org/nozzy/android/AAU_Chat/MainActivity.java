@@ -2,6 +2,11 @@ package org.nozzy.android.AAU_Chat;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.media.Image;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -119,42 +124,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     String info = dataSnapshot.child("status").getValue().toString();
                     final String thumbnail = dataSnapshot.child("thumb_image").getValue().toString();
 
-
-                    // Set the background to a blurred profile image
-                    Picasso.with(getApplicationContext()).load(image).transform(new BlurTransformation(getApplicationContext(), 10, 10))
-                            .networkPolicy(NetworkPolicy.OFFLINE).into(mHeaderBackground, new Callback() {
-                        @Override
-                        public void onSuccess() {
-
-                        }
-
-                        @Override
-                        public void onError() {
-                            Picasso.with(getApplicationContext()).load(image).transform(new BlurTransformation(getApplicationContext(), 10, 10)).into(mHeaderBackground);
-                        }
-                    });
-
-
-
-
-                    // Updates the name and info fields based on information in the database
-                    mProfileName.setText(name);
-                    mProfileInfo.setText(info);
-
-                    // If the user's database entry for image is not 'default' we load their image into the UI, but with our generic image in place as a placeholder
-                    if(!thumbnail.equals("default")) {
-                        // We use the Picasso library to do the image loading, this way we can store the image offline for faster loading
-                        Picasso.with(getApplicationContext()).load(thumbnail).networkPolicy(NetworkPolicy.OFFLINE)
-                                .placeholder(R.drawable.generic).into(mProfileThumb, new Callback() {
-                            @Override
-                            public void onSuccess() { }
-                            @Override
-                            public void onError() {
-                                // If the image fails to load, set the image to the default one
-                                Picasso.with(getApplicationContext()).load(thumbnail).placeholder(R.drawable.generic).into(mProfileThumb);
-                            }
-                        });
-                    }
+                    setSideNavBar(name, image, info, thumbnail);
 
                 }
 
@@ -162,6 +132,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 public void onCancelled(DatabaseError databaseError) {
 
                 }
+
+
             });
 
             // Get the device token from firebase
@@ -174,15 +146,109 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 }
             });
         }
+    }
 
-        // Setting up our tabs
-        //mViewPager = findViewById(R.id.main_tabpager);
-        //mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
+    private void setSideNavBar(String name, final String image, String info, final String thumbnail) {
 
-        //mViewPager.setAdapter(mSectionsPagerAdapter);
-        //mTabLayout = findViewById(R.id.main_tabs);
-        //mTabLayout.setupWithViewPager(mViewPager);
 
+        // Set the background to a blurred profile image
+        Picasso.with(getApplicationContext()).load(image).transform(new BlurTransformation(getApplicationContext(), 10, 10))
+                .networkPolicy(NetworkPolicy.OFFLINE).into(mHeaderBackground, new Callback() {
+            @Override
+            public void onSuccess() {
+
+                // Create a drawable from the image that picasso has assigned
+                Drawable fromPicasso = mHeaderBackground.getDrawable();
+
+                // Convert the drawable to a bitmap
+                Bitmap headerBitmap = drawableToBitmap(fromPicasso);
+
+                // Check to see if the bitmap is considered light or dark and set the text color of the text views accordingly
+                if(!isDark(headerBitmap)) {
+                    mProfileName.setTextColor(Color.BLACK);
+                    mProfileInfo.setTextColor(Color.BLACK);
+                } else {
+                    mProfileName.setTextColor(Color.WHITE);
+                    mProfileInfo.setTextColor(Color.WHITE);
+                }
+
+
+            }
+
+            @Override
+            public void onError() {
+                Picasso.with(getApplicationContext()).load(image).transform(new BlurTransformation(getApplicationContext(), 10, 10)).into(mHeaderBackground);
+            }
+        });
+
+        // Updates the name and info fields based on information in the database
+        mProfileName.setText(name);
+        mProfileInfo.setText(info);
+
+        // If the user's database entry for image is not 'default' we load their image into the UI, but with our generic image in place as a placeholder
+        if (!thumbnail.equals("default")) {
+            // We use the Picasso library to do the image loading, this way we can store the image offline for faster loading
+            Picasso.with(getApplicationContext()).load(thumbnail).networkPolicy(NetworkPolicy.OFFLINE)
+                    .placeholder(R.drawable.generic).into(mProfileThumb, new Callback() {
+                @Override
+                public void onSuccess() {
+                }
+
+                @Override
+                public void onError() {
+                    // If the image fails to load, set the image to the default one
+                    Picasso.with(getApplicationContext()).load(thumbnail).placeholder(R.drawable.generic).into(mProfileThumb);
+                }
+            });
+        }
+    }
+
+    public static Bitmap drawableToBitmap (Drawable drawable) {
+        Bitmap bitmap = null;
+
+        if (drawable instanceof BitmapDrawable) {
+            BitmapDrawable bitmapDrawable = (BitmapDrawable) drawable;
+            if(bitmapDrawable.getBitmap() != null) {
+                return bitmapDrawable.getBitmap();
+            }
+        }
+
+        if(drawable.getIntrinsicWidth() <= 0 || drawable.getIntrinsicHeight() <= 0) {
+            bitmap = Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888); // Single color bitmap will be created of 1x1 pixel
+        } else {
+            bitmap = Bitmap.createBitmap(drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
+        }
+
+        Canvas canvas = new Canvas(bitmap);
+        drawable.setBounds(0, 0, canvas.getWidth(), canvas.getHeight());
+        drawable.draw(canvas);
+        return bitmap;
+    }
+
+    public static boolean isDark(Bitmap bitmap){
+        boolean dark=false;
+
+        float darkThreshold = bitmap.getWidth()*(bitmap.getHeight()/2)*0.95f;
+        int darkPixels=0;
+
+        int[] pixels = new int[bitmap.getWidth()*(bitmap.getHeight()/2)];
+        bitmap.getPixels(pixels,0,bitmap.getWidth(),0,bitmap.getHeight()/2,bitmap.getWidth(),bitmap.getHeight()/2);
+
+        for(int i = 0; i < pixels.length; i++){
+            int color = pixels[i];
+            int r = Color.red(color);
+            int g = Color.green(color);
+            int b = Color.blue(color);
+            double luminance = (0.299*r+0.0f + 0.587*g+0.0f + 0.114*b+0.0f);
+            if (luminance<150) {
+                darkPixels++;
+            }
+        }
+
+        if (darkPixels >= darkThreshold) {
+            dark = true;
+        }
+        return dark;
     }
 
     @Override
@@ -234,65 +300,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         finish();
     }
 
-//    @Override
-//    // Inflating our options menu in the toolbar
-//    public boolean onCreateOptionsMenu(Menu menu) {
-//        super.onCreateOptionsMenu(menu);
-//        getMenuInflater().inflate(R.menu.main_menu, menu);
-//
-//        return true;
-//    }
-
-//    @Override
-//    // After inflation of the options menu, we use a switch statement to determine which option the
-//    // user selects, and depending on which one, we act accordingly
-//    public boolean onOptionsItemSelected(MenuItem item) {
-//        super.onOptionsItemSelected(item);
-//
-//        switch (item.getItemId()) {
-//            // If the Account Settings button was pressed, go to the SettingsActivity
-////            case R.id.main_settings_btn:
-////                Intent settingsIntent = new Intent(MainActivity.this, SettingsActivity.class);
-////                startActivity(settingsIntent);
-////                break;
-////            // If the All Users button was pressed, go to the UsersActivity
-////            case R.id.main_users_btn:
-////                Intent usersIntent = new Intent(MainActivity.this, UsersActivity.class);
-////                startActivity(usersIntent);
-////                break;
-//            // If the Log Out button was pressed, log the user out and go to the StartActivity
-//            case R.id.main_settings:
-//                changeContentFragment(getSupportFragmentManager(), SettingsFragment.getFragmentTag(),new SettingsFragment(),R.id.flFragmentsContainer,false);
-//                break;
-//            case R.id.main_chats:
-//                changeContentFragment(getSupportFragmentManager(), ChatsFragment.getFragmentTag(),new ChatsFragment(),R.id.flFragmentsContainer,false);
-//                break;
-//            case R.id.main_friends:
-//                changeContentFragment(getSupportFragmentManager(), FriendsFragment.getFragmentTag(),new FriendsFragment(),R.id.flFragmentsContainer,false);
-//                break;
-//            case R.id.main_users:
-//                changeContentFragment(getSupportFragmentManager(), UsersFragment.getFragmentTag(),new UsersFragment(),R.id.flFragmentsContainer,false);
-//                break;
-//            case R.id.main_logout_btn:
-//                if (mAuth.getCurrentUser() != null) {
-//                    mUserRef.child("online").setValue(ServerValue.TIMESTAMP);
-//                }
-//                FirebaseAuth.getInstance().signOut();
-//                sendToStart();
-//                break;
-//
-//            default:
-//                break;
-//
-//        }
-//
-//        return true;
-//    }
-
-//    @Override
-//    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-//        return false;
-//    }
     public void changeContentFragment(FragmentManager fm, String fragmentTag, BaseFragment frag, int containerId, boolean shouldAddToBackStack) {
 
         // Check fragment manager to see if fragment exists

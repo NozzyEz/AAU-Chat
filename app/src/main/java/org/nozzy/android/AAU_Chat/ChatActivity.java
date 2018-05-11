@@ -56,18 +56,21 @@ import id.zelory.compressor.Compressor;
 // This activity is used for chatting with other users.
 public class ChatActivity extends AppCompatActivity {
 
-    // ID and name of the user being chatted with
-    // These will only be used if the type of the chat is "direct"
+    // ID of the user being chatted with
+    // It will only be used if the type of the chat is "direct"
     private String mDirectUserID;
-    private String mDirectUserName;
 
-    // ID and type of the chat
+    // Parameters of the chat
     private String mChatID;
     private String mChatType;
     private String mChatName;
+    private String mChatImage;
 
     private DatabaseReference mRootRef;
     private StorageReference mImageStorage;
+
+    private ChildEventListener mMessageAddedListener;
+    private DatabaseReference mMessageRef;
 
     // UI
     private Toolbar mChatToolbar;
@@ -115,11 +118,11 @@ public class ChatActivity extends AppCompatActivity {
         mImageStorage = FirebaseStorage.getInstance().getReference();
 
         // Setting up passed variables
-        mDirectUserID = getIntent().getStringExtra("user_id");
-        mDirectUserName = getIntent().getStringExtra("user_name");
         mChatID = getIntent().getStringExtra("chat_id");
         mChatType = getIntent().getStringExtra("chat_type");
         mChatName = getIntent().getStringExtra("chat_name");
+        mChatImage = getIntent().getStringExtra("chat_image");
+        mDirectUserID = getIntent().getStringExtra("direct_user_id");
 
         // Setting up the UI
         mChatToolbar = findViewById(R.id.chat_app_bar);
@@ -154,14 +157,23 @@ public class ChatActivity extends AppCompatActivity {
         mMessagesList.setAdapter(mAdapter);
 
         // If the chat type is direct, set the title of the conversation to the other user
-        if (mChatType.equals("direct"))
-            mTitleView.setText(mDirectUserName);
-        else mTitleView.setText(mChatName);
+        mTitleView.setText(mChatName);
+
+        // Loads the thumbnail image to the top
+        Picasso.with(getApplicationContext()).load(mChatImage).networkPolicy(NetworkPolicy.OFFLINE)
+                .placeholder(R.drawable.generic).into(mProfileImage, new Callback() {
+            @Override
+            public void onSuccess() { }
+            @Override
+            public void onError() {
+                Picasso.with(getApplicationContext()).load(mChatImage).placeholder(R.drawable.generic).into(mProfileImage);
+            }
+        });
 
         // Loads the first messages
         loadMessages();
 
-        // If the chat is direct, sets the image and profile pic at the top accordingly
+        // If the chat is direct, set the online value at the top accordingly
         if (mChatType.equals("direct")) {
             // Adds a listener to the user being chatted with for setting their current online state
             mRootRef.child("Users").child(mDirectUserID).addValueEventListener(new ValueEventListener() {
@@ -169,9 +181,6 @@ public class ChatActivity extends AppCompatActivity {
                 public void onDataChange(DataSnapshot dataSnapshot) {
                     // Gets either a true value or the timestamp of the last time the user was online
                     String online = dataSnapshot.child("online").getValue().toString();
-                    // Gets the thumbnail image
-                    final String profileImage = dataSnapshot.child("thumb_image").getValue().toString();
-
                     // If the user is online, set the text at the top to 'Online'
                     if (online.equals("true")) {
                         mLastSeenView.setText("Online");
@@ -182,22 +191,18 @@ public class ChatActivity extends AppCompatActivity {
                         String lastSeenTime = GetTimeAgo.getTimeAgo(lastTime, getApplicationContext());
                         mLastSeenView.setText(lastSeenTime);
                     }
-                    // Loads the thumbnail image to the top
-                    Picasso.with(getApplicationContext()).load(profileImage).networkPolicy(NetworkPolicy.OFFLINE)
-                            .placeholder(R.drawable.generic).into(mProfileImage, new Callback() {
-                        @Override
-                        public void onSuccess() { }
-                        @Override
-                        public void onError() {
-                            Picasso.with(getApplicationContext()).load(profileImage).placeholder(R.drawable.generic).into(mProfileImage);
-                        }
-                    });
                 }
                 @Override
                 public void onCancelled(DatabaseError databaseError) { }
             });
+        } else {
+            // If the chat is direct, set the text at the top to "Group chat"
+            // TODO set the text to the number of members in the group
+            mLastSeenView.setText("Group chat");
         }
 
+        // Updates the last seen message of the current user
+        updateSeen();
 
         // Button event for sending a message
         mChatSendBtn.setOnClickListener(new View.OnClickListener() {
@@ -247,6 +252,8 @@ public class ChatActivity extends AppCompatActivity {
 
             // Reference to the messages in the database
             final String messages_ref = "Chats" + "/" + mChatID + "/" + "messages";
+            final String notification_ref = "Notifications/" + mDirectUserID;
+
 
             // Gets the semi-random key of the message about to be stored
             DatabaseReference user_message_push = mRootRef.child("Chats").child(mChatID).child("messages").push();
@@ -294,14 +301,20 @@ public class ChatActivity extends AppCompatActivity {
                         // Which we then store in the database entry for the message that is being sent
                         Map messageMap = new HashMap();
                         messageMap.put("message", download_url);
-                        messageMap.put("seen", false);
                         messageMap.put("type", "image");
                         messageMap.put("time", ServerValue.TIMESTAMP);
                         messageMap.put("from", mCurrentUserID);
 
+                        // A Hashmap to store the notification
+                        Map notifyMap = new HashMap();
+                        notifyMap.put("from", mCurrentUserID);
+                        notifyMap.put("type", "message");
+
                         // Put this message into the messages table inside the current chat
                         Map messageUserMap = new HashMap();
                         messageUserMap.put(messages_ref + "/" + push_id, messageMap);
+                        messageUserMap.put(notification_ref + "/" + push_id, notifyMap);
+
 
                         // Attempts to store all data in the database
                         mRootRef.updateChildren(messageUserMap, new DatabaseReference.CompletionListener() {
@@ -368,8 +381,6 @@ public class ChatActivity extends AppCompatActivity {
                     // Scrolls to the bottom of older messages, effectively showing you the first message
                     mLinearLayout.scrollToPositionWithOffset(itemPos - 1,0);
                 }
-
-
             }
             @Override
             public void onChildChanged(DataSnapshot dataSnapshot, String s) { }
@@ -451,7 +462,6 @@ public class ChatActivity extends AppCompatActivity {
             // A hashmap for storing a message
             Map messageMap = new HashMap();
             messageMap.put("message", message);
-            messageMap.put("seen", false);
             messageMap.put("type", "text");
             messageMap.put("time", ServerValue.TIMESTAMP);
             messageMap.put("from", mCurrentUserID);
@@ -506,6 +516,8 @@ public class ChatActivity extends AppCompatActivity {
         if (currentUser != null) {
             mRootRef.child("Users").child(mCurrentUserID).child("online").setValue(ServerValue.TIMESTAMP);
         }
+
+        mMessageRef.removeEventListener(mMessageAddedListener);
     }
 
     // Method used for updating the chat's timestamp for each user
@@ -521,6 +533,34 @@ public class ChatActivity extends AppCompatActivity {
                 String userID = dataSnapshot.getKey();
                 // Updates the timestamp value representing recent activity
                 mRootRef.child("Users").child(userID).child("chats").child(mChatID).child("timestamp").setValue(ServerValue.TIMESTAMP);
+            }
+            @Override
+            public void onChildChanged(DataSnapshot dataSnapshot, String s) { }
+            @Override
+            public void onChildRemoved(DataSnapshot dataSnapshot) { }
+            @Override
+            public void onChildMoved(DataSnapshot dataSnapshot, String s) { }
+            @Override
+            public void onCancelled(DatabaseError databaseError) { }
+        });
+    }
+
+    // Method used for updating seen values
+    private void updateSeen() {
+        // Reference to the seen value of the current user
+        final DatabaseReference seenRef = mRootRef.child("Chats").child(mChatID).child("seen").child(mCurrentUserID);
+
+        // Reference to all messages of this chat
+        mMessageRef = mRootRef.child("Chats").child(mChatID).child("messages");
+
+        // Query to get the last message added
+        Query lastMessageQuery = mMessageRef.limitToLast(1);
+
+        mMessageAddedListener = lastMessageQuery.addChildEventListener(new ChildEventListener() {
+            @Override
+            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                // Set the seen value to that new message
+                seenRef.setValue(dataSnapshot.getKey());
             }
             @Override
             public void onChildChanged(DataSnapshot dataSnapshot, String s) { }
