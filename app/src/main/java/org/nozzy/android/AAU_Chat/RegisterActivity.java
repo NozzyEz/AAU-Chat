@@ -20,11 +20,19 @@ import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException;
 import com.google.firebase.auth.FirebaseAuthUserCollisionException;
 import com.google.firebase.auth.FirebaseAuthWeakPasswordException;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.ChildEventListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
+import com.google.firebase.database.ServerValue;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.iid.FirebaseInstanceId;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 
 // This activity is accessed from the start activity when the user taps the register new account
 // button. In this activity we facilitate this functionality by letting the user sign up with their
@@ -175,4 +183,104 @@ public class RegisterActivity extends AppCompatActivity {
             }
         });
     }
+
+
+    // Method to add all relevant channels for the newly registered user
+    // TODO work in progress
+    private void addToChannels() {
+
+        final DatabaseReference mRootRef = FirebaseDatabase.getInstance().getReference();
+        mAuth = FirebaseAuth.getInstance();
+        final String currentUserID = mAuth.getCurrentUser().getUid();
+
+        // For every study programme that the user has,
+        DatabaseReference chatsRef = mRootRef.child("Chats");
+
+        Query getChannels = chatsRef.orderByChild("chatType").equalTo("channel");
+
+        getChannels.addChildEventListener(new ChildEventListener() {
+            @Override
+            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                DatabaseReference userProgrammeRef = mRootRef.child("Users").child(currentUserID).child("programmes");
+
+                userProgrammeRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        dataSnapshot.getChildren();
+                        Iterable<DataSnapshot> programmes = dataSnapshot.getChildren();
+                        for (DataSnapshot programme : programmes) {
+
+                        }
+                    }
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) { }
+                });
+            }
+            @Override
+            public void onChildChanged(DataSnapshot dataSnapshot, String s) { }
+            @Override
+            public void onChildRemoved(DataSnapshot dataSnapshot) { }
+            @Override
+            public void onChildMoved(DataSnapshot dataSnapshot, String s) { }
+            @Override
+            public void onCancelled(DatabaseError databaseError) { }
+        });
+    }
+
+    // Method to create a channel and add all relevant users to it
+    // TODO work in progress
+    private void createChannel(String name, String image, final ArrayList<String> includes) {
+
+        // Root reference
+        DatabaseReference rootRef = FirebaseDatabase.getInstance().getReference();
+
+        // Creates a semi-random key for the new channel being created
+        DatabaseReference chat_push = rootRef.child("Chats").push();
+        final String chatID = chat_push.getKey();
+
+        // Creating the chat, adding the type, name, image, and included programmes
+        final DatabaseReference chatRef = rootRef.child("Chats").child(chatID);
+        chatRef.child("chat_type").setValue("channel");
+        chatRef.child("chat_name").setValue(name);
+        chatRef.child("chat_image").setValue(image);
+        for (String programme : includes) {
+            chatRef.child("includes").child(programme).setValue(true);
+        }
+
+        // Reference to all the users
+        final DatabaseReference usersRef = rootRef.child("Users");
+
+        // Check each user
+        usersRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                // For each user
+                Iterable<DataSnapshot> allUsers = dataSnapshot.child("programmes").getChildren();
+                for (DataSnapshot user : allUsers) {
+                    // Gets the ID of the user
+                    final String userID = user.getKey();
+                    // For each programme that this user is in
+                    Iterable<DataSnapshot> programmes = user.getChildren();
+                    for (DataSnapshot programme : programmes) {
+                        // Gets the name of the programme
+                        String programmeName = programme.getKey();
+                        // If the programme name is one of those included in this channel
+                        if (includes.contains(programmeName)) {
+                            // Add the channel into the chats of the user
+                            usersRef.child("chats").child(chatID).child("timestamp").setValue(ServerValue.TIMESTAMP);
+                            // Add the user into the members of the channel
+                            chatRef.child("members").child(userID).setValue("user");
+                        }
+                    }
+                }
+            }
+            @Override
+            public void onCancelled(DatabaseError databaseError) { }
+        });
+    }
+
+
+
+
+
 }

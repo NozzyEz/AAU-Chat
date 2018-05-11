@@ -102,8 +102,6 @@ public class ChatActivity extends AppCompatActivity {
     private static final int GALLERY_PICK = 1;
 
 
-
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -119,10 +117,6 @@ public class ChatActivity extends AppCompatActivity {
 
         // Setting up passed variables
         mChatID = getIntent().getStringExtra("chat_id");
-        mChatType = getIntent().getStringExtra("chat_type");
-        mChatName = getIntent().getStringExtra("chat_name");
-        mChatImage = getIntent().getStringExtra("chat_image");
-        mDirectUserID = getIntent().getStringExtra("direct_user_id");
 
         // Setting up the UI
         mChatToolbar = findViewById(R.id.chat_app_bar);
@@ -156,50 +150,93 @@ public class ChatActivity extends AppCompatActivity {
 
         mMessagesList.setAdapter(mAdapter);
 
-        // If the chat type is direct, set the title of the conversation to the other user
-        mTitleView.setText(mChatName);
 
-        // Loads the thumbnail image to the top
-        Picasso.with(getApplicationContext()).load(mChatImage).networkPolicy(NetworkPolicy.OFFLINE)
-                .placeholder(R.drawable.generic).into(mProfileImage, new Callback() {
+        // Sets the name, image and online values
+        mRootRef.child("Chats").child(mChatID).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
-            public void onSuccess() { }
-            @Override
-            public void onError() {
-                Picasso.with(getApplicationContext()).load(mChatImage).placeholder(R.drawable.generic).into(mProfileImage);
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                mChatType = dataSnapshot.child("chat_type").getValue(String.class);
+                if (mChatType.equals("direct")) {
+                    Iterable<DataSnapshot> chatMembers = dataSnapshot.child("members").getChildren();
+                    for (DataSnapshot member: chatMembers) {
+                        if (!member.getKey().equals(mCurrentUserID)) {
+                            // Gets the ID of that other member
+                            mDirectUserID = member.getKey();
+                            DatabaseReference userRef = mRootRef.child("Users").child(mDirectUserID);
+                            userRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                                @Override
+                                public void onDataChange(DataSnapshot dataSnapshot) {
+                                    mChatName = dataSnapshot.child("name").getValue(String.class);
+                                    mChatImage = dataSnapshot.child("image").getValue(String.class);
+                                    mTitleView.setText(mChatName);
+                                    // Loads the thumbnail image to the top
+                                    if (!mChatImage.equals("")) {
+                                        Picasso.with(getApplicationContext()).load(mChatImage).networkPolicy(NetworkPolicy.OFFLINE)
+                                                .placeholder(R.drawable.generic).into(mProfileImage, new Callback() {
+                                            @Override
+                                            public void onSuccess() { }
+                                            @Override
+                                            public void onError() {
+                                                Picasso.with(getApplicationContext()).load(mChatImage).placeholder(R.drawable.generic).into(mProfileImage);
+                                            }
+                                        });
+                                    }
+                                }
+                                @Override
+                                public void onCancelled(DatabaseError databaseError) { }
+                            });
+                            // Adds a listener to the user being chatted with for setting their current online state
+                            userRef.addValueEventListener(new ValueEventListener() {
+                                @Override
+                                public void onDataChange(DataSnapshot dataSnapshot) {
+                                    // Gets either a true value or the timestamp of the last time the user was online
+                                    String online = dataSnapshot.child("online").getValue().toString();
+                                    // If the user is online, set the text at the top to 'Online'
+                                    if (online.equals("true")) {
+                                        mLastSeenView.setText("Online");
+                                    } else {
+                                        // If the user isn't online, turns the timestamp into a long value
+                                        long lastTime = Long.parseLong(online);
+                                        // Converts it into a readable format, sets the text at the top to that value
+                                        String lastSeenTime = GetTimeAgo.getTimeAgo(lastTime, getApplicationContext());
+                                        mLastSeenView.setText(lastSeenTime);
+                                    }
+                                }
+                                @Override
+                                public void onCancelled(DatabaseError databaseError) { }
+                            });
+                            break;
+                        }
+                    }
+
+                } else {
+                    // Else, if it is a group chat or a channel
+                    mChatName = dataSnapshot.child("chat_name").getValue(String.class);
+                    mChatImage = dataSnapshot.child("chat_image").getValue(String.class);
+                    mTitleView.setText(mChatName);
+                    // Loads the thumbnail image to the top
+                    if (!mChatImage.equals("")) {
+                        Picasso.with(getApplicationContext()).load(mChatImage).networkPolicy(NetworkPolicy.OFFLINE)
+                                .placeholder(R.drawable.generic).into(mProfileImage, new Callback() {
+                            @Override
+                            public void onSuccess() { }
+                            @Override
+                            public void onError() {
+                                Picasso.with(getApplicationContext()).load(mChatImage).placeholder(R.drawable.generic).into(mProfileImage);
+                            }
+                        });
+                    }
+                    // TODO set the text to the number of members in the group
+                    mLastSeenView.setText("Group chat");
+                }
             }
+            @Override
+            public void onCancelled(DatabaseError databaseError) { }
         });
+
 
         // Loads the first messages
         loadMessages();
-
-        // If the chat is direct, set the online value at the top accordingly
-        if (mChatType.equals("direct")) {
-            // Adds a listener to the user being chatted with for setting their current online state
-            mRootRef.child("Users").child(mDirectUserID).addValueEventListener(new ValueEventListener() {
-                @Override
-                public void onDataChange(DataSnapshot dataSnapshot) {
-                    // Gets either a true value or the timestamp of the last time the user was online
-                    String online = dataSnapshot.child("online").getValue().toString();
-                    // If the user is online, set the text at the top to 'Online'
-                    if (online.equals("true")) {
-                        mLastSeenView.setText("Online");
-                    } else {
-                        // If the user isn't online, turns the timestamp into a long value
-                        long lastTime = Long.parseLong(online);
-                        // Converts it into a readable format, sets the text at the top to that value
-                        String lastSeenTime = GetTimeAgo.getTimeAgo(lastTime, getApplicationContext());
-                        mLastSeenView.setText(lastSeenTime);
-                    }
-                }
-                @Override
-                public void onCancelled(DatabaseError databaseError) { }
-            });
-        } else {
-            // If the chat is direct, set the text at the top to "Group chat"
-            // TODO set the text to the number of members in the group
-            mLastSeenView.setText("Group chat");
-        }
 
         // Updates the last seen message of the current user
         updateSeen();

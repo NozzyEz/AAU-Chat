@@ -199,19 +199,22 @@ public class FriendsFragment extends BaseFragment {
         // Creating the chat in the Chats table with members, name, type, image and seen values
         mRootRef.child("Chats").child(push_id).child("members").child(mCurrent_user_id).setValue("user");
         mRootRef.child("Chats").child(push_id).child("members").child(list_user_id).setValue("user");
+        mRootRef.child("Chats").child(push_id).child("chat_name").setValue("New Chat");
+        mRootRef.child("Chats").child(push_id).child("chat_type").setValue("direct");
+        mRootRef.child("Chats").child(push_id).child("chat_image").setValue("");
+
+        // TODO this will be removed later on. It is left at the moment for compatibility reasons.
         mRootRef.child("Chats").child(push_id).child("chatName").setValue("New Chat");
         mRootRef.child("Chats").child(push_id).child("chatType").setValue("direct");
         mRootRef.child("Chats").child(push_id).child("chatImage").setValue("");
+        //
+
         mRootRef.child("Chats").child(push_id).child("seen").child(list_user_id).setValue("");
         mRootRef.child("Chats").child(push_id).child("seen").child(mCurrent_user_id).setValue("");
 
         // Passing variables and starting ChatActivity
         Intent chatIntent = new Intent(getContext(), ChatActivity.class);
         chatIntent.putExtra("chat_id", push_id);
-        chatIntent.putExtra("chat_type", "direct");
-        chatIntent.putExtra("chat_name", userName);
-        chatIntent.putExtra("chat_image", userThumb);
-        chatIntent.putExtra("direct_user_id", list_user_id);
         startActivity(chatIntent);
     }
 
