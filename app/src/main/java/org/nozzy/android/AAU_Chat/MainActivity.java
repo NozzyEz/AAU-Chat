@@ -157,10 +157,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             @Override
             public void onSuccess() {
 
-                final Drawable fromPicasso = mHeaderBackground.getDrawable();
+                // Create a drawable from the image that picasso has assigned
+                Drawable fromPicasso = mHeaderBackground.getDrawable();
 
+                // Convert the drawable to a bitmap
                 Bitmap headerBitmap = drawableToBitmap(fromPicasso);
 
+                // Check to see if the bitmap is considered light or dark and set the text color of the text views accordingly
                 if(!isDark(headerBitmap)) {
                     mProfileName.setTextColor(Color.BLACK);
                     mProfileInfo.setTextColor(Color.BLACK);
@@ -225,11 +228,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     public static boolean isDark(Bitmap bitmap){
         boolean dark=false;
 
-        float darkThreshold = bitmap.getWidth()*bitmap.getHeight()*0.95f;
+        float darkThreshold = bitmap.getWidth()*(bitmap.getHeight()/2)*0.95f;
         int darkPixels=0;
 
-        int[] pixels = new int[bitmap.getWidth()*bitmap.getHeight()];
-        bitmap.getPixels(pixels,0,bitmap.getWidth(),0,0,bitmap.getWidth(),bitmap.getHeight());
+        int[] pixels = new int[bitmap.getWidth()*(bitmap.getHeight()/2)];
+        bitmap.getPixels(pixels,0,bitmap.getWidth(),0,bitmap.getHeight()/2,bitmap.getWidth(),bitmap.getHeight()/2);
 
         for(int i = 0; i < pixels.length; i++){
             int color = pixels[i];
