@@ -30,16 +30,20 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ServerValue;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.NetworkPolicy;
 import com.squareup.picasso.Picasso;
+
+import java.util.ArrayList;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 import jp.wasabeef.picasso.transformations.BlurTransformation;
@@ -268,6 +272,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             // update the device token
             setDeviceToken();
         }
+
     }
 
     @Override
@@ -354,6 +359,61 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             }
         });
 
+    }
+
+
+
+
+    // Method to create a channel and add all relevant users to it
+    private void createChannel(String name, String image, final ArrayList<String> includes) {
+
+        // Root reference
+        DatabaseReference rootRef = FirebaseDatabase.getInstance().getReference();
+
+        // Creates a semi-random key for the new channel being created
+        DatabaseReference chat_push = rootRef.child("Chats").push();
+        final String chatID = chat_push.getKey();
+
+        // Creating the chat, adding the type, name, image, and included programmes
+        final DatabaseReference chatRef = rootRef.child("Chats").child(chatID);
+        chatRef.child("chat_type").setValue("channel");
+        chatRef.child("chat_name").setValue(name);
+        chatRef.child("chat_image").setValue(image);
+        for (String programme : includes) {
+            chatRef.child("includes").child(programme).setValue(true);
+        }
+
+        // Reference to all the users
+        final DatabaseReference usersRef = rootRef.child("Users");
+        Query getAllUsers = usersRef.orderByKey();
+
+        // Check each user
+        getAllUsers.addChildEventListener(new ChildEventListener() {
+            @Override
+            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                // Get the ID of the user
+                final String userID = dataSnapshot.getKey();
+                // For each programme of that user
+                Iterable<DataSnapshot> userProgrammes = dataSnapshot.child("programmes").getChildren();
+                for (DataSnapshot programme : userProgrammes) {
+                    // If the programme name is one of those included in this channel
+                    if (includes.contains(programme.getKey())) {
+                        // Add the channel into the chats of the user
+                        usersRef.child(userID).child("chats").child(chatID).child("timestamp").setValue(ServerValue.TIMESTAMP);
+                        // Add the user into the members of the channel
+                        chatRef.child("members").child(userID).setValue("user");
+                    }
+                }
+            }
+            @Override
+            public void onChildChanged(DataSnapshot dataSnapshot, String s) { }
+            @Override
+            public void onChildRemoved(DataSnapshot dataSnapshot) { }
+            @Override
+            public void onChildMoved(DataSnapshot dataSnapshot, String s) { }
+            @Override
+            public void onCancelled(DatabaseError databaseError) { }
+        });
     }
 }
 

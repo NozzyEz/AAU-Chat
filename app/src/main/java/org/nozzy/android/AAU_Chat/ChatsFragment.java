@@ -184,7 +184,7 @@ public class ChatsFragment extends BaseFragment {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
                         // Gets the type of the chat
-                        final String chatType = dataSnapshot.child("chatType").getValue(String.class);
+                        final String chatType = dataSnapshot.child("chat_type").getValue(String.class);
 
                         // Checks if the type is "direct"
                         if (chatType.equals("direct")) {
@@ -217,10 +217,6 @@ public class ChatsFragment extends BaseFragment {
                                                 public void onClick(View view) {
                                                     Intent chatIntent = new Intent(getContext(), ChatActivity.class);
                                                     chatIntent.putExtra("chat_id", list_chat_id);
-                                                    chatIntent.putExtra("chat_type", chatType);
-                                                    chatIntent.putExtra("chat_name", directMemberName);
-                                                    chatIntent.putExtra("chat_image", directMemberImage);
-                                                    chatIntent.putExtra("direct_user_id", directMemberID);
                                                     startActivity(chatIntent);
                                                 }
                                             });
@@ -233,8 +229,8 @@ public class ChatsFragment extends BaseFragment {
                             }
                         } else {
                             // Else, if the chat is not direct, get the name and image from the database
-                            final String chatName = dataSnapshot.child("chatName").getValue(String.class);
-                            final String chatImage = dataSnapshot.child("chatImage").getValue(String.class);
+                            final String chatName = dataSnapshot.child("chat_name").getValue(String.class);
+                            final String chatImage = dataSnapshot.child("chat_image").getValue(String.class);
 
                             // Set the name and image accordingly
                             convViewHolder.setName(chatName);
@@ -247,10 +243,6 @@ public class ChatsFragment extends BaseFragment {
                                 public void onClick(View view) {
                                     Intent chatIntent = new Intent(getContext(), ChatActivity.class);
                                     chatIntent.putExtra("chat_id", list_chat_id);
-                                    chatIntent.putExtra("chat_type", chatType);
-                                    chatIntent.putExtra("chat_name", chatName);
-                                    chatIntent.putExtra("chat_image", chatImage);
-                                    chatIntent.putExtra("direct_user_id", "");
                                     startActivity(chatIntent);
                                 }
                             });
@@ -295,21 +287,10 @@ public class ChatsFragment extends BaseFragment {
         }
 
         // Sets the image for the image view
-        public void setImage(final String thumb_image, final Context ctx){
+        public void setImage(String thumb_image, Context ctx){
             if (!thumb_image.equals("")) {
-                final CircleImageView userImageView = mView.findViewById(R.id.user_single_image);
-                Picasso.with(ctx).load(thumb_image).placeholder(R.drawable.generic).networkPolicy(NetworkPolicy.OFFLINE)
-                        .into(userImageView, new Callback() {
-                            @Override
-                            public void onSuccess() {
-
-                            }
-
-                            @Override
-                            public void onError() {
-                                Picasso.with(ctx).load(thumb_image).placeholder(R.drawable.generic).into(userImageView);
-                            }
-                        });
+                CircleImageView userImageView = mView.findViewById(R.id.user_single_image);
+                Picasso.with(ctx).load(thumb_image).placeholder(R.drawable.generic).into(userImageView);
             }
         }
 
