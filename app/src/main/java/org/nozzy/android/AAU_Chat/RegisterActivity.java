@@ -198,7 +198,6 @@ public class RegisterActivity extends AppCompatActivity {
 
 
     // Method to add all relevant channels for the newly registered user
-    // TODO work in progress
     private void addToChannels(final String currentUserID, final ArrayList<String> programmes) {
 
         // Root reference

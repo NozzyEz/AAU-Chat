@@ -365,7 +365,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
 
     // Method to create a channel and add all relevant users to it
-    // TODO work in progress
     private void createChannel(String name, String image, final ArrayList<String> includes) {
 
         // Root reference
