@@ -126,21 +126,26 @@ public class RegisterActivity extends AppCompatActivity {
 
                     // First we need the unique user ID for the new account
                     FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
-                    String uid = currentUser.getUid();
+                    final String uid = currentUser.getUid();
 
                     // Then we point our database reference to that very ID
                     mDatabase = FirebaseDatabase.getInstance().getReference().child("Users").child(uid);
 
                     String deviceToken = FirebaseInstanceId.getInstance().getToken();
 
+                    // A Hashmap to store all programmes that the user is in
+                    HashMap<String, Boolean> programmesMap = new HashMap<>();
+                    programmesMap.put("ALL", true);
+
                     // Then we create a HashMap and and fill in the users information for that
                     // account, everything but the display name is default values
-                    HashMap<String, String> userMap = new HashMap<>();
+                    HashMap<String, Object> userMap = new HashMap<>();
                     userMap.put("device_token", deviceToken);
                     userMap.put("name", display_name);
                     userMap.put("status", "Default status");
                     userMap.put("image", "default");
                     userMap.put("thumb_image", "default");
+                    userMap.put("programmes", programmesMap);
 
                     // Once we create our HashMap we can set the values inside the database under the correct User ID
                     mDatabase.setValue(userMap).addOnCompleteListener(new OnCompleteListener<Void>() {
@@ -151,6 +156,12 @@ public class RegisterActivity extends AppCompatActivity {
                             // finish method call so the user cannot use the back button to return
                             // to the register activity
                             if(task.isSuccessful()) {
+
+                                // Adding the user to the corresponding channels
+                                ArrayList<String> programmes = new ArrayList<>();
+                                programmes.add("ALL");
+                                addToChannels(uid, programmes);
+
                                 mRegProgress.dismiss();
 
                                 Intent mainIntent = new Intent(RegisterActivity.this, MainActivity.class);
@@ -160,6 +171,7 @@ public class RegisterActivity extends AppCompatActivity {
                             }
                         }
                     });
+
                 } else {
                     // If we are NOT successful we give an error message through a toast
                     // We set the error message based on what exception was thrown
@@ -197,7 +209,7 @@ public class RegisterActivity extends AppCompatActivity {
         final DatabaseReference usersRef = rootRef.child("Users");
 
         // A query to get all channels
-        Query getChannels = chatsRef.orderByChild("chatType").equalTo("channel");
+        Query getChannels = chatsRef.orderByChild("chat_type").equalTo("channel");
         getChannels.addChildEventListener(new ChildEventListener() {
             @Override
             // For each channel
@@ -213,61 +225,6 @@ public class RegisterActivity extends AppCompatActivity {
                         usersRef.child(currentUserID).child("chats").child(chatID).child("timestamp").setValue(ServerValue.TIMESTAMP);
                         // Add the user into the members of the channel
                         chatsRef.child(chatID).child("members").child(currentUserID).setValue("user");
-                    }
-                }
-            }
-            @Override
-            public void onChildChanged(DataSnapshot dataSnapshot, String s) { }
-            @Override
-            public void onChildRemoved(DataSnapshot dataSnapshot) { }
-            @Override
-            public void onChildMoved(DataSnapshot dataSnapshot, String s) { }
-            @Override
-            public void onCancelled(DatabaseError databaseError) { }
-        });
-    }
-
-
-
-    // Method to create a channel and add all relevant users to it
-    // TODO work in progress
-    private void createChannel(String name, String image, final ArrayList<String> includes) {
-
-        // Root reference
-        DatabaseReference rootRef = FirebaseDatabase.getInstance().getReference();
-
-        // Creates a semi-random key for the new channel being created
-        DatabaseReference chat_push = rootRef.child("Chats").push();
-        final String chatID = chat_push.getKey();
-
-        // Creating the chat, adding the type, name, image, and included programmes
-        final DatabaseReference chatRef = rootRef.child("Chats").child(chatID);
-        chatRef.child("chat_type").setValue("channel");
-        chatRef.child("chat_name").setValue(name);
-        chatRef.child("chat_image").setValue(image);
-        for (String programme : includes) {
-            chatRef.child("includes").child(programme).setValue(true);
-        }
-
-        // Reference to all the users
-        final DatabaseReference usersRef = rootRef.child("Users");
-        Query getAllUsers = usersRef.orderByKey();
-
-        // Check each user
-        getAllUsers.addChildEventListener(new ChildEventListener() {
-            @Override
-            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                // Get the ID of the user
-                final String userID = dataSnapshot.getKey();
-                // For each programme of that user
-                Iterable<DataSnapshot> userProgrammes = dataSnapshot.child("programmes").getChildren();
-                for (DataSnapshot programme : userProgrammes) {
-                    // If the programme name is one of those included in this channel
-                    if (includes.contains(programme.getKey())) {
-                        // Add the channel into the chats of the user
-                        usersRef.child(userID).child("chats").child(chatID).child("timestamp").setValue(ServerValue.TIMESTAMP);
-                        // Add the user into the members of the channel
-                        chatRef.child("members").child(userID).setValue("user");
                     }
                 }
             }
