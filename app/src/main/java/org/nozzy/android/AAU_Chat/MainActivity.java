@@ -374,13 +374,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         DatabaseReference chat_push = rootRef.child("Chats").push();
         final String chatID = chat_push.getKey();
 
-        // Creating the chat, adding the type, name, image, and included programmes
+        // Creating the chat, adding the type, name, image, and included tags
         final DatabaseReference chatRef = rootRef.child("Chats").child(chatID);
         chatRef.child("chat_type").setValue("channel");
         chatRef.child("chat_name").setValue(name);
         chatRef.child("chat_image").setValue(image);
-        for (String programme : includes) {
-            chatRef.child("includes").child(programme).setValue(true);
+        for (String tag : includes) {
+            chatRef.child("includes").child(tag).setValue(true);
         }
 
         // Reference to all the users
@@ -393,11 +393,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                 // Get the ID of the user
                 final String userID = dataSnapshot.getKey();
-                // For each programme of that user
-                Iterable<DataSnapshot> userProgrammes = dataSnapshot.child("programmes").getChildren();
-                for (DataSnapshot programme : userProgrammes) {
-                    // If the programme name is one of those included in this channel
-                    if (includes.contains(programme.getKey())) {
+                // For each tag of that user
+                Iterable<DataSnapshot> userTags = dataSnapshot.child("tags").getChildren();
+                for (DataSnapshot tag : userTags) {
+                    // If the tag is one of those included in this channel
+                    if (includes.contains(tag.getKey())) {
                         // Add the channel into the chats of the user
                         usersRef.child(userID).child("chats").child(chatID).child("timestamp").setValue(ServerValue.TIMESTAMP);
                         // Add the user into the members of the channel

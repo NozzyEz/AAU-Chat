@@ -133,9 +133,9 @@ public class RegisterActivity extends AppCompatActivity {
 
                     String deviceToken = FirebaseInstanceId.getInstance().getToken();
 
-                    // A Hashmap to store all programmes that the user is in
-                    HashMap<String, Boolean> programmesMap = new HashMap<>();
-                    programmesMap.put("ALL", true);
+                    // A Hashmap to store all tags that the user is in, including programmes
+                    HashMap<String, Boolean> tagsMap = new HashMap<>();
+                    tagsMap.put("ALL", true);
 
                     // Then we create a HashMap and and fill in the users information for that
                     // account, everything but the display name is default values
@@ -145,7 +145,7 @@ public class RegisterActivity extends AppCompatActivity {
                     userMap.put("status", "Default status");
                     userMap.put("image", "default");
                     userMap.put("thumb_image", "default");
-                    userMap.put("programmes", programmesMap);
+                    userMap.put("tags", tagsMap);
 
                     // Once we create our HashMap we can set the values inside the database under the correct User ID
                     mDatabase.setValue(userMap).addOnCompleteListener(new OnCompleteListener<Void>() {
@@ -157,10 +157,10 @@ public class RegisterActivity extends AppCompatActivity {
                             // to the register activity
                             if(task.isSuccessful()) {
 
-                                // Adding the user to the corresponding channels
-                                ArrayList<String> programmes = new ArrayList<>();
-                                programmes.add("ALL");
-                                addToChannels(uid, programmes);
+                                // Adding the user to the corresponding channels based on their tags
+                                ArrayList<String> tags = new ArrayList<>();
+                                tags.add("ALL");
+                                addToChannels(uid, tags);
 
                                 mRegProgress.dismiss();
 
@@ -198,7 +198,7 @@ public class RegisterActivity extends AppCompatActivity {
 
 
     // Method to add all relevant channels for the newly registered user
-    private void addToChannels(final String currentUserID, final ArrayList<String> programmes) {
+    private void addToChannels(final String currentUserID, final ArrayList<String> tags) {
 
         // Root reference
         final DatabaseReference rootRef = FirebaseDatabase.getInstance().getReference();
@@ -215,11 +215,11 @@ public class RegisterActivity extends AppCompatActivity {
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                 // Get the ID of the channel
                 String chatID = dataSnapshot.getKey();
-                // For each programme included in the channel
-                Iterable<DataSnapshot> includedProgrammes = dataSnapshot.child("includes").getChildren();
-                for (DataSnapshot programme : includedProgrammes) {
-                    // Check if the user's programmes contain that channel's programme
-                    if (programmes.contains(programme.getKey())) {
+                // For each tag included in the channel
+                Iterable<DataSnapshot> includedTags = dataSnapshot.child("includes").getChildren();
+                for (DataSnapshot tag : includedTags) {
+                    // Check if the user's tags contain that channel's tag
+                    if (tags.contains(tag.getKey())) {
                         // Add the channel into the chats of the user
                         usersRef.child(currentUserID).child("chats").child(chatID).child("timestamp").setValue(ServerValue.TIMESTAMP);
                         // Add the user into the members of the channel
