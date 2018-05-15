@@ -102,7 +102,6 @@ public class ChatActivity extends AppCompatActivity {
     // Variable for detecting a gallery pick result
     private static final int GALLERY_PICK = 1;
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -140,7 +139,7 @@ public class ChatActivity extends AppCompatActivity {
         mChatSendBtn = findViewById(R.id.chat_send_btn);
         mChatMessageView = findViewById(R.id.chat_message_view);
 
-        mAdapter = new MessageAdapter(messagesList, this);
+        mAdapter = new MessageAdapter(messagesList, this, mChatID);
 
         mMessagesList = findViewById(R.id.chat_messages_list);
         mRefreshLayout = findViewById(R.id.message_swipe_layout);
@@ -402,6 +401,8 @@ public class ChatActivity extends AppCompatActivity {
                 // Get the text and id of the message
                 Messages message = dataSnapshot.getValue(Messages.class);
                 String messageKey = dataSnapshot.getKey();
+                // Set the Key value to the message - this is used in-app for deleting and pinning messages
+                message.setKey(messageKey);
 
                 // Loads the message if it's not the last one (since that one is already on the screen)
                 // If it is the last one, set the previous last key to the new last one
@@ -458,11 +459,14 @@ public class ChatActivity extends AppCompatActivity {
             // Triggers whenever a new message is added
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                 Messages message = dataSnapshot.getValue(Messages.class);
+                String messageKey = dataSnapshot.getKey();
+
+                // Set the Key value to the message - this is used in-app for deleting and pinning messages
+                message.setKey(messageKey);
 
                 // If it's the first (oldest) message in that set
                 if (itemPos == 0) {
                     // Set the last key and previous key to that message's key
-                    String messageKey = dataSnapshot.getKey();
                     mLastKey = messageKey;
                     mPrevKey = messageKey;
                 }
@@ -632,6 +636,12 @@ public class ChatActivity extends AppCompatActivity {
             @Override
             public void onCancelled(DatabaseError databaseError) { }
         });
+    }
+
+    protected void refreshMessages() {
+        messagesList.clear();
+//        mAdapter.notifyDataSetChanged();
+        loadMessages();
     }
 
 }

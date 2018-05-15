@@ -286,6 +286,7 @@ public class SettingsFragment extends BaseFragment {
                                         update_hashMap.put("image", download_url);
                                         update_hashMap.put("thumb_image", thumb_downloadUrl);
 
+
                                         // Updates the image and thumb_image values of the user in the database
                                         mUserDatabase.updateChildren(update_hashMap).addOnCompleteListener(new OnCompleteListener<Void>() {
                                             @Override

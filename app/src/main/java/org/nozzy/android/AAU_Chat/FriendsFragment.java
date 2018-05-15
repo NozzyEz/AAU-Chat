@@ -203,12 +203,6 @@ public class FriendsFragment extends BaseFragment {
         mRootRef.child("Chats").child(push_id).child("chat_type").setValue("direct");
         mRootRef.child("Chats").child(push_id).child("chat_image").setValue("");
 
-        // TODO this will be removed later on. It is left at the moment for compatibility reasons.
-        mRootRef.child("Chats").child(push_id).child("chatName").setValue("New Chat");
-        mRootRef.child("Chats").child(push_id).child("chatType").setValue("direct");
-        mRootRef.child("Chats").child(push_id).child("chatImage").setValue("");
-        //
-
         mRootRef.child("Chats").child(push_id).child("seen").child(list_user_id).setValue("");
         mRootRef.child("Chats").child(push_id).child("seen").child(mCurrent_user_id).setValue("");
 
