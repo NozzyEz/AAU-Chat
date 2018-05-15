@@ -132,7 +132,7 @@ public class FriendsFragment extends BaseFragment {
                     public void onDataChange(DataSnapshot dataSnapshot) {
 
                         final String userName = dataSnapshot.child("name").getValue().toString();
-                        String userThumb = dataSnapshot.child("thumb_image").getValue().toString();
+                        final String userThumb = dataSnapshot.child("thumb_image").getValue().toString();
 
                         // Inside each view we retrieve the value for name, date and image with our Friends class, and set it to the view as needed
                         friendsViewHolder.setName(userName);
@@ -158,7 +158,7 @@ public class FriendsFragment extends BaseFragment {
                                                 sendToProfile(list_user_id);
                                                 break;
                                             case 1:
-                                                sendToChat(list_user_id, userName);
+                                                sendToChat(list_user_id, userName, userThumb);
                                                 break;
                                         }
                                     }
@@ -185,31 +185,36 @@ public class FriendsFragment extends BaseFragment {
 
     // Sends the user to the ChatActivityOld where they can chat with the selected friend
     // Creates a chat room with the user
-    private void sendToChat(String list_user_id, String userName) {
+    private void sendToChat(String list_user_id, String userName, String userThumb) {
 
         // Generates chat ID
         mRootRef = FirebaseDatabase.getInstance().getReference();
         DatabaseReference chat_push = mRootRef.child("Chats").push();
         final String push_id = chat_push.getKey();
 
-        // Adding the chat with type and timestamp to the Users table
-        mRootRef.child("Users").child(mCurrent_user_id).child("chats").child(push_id).child("type").setValue("direct");
+        // Adding the chat with timestamp to the Users table
         mRootRef.child("Users").child(mCurrent_user_id).child("chats").child(push_id).child("timestamp").setValue(ServerValue.TIMESTAMP);
-        mRootRef.child("Users").child(list_user_id).child("chats").child(push_id).child("type").setValue("direct");
         mRootRef.child("Users").child(list_user_id).child("chats").child(push_id).child("timestamp").setValue(ServerValue.TIMESTAMP);
 
-        // Creating the chat in the Chats table with members and name
+        // Creating the chat in the Chats table with members, name, type, image and seen values
         mRootRef.child("Chats").child(push_id).child("members").child(mCurrent_user_id).setValue("user");
         mRootRef.child("Chats").child(push_id).child("members").child(list_user_id).setValue("user");
+        mRootRef.child("Chats").child(push_id).child("chat_name").setValue("New Chat");
+        mRootRef.child("Chats").child(push_id).child("chat_type").setValue("direct");
+        mRootRef.child("Chats").child(push_id).child("chat_image").setValue("");
+
+        // TODO this will be removed later on. It is left at the moment for compatibility reasons.
         mRootRef.child("Chats").child(push_id).child("chatName").setValue("New Chat");
+        mRootRef.child("Chats").child(push_id).child("chatType").setValue("direct");
+        mRootRef.child("Chats").child(push_id).child("chatImage").setValue("");
+        //
+
+        mRootRef.child("Chats").child(push_id).child("seen").child(list_user_id).setValue("");
+        mRootRef.child("Chats").child(push_id).child("seen").child(mCurrent_user_id).setValue("");
 
         // Passing variables and starting ChatActivity
         Intent chatIntent = new Intent(getContext(), ChatActivity.class);
         chatIntent.putExtra("chat_id", push_id);
-        chatIntent.putExtra("chat_type", "direct");
-        chatIntent.putExtra("chat_name", "New Chat");
-        chatIntent.putExtra("user_id", list_user_id);
-        chatIntent.putExtra("user_name", userName);
         startActivity(chatIntent);
     }
 

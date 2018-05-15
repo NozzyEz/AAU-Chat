@@ -20,11 +20,19 @@ import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException;
 import com.google.firebase.auth.FirebaseAuthUserCollisionException;
 import com.google.firebase.auth.FirebaseAuthWeakPasswordException;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.ChildEventListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
+import com.google.firebase.database.ServerValue;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.iid.FirebaseInstanceId;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 
 // This activity is accessed from the start activity when the user taps the register new account
 // button. In this activity we facilitate this functionality by letting the user sign up with their
@@ -118,21 +126,26 @@ public class RegisterActivity extends AppCompatActivity {
 
                     // First we need the unique user ID for the new account
                     FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
-                    String uid = currentUser.getUid();
+                    final String uid = currentUser.getUid();
 
                     // Then we point our database reference to that very ID
                     mDatabase = FirebaseDatabase.getInstance().getReference().child("Users").child(uid);
 
                     String deviceToken = FirebaseInstanceId.getInstance().getToken();
 
+                    // A Hashmap to store all tags that the user is in, including programmes
+                    HashMap<String, Boolean> tagsMap = new HashMap<>();
+                    tagsMap.put("ALL", true);
+
                     // Then we create a HashMap and and fill in the users information for that
                     // account, everything but the display name is default values
-                    HashMap<String, String> userMap = new HashMap<>();
+                    HashMap<String, Object> userMap = new HashMap<>();
                     userMap.put("device_token", deviceToken);
                     userMap.put("name", display_name);
                     userMap.put("status", "Default status");
                     userMap.put("image", "default");
                     userMap.put("thumb_image", "default");
+                    userMap.put("tags", tagsMap);
 
                     // Once we create our HashMap we can set the values inside the database under the correct User ID
                     mDatabase.setValue(userMap).addOnCompleteListener(new OnCompleteListener<Void>() {
@@ -143,6 +156,12 @@ public class RegisterActivity extends AppCompatActivity {
                             // finish method call so the user cannot use the back button to return
                             // to the register activity
                             if(task.isSuccessful()) {
+
+                                // Adding the user to the corresponding channels based on their tags
+                                ArrayList<String> tags = new ArrayList<>();
+                                tags.add("ALL");
+                                addToChannels(uid, tags);
+
                                 mRegProgress.dismiss();
 
                                 Intent mainIntent = new Intent(RegisterActivity.this, MainActivity.class);
@@ -152,6 +171,7 @@ public class RegisterActivity extends AppCompatActivity {
                             }
                         }
                     });
+
                 } else {
                     // If we are NOT successful we give an error message through a toast
                     // We set the error message based on what exception was thrown
@@ -175,4 +195,48 @@ public class RegisterActivity extends AppCompatActivity {
             }
         });
     }
+
+
+    // Method to add all relevant channels for the newly registered user
+    private void addToChannels(final String currentUserID, final ArrayList<String> tags) {
+
+        // Root reference
+        final DatabaseReference rootRef = FirebaseDatabase.getInstance().getReference();
+
+        // References to all chats and users
+        final DatabaseReference chatsRef = rootRef.child("Chats");
+        final DatabaseReference usersRef = rootRef.child("Users");
+
+        // A query to get all channels
+        Query getChannels = chatsRef.orderByChild("chat_type").equalTo("channel");
+        getChannels.addChildEventListener(new ChildEventListener() {
+            @Override
+            // For each channel
+            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                // Get the ID of the channel
+                String chatID = dataSnapshot.getKey();
+                // For each tag included in the channel
+                Iterable<DataSnapshot> includedTags = dataSnapshot.child("includes").getChildren();
+                for (DataSnapshot tag : includedTags) {
+                    // Check if the user's tags contain that channel's tag
+                    if (tags.contains(tag.getKey())) {
+                        // Add the channel into the chats of the user
+                        usersRef.child(currentUserID).child("chats").child(chatID).child("timestamp").setValue(ServerValue.TIMESTAMP);
+                        // Add the user into the members of the channel
+                        chatsRef.child(chatID).child("members").child(currentUserID).setValue("user");
+                    }
+                }
+            }
+            @Override
+            public void onChildChanged(DataSnapshot dataSnapshot, String s) { }
+            @Override
+            public void onChildRemoved(DataSnapshot dataSnapshot) { }
+            @Override
+            public void onChildMoved(DataSnapshot dataSnapshot, String s) { }
+            @Override
+            public void onCancelled(DatabaseError databaseError) { }
+        });
+    }
+
+
 }
