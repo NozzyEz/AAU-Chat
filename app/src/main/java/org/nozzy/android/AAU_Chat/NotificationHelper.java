@@ -55,8 +55,8 @@ public class NotificationHelper extends ContextWrapper{
         return mManager;
     }
 
-    // This is how the actual notification is set up
-    public NotificationCompat.Builder getChannel1Notification(String title, String message, String click_action, String from_user_id) {
+    // This is how the friend request notification is set up
+    public NotificationCompat.Builder getChannel1FriendReqNotification(String title, String message, String click_action, String from_user_id) {
 
         // Here we create an intent to send the user to the profile activity of whom sent them a request
         Intent resultIntent = new Intent(click_action);
@@ -66,14 +66,32 @@ public class NotificationHelper extends ContextWrapper{
         // This intent is pending and ready to execute when the user taps it from within the app
         PendingIntent resultPendingIntent = PendingIntent.getActivity(this, 0, resultIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
-        // And here we return the notification back to the FirebaseMessagingService class for showing.
+        // And here we return the notification back to the FirebaseMessagingService class for showing
         return new NotificationCompat.Builder(getApplicationContext(),CHANNEL_ID_1)
                 .setContentTitle(title)
                 .setContentText(message)
                 .setSmallIcon(R.drawable.notification_icon)
                 .setContentIntent(resultPendingIntent);
 
-        }
+    }
 
+    // This is how the message notification is set up
+    public NotificationCompat.Builder getChannel1MessageNotification(String title, String message, String click_action, String chat_id) {
+
+        // Here we create an intent to send the user to the chat activity where the notification came from
+        Intent resultIntent = new Intent(click_action);
+        // With the intent we pass the chat ID of the conversation where the notification came from
+        resultIntent.putExtra("chat_id", chat_id);
+
+        // This intent is pending and ready to execute when the user taps it from within the app
+        PendingIntent resultPendingIntent = PendingIntent.getActivity(this, 0, resultIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+        // And here we return the notification back to the FirebaseMessagingService class for showing
+        return new NotificationCompat.Builder(getApplicationContext(),CHANNEL_ID_1)
+                .setContentTitle(title)
+                .setContentText(message)
+                .setSmallIcon(R.drawable.notification_icon)
+                .setContentIntent(resultPendingIntent);
+    }
 
 }

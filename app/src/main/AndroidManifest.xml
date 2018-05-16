@@ -64,13 +64,18 @@
             android:name=".ProfileActivity"
             android:screenOrientation="portrait">
             <intent-filter>
-                <action android:name="org.nozzy.android.lapitchat.TAGRET_NOTIFICATION" />
+                <action android:name="org.nozzy.android.lapitchat.TARGET_NOTIFICATION" />
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
         <activity android:name=".ChatActivity"
             android:parentActivityName=".MainActivity"
-            android:screenOrientation="portrait"/>
+            android:screenOrientation="portrait">
+            <intent-filter>
+                <action android:name="org.nozzy.android.lapitchat.MESSAGE_NOTIFICATION" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
     </application>
 
 </manifest>
