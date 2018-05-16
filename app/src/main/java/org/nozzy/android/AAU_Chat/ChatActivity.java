@@ -139,18 +139,6 @@ public class ChatActivity extends AppCompatActivity {
         mChatSendBtn = findViewById(R.id.chat_send_btn);
         mChatMessageView = findViewById(R.id.chat_message_view);
 
-        mAdapter = new MessageAdapter(messagesList, this, mChatID);
-
-        mMessagesList = findViewById(R.id.chat_messages_list);
-        mRefreshLayout = findViewById(R.id.message_swipe_layout);
-        mLinearLayout = new LinearLayoutManager(this);
-
-        mMessagesList.setHasFixedSize(true);
-        mMessagesList.setLayoutManager(mLinearLayout);
-
-        mMessagesList.setAdapter(mAdapter);
-
-
         // Sets the name, image and online values
         // Adds a listener to get all the chat values
         mRootRef.child("Chats").child(mChatID).addListenerForSingleValueEvent(new ValueEventListener() {
@@ -244,6 +232,19 @@ public class ChatActivity extends AppCompatActivity {
             @Override
             public void onCancelled(DatabaseError databaseError) { }
         });
+
+
+        // UI
+        mAdapter = new MessageAdapter(messagesList, this, mChatID);
+
+        mMessagesList = findViewById(R.id.chat_messages_list);
+        mRefreshLayout = findViewById(R.id.message_swipe_layout);
+        mLinearLayout = new LinearLayoutManager(this);
+
+        mMessagesList.setHasFixedSize(true);
+        mMessagesList.setLayoutManager(mLinearLayout);
+
+        mMessagesList.setAdapter(mAdapter);
 
 
         // Loads the first messages
@@ -383,6 +384,59 @@ public class ChatActivity extends AppCompatActivity {
         }
     }
 
+    // Method for loading in the first messages
+    private void loadMessages() {
+
+        // Reference for getting messages
+        DatabaseReference messageRef = mRootRef.child("Chats").child(mChatID).child("messages");
+
+        // A query to load the last 10 messages, from the oldest to the newest one
+        Query messageQuery = messageRef.limitToLast(TOTAL_ITEMS_TO_LOAD);
+
+        // Adds a listener to messages
+        messageQuery.addChildEventListener(new ChildEventListener() {
+            @Override
+            // Triggers whenever a new message is added
+            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                Messages message = dataSnapshot.getValue(Messages.class);
+                String messageKey = dataSnapshot.getKey();
+
+                // Set the Key value to the message - this is used in-app for deleting and pinning messages
+                message.setKey(messageKey);
+
+                // If it's the first (oldest) message in that set
+                if (itemPos == 0) {
+                    // Set the last key and previous key to that message's key
+                    mLastKey = messageKey;
+                    mPrevKey = messageKey;
+                }
+
+                // Increment the position so that other messages don't get counted as first
+                itemPos++;
+
+                // Adds the new message to the list
+                messagesList.add(message);
+                mAdapter.notifyDataSetChanged();
+
+                // Scroll the view to the bottom when a message is sent or received.
+                mMessagesList.scrollToPosition(messagesList.size() - 1);
+
+                // Stops the refreshing
+                mRefreshLayout.setRefreshing(false);
+            }
+
+            @Override
+            public void onChildChanged(DataSnapshot dataSnapshot, String s) { }
+            @Override
+            public void onChildRemoved(DataSnapshot dataSnapshot) { }
+            @Override
+            public void onChildMoved(DataSnapshot dataSnapshot, String s) { }
+            @Override
+            public void onCancelled(DatabaseError databaseError) { }
+        });
+
+    }
+
     // Method for loading in older messages when refreshing
     private void loadMoreMessages() {
 
@@ -441,60 +495,6 @@ public class ChatActivity extends AppCompatActivity {
             @Override
             public void onCancelled(DatabaseError databaseError) { }
         });
-    }
-
-
-    // Method for loading in the first messages
-    private void loadMessages() {
-
-        // Reference for getting messages
-        DatabaseReference messageRef = mRootRef.child("Chats").child(mChatID).child("messages");
-
-        // A query to load the last 10 messages, from the oldest to the newest one
-        Query messageQuery = messageRef.limitToLast(TOTAL_ITEMS_TO_LOAD);
-
-        // Adds a listener to messages
-        messageQuery.addChildEventListener(new ChildEventListener() {
-            @Override
-            // Triggers whenever a new message is added
-            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                Messages message = dataSnapshot.getValue(Messages.class);
-                String messageKey = dataSnapshot.getKey();
-
-                // Set the Key value to the message - this is used in-app for deleting and pinning messages
-                message.setKey(messageKey);
-
-                // If it's the first (oldest) message in that set
-                if (itemPos == 0) {
-                    // Set the last key and previous key to that message's key
-                    mLastKey = messageKey;
-                    mPrevKey = messageKey;
-                }
-
-                // Increment the position so that other messages don't get counted as first
-                itemPos++;
-
-                // Adds the new message to the list
-                messagesList.add(message);
-                mAdapter.notifyDataSetChanged();
-
-                // Scroll the view to the bottom when a message is sent or received.
-                mMessagesList.scrollToPosition(messagesList.size() - 1);
-
-                // Stops the refreshing
-                mRefreshLayout.setRefreshing(false);
-            }
-
-            @Override
-            public void onChildChanged(DataSnapshot dataSnapshot, String s) { }
-            @Override
-            public void onChildRemoved(DataSnapshot dataSnapshot) { }
-            @Override
-            public void onChildMoved(DataSnapshot dataSnapshot, String s) { }
-            @Override
-            public void onCancelled(DatabaseError databaseError) { }
-        });
-
     }
 
     // Method for sending a simple text message
@@ -639,7 +639,9 @@ public class ChatActivity extends AppCompatActivity {
     }
 
     protected void refreshMessages() {
+        // For editing messages
         messagesList.clear();
+        itemPos = 0;
 //        mAdapter.notifyDataSetChanged();
         loadMessages();
     }
