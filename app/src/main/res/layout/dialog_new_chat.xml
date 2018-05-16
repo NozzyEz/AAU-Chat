@@ -1,14 +1,32 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="10dp"
-    android:orientation="vertical">
+    android:padding="10dp">
+
+    <!--<de.hdodenhof.circleimageview.CircleImageView-->
+        <!--android:id="@+id/group_image"-->
+        <!--android:layout_width="30dp"-->
+        <!--android:layout_height="30dp"-->
+        <!--android:layout_marginEnd="8dp"-->
+        <!--android:layout_marginStart="8dp"-->
+        <!--android:src="@drawable/ic_search"/>-->
+
+    <ImageButton
+        android:id="@+id/icon_group"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_marginBottom="16dp"
+        android:background="@android:color/white"
+        android:text="@string/change_image"
+        android:src="@drawable/ic_search"
+        android:textColor="@color/colorPrimaryDark" />
 
     <android.support.v7.widget.AppCompatEditText
         android:id="@+id/etChatName"
+        android:layout_toEndOf="@id/icon_group"
+        android:layout_alignBottom="@id/icon_group"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Enter chat name"
         android:inputType="text" />
 
-</LinearLayout>
+</RelativeLayout>

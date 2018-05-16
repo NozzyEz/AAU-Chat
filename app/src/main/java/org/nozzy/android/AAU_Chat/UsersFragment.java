@@ -1,16 +1,12 @@
 package org.nozzy.android.AAU_Chat;
 
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.KeyEvent;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
@@ -33,7 +29,6 @@ import com.squareup.picasso.NetworkPolicy;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
@@ -87,24 +82,7 @@ public class UsersFragment extends BaseFragment {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-//                Snackbar.make(view, "Select Users to start a new newGroupChat", Snackbar.LENGTH_LONG)
-//                        .setAction("Action", null).show();
-                tvNoReporter.setVisibility(View.VISIBLE);
-                fab.setImageResource(R.drawable.ic_next_white);
-               if(!newGroupChat){
-                   newGroupChat = true;
-               }
-               if(!users.isEmpty()) {
-
-                   showReportInput();
-
-//                   UsersFragment fragment = new UsersFragment();
-//                   Bundle bundle = new Bundle();
-//                   bundle.putString("users", Arrays.toString(users.toArray()));
-//                   fragment.setArguments(bundle);
-//                   ((MainActivity) getActivity()).changeContentFragment(getFragmentManager(), NewGroupChatFragment.getFragmentTag(), new NewGroupChatFragment(), R.id.flFragmentsContainer, true);
-
-               }
+                   ((MainActivity) getActivity()).changeContentFragment(getFragmentManager(), NewGroupChatFragment.getFragmentTag(), new NewGroupChatFragment(), R.id.flFragmentsContainer, true);
             }
         });
 
@@ -191,19 +169,6 @@ public class UsersFragment extends BaseFragment {
             mUserNameView.setText(name);
         }
 
-//        private void addUser(final String userId,final Context ctx){
-//            final CheckBox checkBox = mView.findViewById(R.id.cbSelectUser);
-//            checkBox.setOnClickListener(new View.OnClickListener() {
-//                @Override
-//                public void onClick(View arg0) {
-//                    final boolean isChecked = checkBox.isChecked();
-//                    if(isChecked) {
-//                        Toast.makeText(ctx, userId, Toast.LENGTH_SHORT).show();
-//
-//                    }
-//                }
-//            });
-//        }
 
         // Sets the status for the status text field
         public void setStatus(String status) {
@@ -258,59 +223,6 @@ public class UsersFragment extends BaseFragment {
             }
         });
     }
-    private void showReportInput() {
-        AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(getContext());
-        LayoutInflater inflater = this.getLayoutInflater();
-        final View dialogView = inflater.inflate(R.layout.dialog_new_chat, null);
-        dialogBuilder.setView(dialogView);
-        final EditText edt = dialogView.findViewById(R.id.etChatName);
-        dialogBuilder.setTitle("Enter chat title");
-        //dialogBuilder.setMessage("Enter text below");
-        dialogBuilder.setPositiveButton(getResources().getString(R.string.new_chat), new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int whichButton) {
-
-                String message = edt.getText().toString().trim();
-
-            }
-        });
-        dialogBuilder.setNegativeButton(getResources().getString(R.string.cancel), new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int whichButton) {
-            }
-        });
-        AlertDialog b = dialogBuilder.create();
-        b.show();
-    }
-    private void sendToChat(ArrayList<String> list_users, String userName,String chatName) {
-
-        // Generates chat ID
-        mRootRef = FirebaseDatabase.getInstance().getReference();
-        DatabaseReference chat_push = mRootRef.child("Chats").push();
-        final String push_id = chat_push.getKey();
-
-        // Adding the chat with type and timestamp to the Users table
-        mRootRef.child("Users").child(mCurrentUserID).child("chats").child(push_id).child("type").setValue("group");
-        mRootRef.child("Users").child(mCurrentUserID).child("chats").child(push_id).child("timestamp").setValue(ServerValue.TIMESTAMP);
-        mRootRef.child("Users").child(list_users.get(0)).child("chats").child(push_id).child("type").setValue("group");
-        mRootRef.child("Users").child(list_users.get(0)).child("chats").child(push_id).child("timestamp").setValue(ServerValue.TIMESTAMP);
-        mRootRef.child("Users").child(list_users.get(1)).child("chats").child(push_id).child("type").setValue("group");
-        mRootRef.child("Users").child(list_users.get(1)).child("chats").child(push_id).child("timestamp").setValue(ServerValue.TIMESTAMP);
-
-        // Creating the chat in the Chats table with members and name
-        mRootRef.child("Chats").child(push_id).child("members").child(mCurrentUserID).setValue("user");
-        mRootRef.child("Chats").child(push_id).child("members").child(list_users.get(0)).setValue("user");
-        mRootRef.child("Chats").child(push_id).child("members").child(list_users.get(1)).setValue("user");
-
-        mRootRef.child("Chats").child(push_id).child("chatName").setValue(chatName);
-
-        // Passing variables and starting ChatActivity
-        Intent chatIntent = new Intent(getContext(), ChatActivity.class);
-        chatIntent.putExtra("chat_id", push_id);
-        chatIntent.putExtra("chat_type", "group");
-        chatIntent.putExtra("chat_name", "New Chat");
-        chatIntent.putExtra("user_id", list_users.get(0));
-        chatIntent.putExtra("user_name", userName);
-        startActivity(chatIntent);
-    }
     private void searchUser(String searchString) {
         // Query is being passed with information from edittext
         Query searchQuery = mUsersDatabase.orderByChild("name").startAt(searchString).endAt(searchString + "\uf8ff");
@@ -329,8 +241,8 @@ public class UsersFragment extends BaseFragment {
                 if (name.equals(model.getName())) {
                     viewHolder.hideLayout();
                 }
-                //else {
-                    //viewHolder.showLayout();
+                else {
+                    viewHolder.showLayout();
 
                     // Inside each view we retrieve the value for name, status and image with our Users class, and set it to the view as needed
                     viewHolder.setName(model.getName());
@@ -346,29 +258,14 @@ public class UsersFragment extends BaseFragment {
                     viewHolder.mView.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View view) {
-
-                            if (!newGroupChat) {
                                 Intent profileIntent = new Intent(getActivity(), ProfileActivity.class);
                                 profileIntent.putExtra("user_id", user_id);
                                 startActivity(profileIntent);
-                            } else {
-                                //Toast.makeText(getActivity(),user_id,Toast.LENGTH_SHORT).show();
-                                viewHolder.checkBox.setVisibility(View.VISIBLE);
-                                if(users.contains(user_id)){
-                                    users.remove(users.indexOf(user_id));
-                                } else {
-                                    users.add(user_id);
-                                }
-                               Log.e ("List",(Arrays.toString(users.toArray())));
-                                viewHolder.changeState();
-
-                            }
-
                         }
                     });
 
 
-               // }
+                }
             }
         };
         // Finally we set the adapter for our recycler view
