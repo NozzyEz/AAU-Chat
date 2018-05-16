@@ -205,9 +205,8 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
             @Override
             public void onClick(View view) {
 
-                // If the user is an admin, they should be able to edit, delete and pin anyone's message
-                if (mChatRole.equals("admin")) {
-//                if (false) {
+                // If the user is an admin and it's their message, they should be able to edit, delete and pin it
+                if (mChatRole.equals("admin") && c.getFrom().equals(current_user_id)) {
                         // The selection will have two options - pin or delete the message
                     CharSequence options[] = new CharSequence[]{"Pin Message", "Edit Message", "Delete Message"};
                     // An alert dialog is displayed with these two options
@@ -222,7 +221,6 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
                                     // Adds the message to the pinned table
                                     mChatRef.child("pinned").child(c.getKey()).setValue(ServerValue.TIMESTAMP);
                                     Toast.makeText(context, "Message pinned", Toast.LENGTH_SHORT).show();
-                                    context.refreshMessages();
                                     break;
                                 case 1:
                                     // Opens up an edit message dialog
@@ -239,7 +237,35 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
                     });
                     builder.show();
                 }
-                // If the user is not an admin, they should be able to edit and delete their own messages
+                // Else, if the user is an admin and it's someone else's message, they should be able to delete and pin it
+                else if (mChatRole.equals("admin")) {
+                    // The selection will have two options - pin or delete the message
+                    CharSequence options[] = new CharSequence[]{"Pin Message", "Delete Message"};
+                    // An alert dialog is displayed with these two options
+                    AlertDialog.Builder builder = new AlertDialog.Builder(context);
+                    builder.setTitle("Select Options");
+                    builder.setItems(options, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            // Click event for each item: 0 for pinning the message 1 for deleting it
+                            switch (i) {
+                                case 0:
+                                    // Adds the message to the pinned table
+                                    mChatRef.child("pinned").child(c.getKey()).setValue(ServerValue.TIMESTAMP);
+                                    Toast.makeText(context, "Message pinned", Toast.LENGTH_SHORT).show();
+                                    break;
+                                case 1:
+                                    // Removes the message from the messages table
+                                    mChatRef.child("messages").child(c.getKey()).removeValue();
+                                    Toast.makeText(context, "Message deleted", Toast.LENGTH_SHORT).show();
+                                    context.refreshMessages();
+                                    break;
+                            }
+                        }
+                    });
+                    builder.show();
+                }
+                // Else, If the user is not an admin, they should be able to edit and delete their own messages
                 else if (c.getFrom().equals(current_user_id)) {
                     // The selection will have two options - pin or delete the message
                     CharSequence options[] = new CharSequence[]{"Edit Message", "Delete Message"};

@@ -513,7 +513,7 @@ public class ChatActivity extends AppCompatActivity {
             String push_id = user_message_push.getKey();
 
             // A hashmap for storing a message
-            Map messageMap = new HashMap();
+            Map<String, Object> messageMap = new HashMap<>();
             messageMap.put("message", message);
             if(message.startsWith("https://firebasestorage.googleapis.com/"))
                 messageMap.put("type", "image");
@@ -523,7 +523,7 @@ public class ChatActivity extends AppCompatActivity {
             messageMap.put("from", mCurrentUserID);
 
             // A Hashmap to store the notification
-            Map notifyMap = new HashMap();
+            Map<String, Object> notifyMap = new HashMap<>();
             notifyMap.put("from", mCurrentUserID);
 
             if(message.startsWith("https://firebasestorage.googleapis.com/"))
@@ -537,7 +537,7 @@ public class ChatActivity extends AppCompatActivity {
             notifyMap.put("chat_image", mChatImage);
 
             // Put this message into the messages table inside the current chat
-            Map messageUserMap = new HashMap();
+            Map<String, Object> messageUserMap = new HashMap<>();
             messageUserMap.put(messages_ref + "/" + push_id, messageMap);
             messageUserMap.put(notification_ref + "/" + push_id, notifyMap);
 
@@ -638,8 +638,9 @@ public class ChatActivity extends AppCompatActivity {
         });
     }
 
+    // Used by MessageAdapter to refresh messages after one of them has been edited/deleted
     protected void refreshMessages() {
-        // For editing messages
+        // Works fine for editing messages. Buggy with deleting
         messagesList.clear();
         itemPos = 0;
 //        mAdapter.notifyDataSetChanged();
