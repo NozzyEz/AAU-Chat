@@ -87,6 +87,7 @@ public class NewGroupChatFragment extends BaseFragment {
     public static String searchString = "";
     public static String name;
     private static final int GALLERY_PICK = 1;
+    private boolean addedImage = false;
 
     private StorageReference mImageStorage;
 
@@ -106,6 +107,13 @@ public class NewGroupChatFragment extends BaseFragment {
 
         mImageStorage = FirebaseStorage.getInstance().getReference();
 
+//        ((MainActivity)getActivity()).getToolbar().setNavigationIcon(R.drawable.ic_back);
+//        ((MainActivity)getActivity()).getToolbar().setNavigationOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                getActivity().onBackPressed();
+//            }
+//        });
 
 
 
@@ -297,7 +305,7 @@ public class NewGroupChatFragment extends BaseFragment {
 
         dialogBuilder.setView(dialogView);
         final EditText edt = dialogView.findViewById(R.id.etChatName);
-        dialogBuilder.setTitle("Enter group name");
+        dialogBuilder.setTitle("Add a group name and image");
         //dialogBuilder.setMessage("Enter text below");
         dialogBuilder.setPositiveButton(getResources().getString(R.string.new_chat), new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int whichButton) {
@@ -332,6 +340,9 @@ public class NewGroupChatFragment extends BaseFragment {
         mRootRef.child("Chats").child(push_id).child("chat_name").setValue(chatName);
         mRootRef.child("Chats").child(push_id).child("chat_type").setValue("group");
         mRootRef.child("Chats").child(push_id).child("seen").child(mCurrentUserID).setValue("");
+        if(!addedImage) {
+            mRootRef.child("Chats").child(push_id).child("chat_image").setValue("");
+        }
 
         // Passing variables and starting ChatActivity
         Intent chatIntent = new Intent(getContext(), ChatActivity.class);
@@ -492,6 +503,7 @@ public class NewGroupChatFragment extends BaseFragment {
 //                                        mRootRef = FirebaseDatabase.getInstance().getReference();
                                         mRootRef.child("Chats").child(push_id).child("chat_image").setValue(thumb_downloadUrl);
                                         mProgressDialog.dismiss();
+                                        addedImage = true;
 
                                     } else {
                                         // Shows a toast if the thumbnail upload was unsuccessful
