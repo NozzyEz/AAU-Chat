@@ -303,7 +303,6 @@ public class ChatActivity extends AppCompatActivity {
             final String messages_ref = "Chats" + "/" + mChatID + "/" + "messages";
             final String notification_ref = "Notifications/" + mDirectUserID;
 
-
             // Gets the semi-random key of the message about to be stored
             DatabaseReference user_message_push = mRootRef.child("Chats").child(mChatID).child("messages").push();
             final String push_id = user_message_push.getKey();
@@ -357,13 +356,13 @@ public class ChatActivity extends AppCompatActivity {
                         // A Hashmap to store the notification
                         Map notifyMap = new HashMap();
                         notifyMap.put("from", mCurrentUserID);
-                        notifyMap.put("type", "message");
+                        notifyMap.put("type", "image");
+                        notifyMap.put("chat_id", mChatID);
 
                         // Put this message into the messages table inside the current chat
                         Map messageUserMap = new HashMap();
                         messageUserMap.put(messages_ref + "/" + push_id, messageMap);
                         messageUserMap.put(notification_ref + "/" + push_id, notifyMap);
-
 
                         // Attempts to store all data in the database
                         mRootRef.updateChildren(messageUserMap, new DatabaseReference.CompletionListener() {
@@ -442,7 +441,6 @@ public class ChatActivity extends AppCompatActivity {
         });
     }
 
-
     // Method for loading in the first messages
     private void loadMessages() {
 
@@ -510,27 +508,17 @@ public class ChatActivity extends AppCompatActivity {
 
             // A hashmap for storing a message
             Map messageMap = new HashMap();
-            messageMap.put("message", message);
-            if(message.startsWith("https://firebasestorage.googleapis.com/"))
-                messageMap.put("type", "image");
-            else
-                messageMap.put("type", "text");
-            messageMap.put("time", ServerValue.TIMESTAMP);
             messageMap.put("from", mCurrentUserID);
+            messageMap.put("message", message);
+            messageMap.put("time", ServerValue.TIMESTAMP);
+            messageMap.put("type", "text");
 
             // A Hashmap to store the notification
             Map notifyMap = new HashMap();
             notifyMap.put("from", mCurrentUserID);
-
-            if(message.startsWith("https://firebasestorage.googleapis.com/"))
-                messageMap.put("type", "image");
-            else
-                notifyMap.put("type", "message");
-
-            notifyMap.put("message", message);
+            notifyMap.put("type", "message");
             notifyMap.put("chat_id", mChatID);
-            notifyMap.put("chat_name", mChatName);
-            notifyMap.put("chat_image", mChatImage);
+            notifyMap.put("chat_message", message);
 
             // Put this message into the messages table inside the current chat
             Map messageUserMap = new HashMap();

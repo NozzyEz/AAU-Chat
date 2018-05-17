@@ -21,12 +21,16 @@ public class FirebaseMessagingService extends com.google.firebase.messaging.Fire
         // Here we get the notification title and message from our Firebase function
         String notificationTitle = remoteMessage.getNotification().getTitle();
         String notificationBody = remoteMessage.getNotification().getBody();
-
         String click_action = remoteMessage.getNotification().getClickAction();
-        String from_user_id = remoteMessage.getData().get("from_user_id");
 
-        // When that function calls this service we run this method after extracting the title and remote message
-        sendFriendReqNotification(notificationTitle, notificationBody, click_action, from_user_id);
+        if(notificationTitle.equals("Friend Request")) {
+            String from_user_id = remoteMessage.getData().get("from_user_id");
+            sendFriendReqNotification(notificationTitle, notificationBody, click_action, from_user_id);
+        }
+        else {
+            String chat_id = remoteMessage.getData().get("chat_id");
+            sendMessageNotification(notificationTitle, notificationBody, click_action, chat_id);
+        }
 
     }
 
@@ -35,7 +39,16 @@ public class FirebaseMessagingService extends com.google.firebase.messaging.Fire
 
         // Here we create a new NotificationHelper object from a class we've built to deal with our notifications
         mNotificationHelper = new NotificationHelper(this);
-        NotificationCompat.Builder nb = mNotificationHelper.getChannel1Notification(title, message, click_action, from_user_id);
+        NotificationCompat.Builder nb = mNotificationHelper.getChannel1FriendReqNotification(title, message, click_action, from_user_id);
+        mNotificationHelper.getManager().notify(1, nb.build());
+
+    }
+
+    private void sendMessageNotification(String title, String message, String click_action, String chat_id) {
+
+        // Here we create a new NotificationHelper object from a class we've built to deal with our notifications
+        mNotificationHelper = new NotificationHelper(this);
+        NotificationCompat.Builder nb = mNotificationHelper.getChannel1MessageNotification(title, message, click_action, chat_id);
         mNotificationHelper.getManager().notify(1, nb.build());
 
     }

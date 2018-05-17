@@ -124,7 +124,7 @@ public class SettingsActivity extends AppCompatActivity {
         });
 
         // Standard button that sends the user to the status activity where they can change their
-        // status message, we pass along the users current status message with the intent, so that
+        // status message, we pass along the user's current status message with the intent, so that
         // the new activity can show the message without having to fetch it again
         mStatus_btn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -140,7 +140,6 @@ public class SettingsActivity extends AppCompatActivity {
                     }
                 });
                 startActivityForResult(statusIntent,1);
-//                startActivity(statusIntent);
 
             }
         });
