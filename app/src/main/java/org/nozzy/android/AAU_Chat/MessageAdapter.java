@@ -1,26 +1,27 @@
 package org.nozzy.android.AAU_Chat;
 
-import android.app.Application;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.graphics.Color;
 import android.support.v7.widget.RecyclerView;
-import android.text.Layout;
 import android.text.format.DateUtils;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.WindowManager;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ServerValue;
 import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.NetworkPolicy;
@@ -36,11 +37,32 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
     private List<Messages> mMessageList;
     private FirebaseAuth mAuth;
     private DatabaseReference mUsersDatabase;
-    private Context context;
+    private ChatActivity context;
+    private String mChatID;
+    private String mChatRole;
+    private DatabaseReference mChatRef;
+    private String current_user_id;
 
-    public MessageAdapter(List<Messages> mMessageList, Context context) {
+    public MessageAdapter(List<Messages> mMessageList, Context context, String chatID) {
         this.mMessageList = mMessageList;
-        this.context = context;
+        this.context = (ChatActivity) context;
+        this.mChatID = chatID;
+        this.mChatRef = FirebaseDatabase.getInstance().getReference().child("Chats").child(mChatID);
+
+        // Gets the current user
+        mAuth = FirebaseAuth.getInstance();
+        this.current_user_id = mAuth.getCurrentUser().getUid();
+
+        mChatRef.child("members").child(current_user_id).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                mChatRole = dataSnapshot.getValue(String.class);
+            }
+            @Override
+            public void onCancelled(DatabaseError databaseError) { }
+        });
+
+
     }
 
     @Override
@@ -77,11 +99,9 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
     }
 
     @Override
-    public void onBindViewHolder(final MessageAdapter.MessageViewHolder holder, int position) {
+    public void onBindViewHolder(final MessageAdapter.MessageViewHolder holder, final int position) {
 
-        // Gets the current user
-        mAuth = FirebaseAuth.getInstance();
-        final String current_user_id = mAuth.getCurrentUser().getUid();
+
 
         // Gets the current message from the list
         final Messages c = mMessageList.get(position);
@@ -175,11 +195,142 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
         // This long we can then convert to the appropriate string to show the clock
         String convertedTime = DateUtils.formatDateTime(context, time, DateUtils.FORMAT_SHOW_TIME);
 
+        // TODO: Check if time is yesterday or more, then show different information to the user.
         // And finally we can assign that string to the viewholder's text field
         holder.messageTime.setText(convertedTime);
 
-        // TODO: Check if time is yesterday or more, then show different information to the user.
+
+        // A listener on each message for pinning or deleting
+        holder.messageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                // If the user is an admin and it's their message, they should be able to edit, delete and pin it
+                if (mChatRole.equals("admin") && c.getFrom().equals(current_user_id)) {
+                        // The selection will have two options - pin or delete the message
+                    CharSequence options[] = new CharSequence[]{"Pin Message", "Edit Message", "Delete Message"};
+                    // An alert dialog is displayed with these two options
+                    AlertDialog.Builder builder = new AlertDialog.Builder(context);
+                    builder.setTitle("Select Options");
+                    builder.setItems(options, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            // Click event for each item: 0 for pinning the message, 1 for editing, 2 for deleting it
+                            switch (i) {
+                                case 0:
+                                    // Adds the message to the pinned table
+                                    mChatRef.child("pinned").child(c.getKey()).setValue(ServerValue.TIMESTAMP);
+                                    Toast.makeText(context, "Message pinned", Toast.LENGTH_SHORT).show();
+                                    break;
+                                case 1:
+                                    // Opens up an edit message dialog
+                                    showEditMessageDialog(c.getKey(), c.getMessage());
+                                    break;
+                                case 2:
+                                    // Removes the message from the messages table
+                                    mChatRef.child("messages").child(c.getKey()).removeValue();
+                                    Toast.makeText(context, "Message deleted", Toast.LENGTH_SHORT).show();
+                                    context.refreshMessages();
+                                    break;
+                            }
+                        }
+                    });
+                    builder.show();
+                }
+                // Else, if the user is an admin and it's someone else's message, they should be able to delete and pin it
+                else if (mChatRole.equals("admin")) {
+                    // The selection will have two options - pin or delete the message
+                    CharSequence options[] = new CharSequence[]{"Pin Message", "Delete Message"};
+                    // An alert dialog is displayed with these two options
+                    AlertDialog.Builder builder = new AlertDialog.Builder(context);
+                    builder.setTitle("Select Options");
+                    builder.setItems(options, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            // Click event for each item: 0 for pinning the message 1 for deleting it
+                            switch (i) {
+                                case 0:
+                                    // Adds the message to the pinned table
+                                    mChatRef.child("pinned").child(c.getKey()).setValue(ServerValue.TIMESTAMP);
+                                    Toast.makeText(context, "Message pinned", Toast.LENGTH_SHORT).show();
+                                    break;
+                                case 1:
+                                    // Removes the message from the messages table
+                                    mChatRef.child("messages").child(c.getKey()).removeValue();
+                                    Toast.makeText(context, "Message deleted", Toast.LENGTH_SHORT).show();
+                                    context.refreshMessages();
+                                    break;
+                            }
+                        }
+                    });
+                    builder.show();
+                }
+                // Else, If the user is not an admin, they should be able to edit and delete their own messages
+                else if (c.getFrom().equals(current_user_id)) {
+                    // The selection will have two options - pin or delete the message
+                    CharSequence options[] = new CharSequence[]{"Edit Message", "Delete Message"};
+                    // An alert dialog is displayed with these two options
+                    AlertDialog.Builder builder = new AlertDialog.Builder(context);
+                    builder.setTitle("Select Options");
+                    builder.setItems(options, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            // Click event for each item: 0 for editing the message, 1 for deleting it
+                            switch (i) {
+                                case 0:
+                                    // Opens up an edit message dialog
+                                    showEditMessageDialog(c.getKey(), c.getMessage());
+                                    break;
+                                case 1:
+                                    // Removes the message from the messages table
+                                    mChatRef.child("messages").child(c.getKey()).removeValue();
+                                    Toast.makeText(context, "Message deleted", Toast.LENGTH_SHORT).show();
+                                    context.refreshMessages();
+                                    break;
+                            }
+                        }
+                    });
+                    builder.show();
+                }
+
+
+            }
+        });
     }
+
+    private void showEditMessageDialog(final String messageKey, String oldMessage) {
+        // Building the edit message dialog
+        AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(context);
+        LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        final View dialogView = inflater.inflate(R.layout.dialog_edit_message, null);
+        dialogBuilder.setView(dialogView);
+
+        // Edit text field for editing the message
+        final EditText editText = dialogView.findViewById(R.id.edit1);
+        editText.setText(oldMessage);
+
+        // Sets the title of the dialog
+        dialogBuilder.setTitle("Edit the message");
+        // Sets the title and action of the "Done" button
+        dialogBuilder.setPositiveButton("Done", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int whichButton) {
+                String newMessage = editText.getText().toString();
+                mChatRef.child("messages").child(messageKey).child("message").setValue(newMessage);
+                Toast.makeText(context, "Message edited", Toast.LENGTH_SHORT).show();
+                context.refreshMessages();
+            }
+        });
+        // Sets the title and action of the "Cancel" button
+        dialogBuilder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int whichButton) { }
+        });
+
+        // Shows the dialog
+        AlertDialog b = dialogBuilder.create();
+        b.show();
+    }
+
+
 
     @Override
     public int getItemCount() {

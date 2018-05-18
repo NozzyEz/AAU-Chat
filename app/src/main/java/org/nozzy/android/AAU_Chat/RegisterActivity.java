@@ -34,7 +34,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-// This activity is accessed from the start activity when the user taps the register new account
+// This activity is accessed from the startImageSelection activity when the user taps the register new account
 // button. In this activity we facilitate this functionality by letting the user sign up with their
 // email, name and password.
 public class RegisterActivity extends AppCompatActivity {
@@ -63,7 +63,7 @@ public class RegisterActivity extends AppCompatActivity {
         mAuth = FirebaseAuth.getInstance();
 
         // We setup the toolbar by first identifying, then setting it, then giving it a title, and
-        // finally allow the user to return to the start activity with the arrow icon
+        // finally allow the user to return to the startImageSelection activity with the arrow icon
         mToolbar = findViewById(R.id.register_toolbar);
         setSupportActionBar(mToolbar);
         getSupportActionBar().setTitle("Create Account");
@@ -80,7 +80,7 @@ public class RegisterActivity extends AppCompatActivity {
         mCreateBtn = findViewById(R.id.reg_create_btn);
 
         // Here we make a listener for the create account button, so that when it is tapped we can
-        // start to proceed with the data the user has put into our form
+        // startImageSelection to proceed with the data the user has put into our form
         mCreateBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -92,7 +92,7 @@ public class RegisterActivity extends AppCompatActivity {
                 // Here we check to make sure that all the text fields has information put in so that the app does not crash
                 if (!TextUtils.isEmpty(display_name) && !TextUtils.isEmpty(email) && !TextUtils.isEmpty(password)) {
 
-                    // Then we start our progress dialog with some information for the user so that
+                    // Then we startImageSelection our progress dialog with some information for the user so that
                     // they know that we are actively working in the background
                     mRegProgress.setTitle("Creating Account");
                     mRegProgress.setMessage("Please wait while an account is being created");

@@ -83,7 +83,7 @@ public class FriendsFragment extends BaseFragment {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Select Users to start a new group", Snackbar.LENGTH_LONG)
+                Snackbar.make(view, "Select Users to startImageSelection a new group", Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();
             }
         });
@@ -158,7 +158,7 @@ public class FriendsFragment extends BaseFragment {
                                                 sendToProfile(list_user_id);
                                                 break;
                                             case 1:
-                                                sendToChat(list_user_id, userName, userThumb);
+                                                sendToChat(list_user_id);
                                                 break;
                                         }
                                     }
@@ -185,7 +185,7 @@ public class FriendsFragment extends BaseFragment {
 
     // Sends the user to the ChatActivityOld where they can chat with the selected friend
     // Creates a chat room with the user
-    private void sendToChat(String list_user_id, String userName, String userThumb) {
+    private void sendToChat(String list_user_id) {
 
         // Generates chat ID
         mRootRef = FirebaseDatabase.getInstance().getReference();
@@ -197,17 +197,11 @@ public class FriendsFragment extends BaseFragment {
         mRootRef.child("Users").child(list_user_id).child("chats").child(push_id).child("timestamp").setValue(ServerValue.TIMESTAMP);
 
         // Creating the chat in the Chats table with members, name, type, image and seen values
-        mRootRef.child("Chats").child(push_id).child("members").child(mCurrent_user_id).setValue("user");
-        mRootRef.child("Chats").child(push_id).child("members").child(list_user_id).setValue("user");
+        mRootRef.child("Chats").child(push_id).child("members").child(mCurrent_user_id).setValue("admin");
+        mRootRef.child("Chats").child(push_id).child("members").child(list_user_id).setValue("admin");
         mRootRef.child("Chats").child(push_id).child("chat_name").setValue("New Chat");
         mRootRef.child("Chats").child(push_id).child("chat_type").setValue("direct");
         mRootRef.child("Chats").child(push_id).child("chat_image").setValue("");
-
-        // TODO this will be removed later on. It is left at the moment for compatibility reasons.
-        mRootRef.child("Chats").child(push_id).child("chatName").setValue("New Chat");
-        mRootRef.child("Chats").child(push_id).child("chatType").setValue("direct");
-        mRootRef.child("Chats").child(push_id).child("chatImage").setValue("");
-        //
 
         mRootRef.child("Chats").child(push_id).child("seen").child(list_user_id).setValue("");
         mRootRef.child("Chats").child(push_id).child("seen").child(mCurrent_user_id).setValue("");
