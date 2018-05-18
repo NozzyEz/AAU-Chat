@@ -24,6 +24,7 @@
     <string name="navigation_drawer_close">Close navigation drawer</string>
 
     <string name="reset_password">Reset password</string>
+    <string name="forgot_password">Forgot password</string>
 
     <string name="options_semester_student">Semester</string>
 

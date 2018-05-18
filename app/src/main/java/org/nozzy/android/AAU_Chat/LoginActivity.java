@@ -30,7 +30,6 @@ public class LoginActivity extends AppCompatActivity {
     private EditText mLoginEmail;
     private EditText mLoginPassword;
     private Button mLogin_btn;
-    private TextView mForgetPassword;
     private Button mResetPassword;
     private static final String TAG="Login Activity";
 
@@ -54,7 +53,7 @@ public class LoginActivity extends AppCompatActivity {
         mLoginEmail = findViewById(R.id.username_login_activity);
         mLoginPassword = findViewById(R.id.password_login_activity);
         mLogin_btn = findViewById(R.id.login_button);
-        mForgetPassword=findViewById(R.id.forgot_password_text_view);
+
         mResetPassword=findViewById(R.id.reset_password_button);
 
         mLoginProgress = new ProgressDialog(this);
@@ -109,6 +108,14 @@ public class LoginActivity extends AppCompatActivity {
 
 
 
+            }
+        });
+
+        mResetPassword.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent startResendActivity= new Intent(LoginActivity.this, ResetPassword.class);
+                startActivity(startResendActivity);
             }
         });
     }
