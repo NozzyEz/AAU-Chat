@@ -203,7 +203,7 @@ public class ChatsFragment extends BaseFragment {
                                         public void onDataChange(DataSnapshot dataSnapshot) {
                                             // Gets the name, image and online values of the member
                                             final String directMemberName = dataSnapshot.child("name").getValue().toString();
-                                            final String directMemberImage = dataSnapshot.child("image").getValue().toString();
+                                            final String directMemberImage = dataSnapshot.child("thumb_image").getValue().toString();
                                             final String directMemberOnline = dataSnapshot.child("online").getValue().toString();
 
                                             // Sets the name, image and the online value accordingly
