@@ -392,13 +392,13 @@ public class ChatActivity extends AppCompatActivity {
                         // A Hashmap to store the notification
                         Map<String, Object> notifyMap = new HashMap<>();
                         notifyMap.put("from", mCurrentUserID);
-                        notifyMap.put("type", "message");
+                        notifyMap.put("type", "image");
+                        notifyMap.put("chat_id", mChatID);
 
                         // Put the message and the notification into their corresponding tables
                         Map<String, Object> messageUserMap = new HashMap<>();
                         messageUserMap.put(messages_ref + "/" + push_id, messageMap);
                         messageUserMap.put(notification_ref + "/" + push_id, notifyMap);
-
 
                         // Attempts to store all data in the database
                         mRootRef.updateChildren(messageUserMap, new DatabaseReference.CompletionListener() {
@@ -613,27 +613,17 @@ public class ChatActivity extends AppCompatActivity {
 
             // A hashmap for storing a message
             Map<String, Object> messageMap = new HashMap<>();
-            messageMap.put("message", message);
-            if(message.startsWith("https://firebasestorage.googleapis.com/"))
-                messageMap.put("type", "image");
-            else
-                messageMap.put("type", "text");
-            messageMap.put("time", ServerValue.TIMESTAMP);
             messageMap.put("from", mCurrentUserID);
+            messageMap.put("message", message);
+            messageMap.put("time", ServerValue.TIMESTAMP);
+            messageMap.put("type", "text");
 
             // A Hashmap to store the notification
             Map<String, Object> notifyMap = new HashMap<>();
             notifyMap.put("from", mCurrentUserID);
-
-            if(message.startsWith("https://firebasestorage.googleapis.com/"))
-                messageMap.put("type", "image");
-            else
-                notifyMap.put("type", "message");
-
-            notifyMap.put("message", message);
+            notifyMap.put("type", "message");
             notifyMap.put("chat_id", mChatID);
-            notifyMap.put("chat_name", mChatName);
-            notifyMap.put("chat_image", mChatImage);
+            notifyMap.put("chat_message", message);
 
             // Put this message into the messages table inside the current chat
             Map<String, Object> messageUserMap = new HashMap<>();
@@ -780,14 +770,6 @@ public class ChatActivity extends AppCompatActivity {
 
 
 
-
-
-
-
-
-
-
-
     /**
      * Get a file path from a Uri. This will get the the path for Storage Access
      * Framework Documents, as well as the _data field for the MediaStore and
@@ -914,16 +896,3 @@ public class ChatActivity extends AppCompatActivity {
     public static boolean isMediaDocument(Uri uri) {
         return "com.android.providers.media.documents".equals(uri.getAuthority());
     }
-
-
-
-
-
-
-
-
-
-
-
-}
-
