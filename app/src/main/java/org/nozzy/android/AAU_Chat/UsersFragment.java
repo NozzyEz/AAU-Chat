@@ -28,8 +28,6 @@ import com.squareup.picasso.Callback;
 import com.squareup.picasso.NetworkPolicy;
 import com.squareup.picasso.Picasso;
 
-import java.util.ArrayList;
-
 import de.hdodenhof.circleimageview.CircleImageView;
 
 
@@ -43,14 +41,10 @@ public class UsersFragment extends BaseFragment {
     private FirebaseAuth mAuth;
     private String mCurrentUserID;
     private EditText etSearch;
-    private TextView tvNoReporter;
-    private DatabaseReference mRootRef;
 
     public static String searchString = "";
     public static String name;
-    public static Boolean newGroupChat = false;
 
-    private ArrayList<String> users = new ArrayList<>();
 
 
     @Override
@@ -73,7 +67,6 @@ public class UsersFragment extends BaseFragment {
 
         // Here we setup our RecyclerView which we use to show all the users, one by one
         mUsersList = getView().findViewById(R.id.users_list);
-        tvNoReporter = getView().findViewById(R.id.tvNoReporter);
 
 
 
@@ -199,7 +192,6 @@ public class UsersFragment extends BaseFragment {
     @Override
     public void onResume(){
         super.onResume();
-        newGroupChat = false;
         searchUser(searchString);
     }
 

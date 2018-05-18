@@ -77,7 +77,6 @@ public class NewGroupChatFragment extends BaseFragment {
     private FirebaseAuth mAuth;
     private String mCurrentUserID;
     private EditText etSearch;
-    private TextView tvNoReporter;
     private DatabaseReference mRootRef;
     private String push_id;
     private ImageButton icon_group;
@@ -102,7 +101,6 @@ public class NewGroupChatFragment extends BaseFragment {
 
         // Here we setup our RecyclerView which we use to show all the users, one by one
         mUsersList = getView().findViewById(R.id.users_list);
-        tvNoReporter = getView().findViewById(R.id.tvNoReporter);
         dialogBuilder = new AlertDialog.Builder(getContext());
 
         mImageStorage = FirebaseStorage.getInstance().getReference();
