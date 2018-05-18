@@ -8,14 +8,12 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
-import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.DocumentsContract;
 import android.provider.MediaStore;
-import android.support.annotation.NonNull;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -31,9 +29,7 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.ChildEventListener;
@@ -52,12 +48,8 @@ import com.squareup.picasso.NetworkPolicy;
 import com.squareup.picasso.Picasso;
 import com.theartofdev.edmodo.cropper.CropImage;
 
-import java.io.BufferedOutputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -109,7 +101,7 @@ public class ChatActivity extends AppCompatActivity {
     private MessageAdapter mAdapter;
 
     // Variables for displaying messages
-    private static final int  TOTAL_ITEMS_TO_LOAD = 10;
+    private static final int TOTAL_ITEMS_TO_LOAD = 10;
     private int itemPos = 0;
     private String mLastKey = "";
     private String mPrevKey = "";
@@ -170,7 +162,7 @@ public class ChatActivity extends AppCompatActivity {
                 if (mChatType.equals("direct")) {
                     // Goes through all members of the chat to find the other member
                     Iterable<DataSnapshot> chatMembers = dataSnapshot.child("members").getChildren();
-                    for (DataSnapshot member: chatMembers) {
+                    for (DataSnapshot member : chatMembers) {
                         // If it's not the current user
                         if (!member.getKey().equals(mCurrentUserID)) {
                             // Gets the ID of that other member
@@ -190,7 +182,9 @@ public class ChatActivity extends AppCompatActivity {
                                         Picasso.with(getApplicationContext()).load(mChatImage).networkPolicy(NetworkPolicy.OFFLINE)
                                                 .placeholder(R.drawable.generic).into(mProfileImage, new Callback() {
                                             @Override
-                                            public void onSuccess() { }
+                                            public void onSuccess() {
+                                            }
+
                                             @Override
                                             public void onError() {
                                                 Picasso.with(getApplicationContext()).load(mChatImage).placeholder(R.drawable.generic).into(mProfileImage);
@@ -198,8 +192,10 @@ public class ChatActivity extends AppCompatActivity {
                                         });
                                     }
                                 }
+
                                 @Override
-                                public void onCancelled(DatabaseError databaseError) { }
+                                public void onCancelled(DatabaseError databaseError) {
+                                }
                             });
                             // Adds a listener to the user being chatted with for setting their current online state
                             userRef.addValueEventListener(new ValueEventListener() {
@@ -218,8 +214,10 @@ public class ChatActivity extends AppCompatActivity {
                                         mLastSeenView.setText(lastSeenTime);
                                     }
                                 }
+
                                 @Override
-                                public void onCancelled(DatabaseError databaseError) { }
+                                public void onCancelled(DatabaseError databaseError) {
+                                }
                             });
                             break;
                         }
@@ -238,7 +236,9 @@ public class ChatActivity extends AppCompatActivity {
                         Picasso.with(getApplicationContext()).load(mChatImage).networkPolicy(NetworkPolicy.OFFLINE)
                                 .placeholder(R.drawable.generic).into(mProfileImage, new Callback() {
                             @Override
-                            public void onSuccess() { }
+                            public void onSuccess() {
+                            }
+
                             @Override
                             public void onError() {
                                 Picasso.with(getApplicationContext()).load(mChatImage).placeholder(R.drawable.generic).into(mProfileImage);
@@ -281,8 +281,10 @@ public class ChatActivity extends AppCompatActivity {
                     mLastSeenView.setText("Members: " + mChatUserCount);
                 }
             }
+
             @Override
-            public void onCancelled(DatabaseError databaseError) { }
+            public void onCancelled(DatabaseError databaseError) {
+            }
         });
 
 
@@ -350,7 +352,7 @@ public class ChatActivity extends AppCompatActivity {
     // We use this method when an image is being picked, in here the user picks an image from their
     // external storage, we startImageSelection it, compress it, and we store it with firebase.
     protected void onActivityResult(int requestCode, int resultCode, final Intent data) {
-        super.onActivityResult(requestCode,resultCode,data);
+        super.onActivityResult(requestCode, resultCode, data);
 
         // Checks if the activity was the image message gallery picker
         if (requestCode == MESSAGE_GALLERY_PICK && resultCode == RESULT_OK) {
@@ -434,7 +436,7 @@ public class ChatActivity extends AppCompatActivity {
         if (requestCode == CHAT_IMAGE_GALLERY_PICK && resultCode == RESULT_OK) {
             Uri imageUri = data.getData();
             CropImage.activity(imageUri)
-                    .setAspectRatio(1,1)
+                    .setAspectRatio(1, 1)
                     .setMinCropWindowSize(500, 500)
                     .start(this);
         }
@@ -525,13 +527,20 @@ public class ChatActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onChildChanged(DataSnapshot dataSnapshot, String s) { }
+            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+            }
+
             @Override
-            public void onChildRemoved(DataSnapshot dataSnapshot) { }
+            public void onChildRemoved(DataSnapshot dataSnapshot) {
+            }
+
             @Override
-            public void onChildMoved(DataSnapshot dataSnapshot, String s) { }
+            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+            }
+
             @Override
-            public void onCancelled(DatabaseError databaseError) { }
+            public void onCancelled(DatabaseError databaseError) {
+            }
         });
 
     }
@@ -544,7 +553,7 @@ public class ChatActivity extends AppCompatActivity {
 
         // Query for getting the specific 10 messages which end at the oldest currently displayed message
         // Note - actually loads in 11 messages, but the last one is a repeat, so it isn't shown.
-        Query messageQuery = messagesRef.orderByKey().endAt(mLastKey).limitToLast(TOTAL_ITEMS_TO_LOAD+1);
+        Query messageQuery = messagesRef.orderByKey().endAt(mLastKey).limitToLast(TOTAL_ITEMS_TO_LOAD + 1);
 
         // For each of these messages
         messageQuery.addChildEventListener(new ChildEventListener() {
@@ -575,24 +584,32 @@ public class ChatActivity extends AppCompatActivity {
                     // Stops the refreshing from continuing
                     mRefreshLayout.setRefreshing(false);
                     // Scrolls to the bottom of older messages, effectively showing you the first message
-                    mLinearLayout.scrollToPositionWithOffset(itemPos - 1,0);
+                    mLinearLayout.scrollToPositionWithOffset(itemPos - 1, 0);
                 } else {
                     mAdapter.notifyDataSetChanged();
 
                     // Stops the refreshing from continuing
                     mRefreshLayout.setRefreshing(false);
                     // Scrolls to the bottom of older messages, effectively showing you the first message
-                    mLinearLayout.scrollToPositionWithOffset(itemPos - 1,0);
+                    mLinearLayout.scrollToPositionWithOffset(itemPos - 1, 0);
                 }
             }
+
             @Override
-            public void onChildChanged(DataSnapshot dataSnapshot, String s) { }
+            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+            }
+
             @Override
-            public void onChildRemoved(DataSnapshot dataSnapshot) { }
+            public void onChildRemoved(DataSnapshot dataSnapshot) {
+            }
+
             @Override
-            public void onChildMoved(DataSnapshot dataSnapshot, String s) { }
+            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+            }
+
             @Override
-            public void onCancelled(DatabaseError databaseError) { }
+            public void onCancelled(DatabaseError databaseError) {
+            }
         });
     }
 
@@ -672,7 +689,8 @@ public class ChatActivity extends AppCompatActivity {
         });
         // Sets the title and action of the "Cancel" button
         dialogBuilder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int whichButton) { }
+            public void onClick(DialogInterface dialog, int whichButton) {
+            }
         });
 
         // Shows the dialog
@@ -720,14 +738,22 @@ public class ChatActivity extends AppCompatActivity {
                 // Updates the timestamp value representing recent activity
                 mRootRef.child("Users").child(userID).child("chats").child(mChatID).child("timestamp").setValue(ServerValue.TIMESTAMP);
             }
+
             @Override
-            public void onChildChanged(DataSnapshot dataSnapshot, String s) { }
+            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+            }
+
             @Override
-            public void onChildRemoved(DataSnapshot dataSnapshot) { }
+            public void onChildRemoved(DataSnapshot dataSnapshot) {
+            }
+
             @Override
-            public void onChildMoved(DataSnapshot dataSnapshot, String s) { }
+            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+            }
+
             @Override
-            public void onCancelled(DatabaseError databaseError) { }
+            public void onCancelled(DatabaseError databaseError) {
+            }
         });
     }
 
@@ -748,14 +774,22 @@ public class ChatActivity extends AppCompatActivity {
                 // Set the seen value to that new message
                 seenRef.setValue(dataSnapshot.getKey());
             }
+
             @Override
-            public void onChildChanged(DataSnapshot dataSnapshot, String s) { }
+            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+            }
+
             @Override
-            public void onChildRemoved(DataSnapshot dataSnapshot) { }
+            public void onChildRemoved(DataSnapshot dataSnapshot) {
+            }
+
             @Override
-            public void onChildMoved(DataSnapshot dataSnapshot, String s) { }
+            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+            }
+
             @Override
-            public void onCancelled(DatabaseError databaseError) { }
+            public void onCancelled(DatabaseError databaseError) {
+            }
         });
     }
 
@@ -769,17 +803,16 @@ public class ChatActivity extends AppCompatActivity {
     }
 
 
-
     /**
      * Get a file path from a Uri. This will get the the path for Storage Access
      * Framework Documents, as well as the _data field for the MediaStore and
      * other file-based ContentProviders.
      *
      * @param context The context.
-     * @param uri The Uri to query.
+     * @param uri     The Uri to query.
      * @author paulburke
      */
-    public static String getPath(final Context context, final Uri uri) {
+    private static String getPath(final Context context, final Uri uri) {
 
         final boolean isKitKat = Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT;
 
@@ -820,7 +853,7 @@ public class ChatActivity extends AppCompatActivity {
                 }
 
                 final String selection = "_id=?";
-                final String[] selectionArgs = new String[] {
+                final String[] selectionArgs = new String[]{
                         split[1]
                 };
 
@@ -843,13 +876,13 @@ public class ChatActivity extends AppCompatActivity {
      * Get the value of the data column for this Uri. This is useful for
      * MediaStore Uris, and other file-based ContentProviders.
      *
-     * @param context The context.
-     * @param uri The Uri to query.
-     * @param selection (Optional) Filter used in the query.
+     * @param context       The context.
+     * @param uri           The Uri to query.
+     * @param selection     (Optional) Filter used in the query.
      * @param selectionArgs (Optional) Selection arguments used in the query.
      * @return The value of the _data column, which is typically a file path.
      */
-    public static String getDataColumn(Context context, Uri uri, String selection,
+    private static String getDataColumn(Context context, Uri uri, String selection,
                                        String[] selectionArgs) {
 
         Cursor cursor = null;
@@ -877,7 +910,7 @@ public class ChatActivity extends AppCompatActivity {
      * @param uri The Uri to check.
      * @return Whether the Uri authority is ExternalStorageProvider.
      */
-    public static boolean isExternalStorageDocument(Uri uri) {
+    private static boolean isExternalStorageDocument(Uri uri) {
         return "com.android.externalstorage.documents".equals(uri.getAuthority());
     }
 
@@ -885,7 +918,7 @@ public class ChatActivity extends AppCompatActivity {
      * @param uri The Uri to check.
      * @return Whether the Uri authority is DownloadsProvider.
      */
-    public static boolean isDownloadsDocument(Uri uri) {
+    private static boolean isDownloadsDocument(Uri uri) {
         return "com.android.providers.downloads.documents".equals(uri.getAuthority());
     }
 
@@ -893,6 +926,8 @@ public class ChatActivity extends AppCompatActivity {
      * @param uri The Uri to check.
      * @return Whether the Uri authority is MediaProvider.
      */
-    public static boolean isMediaDocument(Uri uri) {
+    private static boolean isMediaDocument(Uri uri) {
         return "com.android.providers.media.documents".equals(uri.getAuthority());
     }
+
+}
