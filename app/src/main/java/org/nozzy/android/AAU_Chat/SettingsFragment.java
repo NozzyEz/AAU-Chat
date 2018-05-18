@@ -183,15 +183,6 @@ public class SettingsFragment extends BaseFragment {
                 // Starts the activity with the request code GALLERY_PICK, which is caught in the onActivityResult method
                 startActivityForResult(Intent.createChooser(galleryIntent, "SELECT IMAGE"), GALLERY_PICK);
 
-                // start picker to get image for cropping and then use the image in cropping
-                // activity, this one allows for the user to pick the app they want to use to select the image,
-                // including the camera
-                /*
-                CropImage.activity()
-                        .setGuidelines(CropImageView.Guidelines.ON)
-                        .start(SettingsActivity.this);
-                */
-
             }
         });
 
