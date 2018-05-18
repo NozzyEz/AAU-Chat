@@ -100,7 +100,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         toggle.syncState();
 
 
-        // TODO: Comemnting
+        // TODO: Commenting
         final NavigationView navigationView = findViewById(R.id.nav_view);
 
         final View header = navigationView.getHeaderView(0);
