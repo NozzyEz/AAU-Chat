@@ -7,6 +7,8 @@ public class Messages {
     private String message, type, from;
     private long time;
 
+    private String key;
+
     public Messages(String message, long time, String type, String from) {
 
         this.message = message;
@@ -50,5 +52,13 @@ public class Messages {
 
     public void setFrom(String from) {
         this.from = from;
+    }
+
+    public String getKey() {
+        return key;
+    }
+
+    public void setKey(String key) {
+        this.key = key;
     }
 }
