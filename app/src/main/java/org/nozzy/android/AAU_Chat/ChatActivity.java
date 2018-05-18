@@ -174,7 +174,7 @@ public class ChatActivity extends AppCompatActivity {
                                 public void onDataChange(DataSnapshot dataSnapshot) {
                                     // Gets the name and image of the user
                                     mChatName = dataSnapshot.child("name").getValue(String.class);
-                                    mChatImage = dataSnapshot.child("image").getValue(String.class);
+                                    mChatImage = dataSnapshot.child("thumb_image").getValue(String.class);
                                     // Sets the name of the user as the title of the chat
                                     mTitleView.setText(mChatName);
                                     // Loads the user's image to the top
