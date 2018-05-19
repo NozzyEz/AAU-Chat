@@ -7,23 +7,25 @@
     android:background="@color/ColorProfile"
     tools:context="org.nozzy.android.AAU_Chat.ProfileActivity">
 
-    <ImageView
+    <de.hdodenhof.circleimageview.CircleImageView
         android:id="@+id/profile_image"
-        android:layout_width="match_parent"
-        android:layout_height="300dp"
-        android:layout_alignParentStart="true"
+        android:layout_width="170dp"
+        android:layout_height="170dp"
         android:layout_alignParentTop="true"
-        android:adjustViewBounds="false"
-        android:cropToPadding="false"
-        android:scaleType="centerCrop"
-        app:srcCompat="@drawable/generic" />
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="50dp"
+        android:src="@drawable/generic"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/profile_displayName"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="43dp"
+        android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
-        android:layout_centerVertical="true"
+        android:layout_marginTop="242dp"
         android:text="@string/display_name"
         android:textColor="@android:color/white"
         android:textSize="24sp" />
