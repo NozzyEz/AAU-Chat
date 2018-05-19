@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/ColorProfile"
+    android:background="@color/ColorBG"
     tools:context="org.nozzy.android.AAU_Chat.ProfileActivity">
 
     <de.hdodenhof.circleimageview.CircleImageView
@@ -27,7 +27,7 @@
         android:layout_centerHorizontal="true"
         android:layout_marginTop="242dp"
         android:text="@string/display_name"
-        android:textColor="@android:color/white"
+        android:textColor="@android:color/black"
         android:textSize="24sp" />
 
     <TextView
@@ -38,7 +38,7 @@
         android:layout_centerHorizontal="true"
         android:layout_marginTop="20dp"
         android:text="@string/default_status"
-        android:textColor="@android:color/white"
+        android:textColor="@android:color/black"
         android:paddingStart="20dp"
         android:paddingEnd="20dp"/>
 
@@ -50,7 +50,7 @@
         android:layout_centerHorizontal="true"
         android:layout_marginBottom="61dp"
         android:text="Total Friends"
-        android:textColor="@android:color/white" />
+        android:textColor="@android:color/black" />
 
     <Button
         android:id="@+id/profile_send_req_btn"
@@ -60,7 +60,7 @@
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
         android:layout_marginBottom="110dp"
-        android:background="@color/colorAccent"
+        android:background="@drawable/roundbutton"
         android:backgroundTint="@color/colorAccent"
         android:text="@string/send_friend_req"
         android:textColor="@android:color/white" />
@@ -74,7 +74,7 @@
         android:layout_alignEnd="@+id/profile_send_req_btn"
         android:layout_below="@+id/profile_total_friends"
         android:layout_marginTop="19dp"
-        android:background="@color/colorAccent"
+        android:background="@drawable/roundbutton"
         android:backgroundTint="@color/colorAccent"
         android:text="@string/decline_friend_req"
         android:textColor="@android:color/white" />
