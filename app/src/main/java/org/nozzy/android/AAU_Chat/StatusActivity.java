@@ -92,15 +92,9 @@ public class StatusActivity extends AppCompatActivity {
                             Toast.makeText(getApplicationContext(), "There was an error when saving changes", Toast.LENGTH_LONG).show();
 
                         }
-
                     }
                 });
-
-
             }
         });
-
-
-
     }
 }
