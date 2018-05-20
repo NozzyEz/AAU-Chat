@@ -29,6 +29,11 @@
     <string name="do_not_have_account">Don\'t have an account?</string>
     <string name="register_account">Register here</string>
 
+    <string name="select_course">Select the study programme</string>
+    <string-array name="courses_list">
+        
+    </string-array>
+
     <string name="options_semester_student">Semester</string>
 
 
