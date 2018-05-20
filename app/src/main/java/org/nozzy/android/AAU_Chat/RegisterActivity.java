@@ -36,9 +36,9 @@ import java.util.HashMap;
 public class RegisterActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener{
 
     // UI
-    private TextInputLayout mDisplayName;
-    private TextInputLayout mEmail;
-    private TextInputLayout mPassword;
+    private TextInputEditText mDisplayName;
+    private TextInputEditText mEmail;
+    private TextInputEditText mPassword;
     private Button mCreateBtn;
     private Toolbar mToolbar;
     private Spinner mSemesterSpinner;
@@ -104,9 +104,9 @@ public class RegisterActivity extends AppCompatActivity implements AdapterView.O
             @Override
             public void onClick(View view) {
 
-                String display_name = mDisplayName.getEditText().getText().toString();
-                String email = mEmail.getEditText().getText().toString();
-                String password = mPassword.getEditText().getText().toString();
+                String display_name = mDisplayName.getText().toString();
+                String email = mEmail.getText().toString();
+                String password = mPassword.getText().toString();
 
                 // Here we check to make sure that all the text fields has information put in so that the app does not crash
                 if (!TextUtils.isEmpty(display_name) && !TextUtils.isEmpty(email) && !TextUtils.isEmpty(password)) {
