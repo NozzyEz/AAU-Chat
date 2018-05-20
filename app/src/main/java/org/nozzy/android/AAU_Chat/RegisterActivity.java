@@ -30,7 +30,9 @@ import com.google.firebase.database.ServerValue;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.iid.FirebaseInstanceId;
 
+import java.text.DateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -161,6 +163,7 @@ public class RegisterActivity extends AppCompatActivity {
                                 ArrayList<String> tags = new ArrayList<>();
                                 tags.add("ALL");
                                 addToChannels(uid, tags);
+                                addToFriends(uid);
 
                                 mRegProgress.dismiss();
 
@@ -236,6 +239,40 @@ public class RegisterActivity extends AppCompatActivity {
             @Override
             public void onCancelled(DatabaseError databaseError) { }
         });
+    }
+
+    // A method to add all users to the friends list
+    private void addToFriends(final String currentUserID) {
+
+        // DateTime to get the current time
+        final String currentDate = DateFormat.getDateTimeInstance().format(new Date());
+
+        // Root reference
+        final DatabaseReference rootRef = FirebaseDatabase.getInstance().getReference();
+
+        // References to all friends and users
+        final DatabaseReference friendsRef = rootRef.child("Friends");
+        final DatabaseReference usersRef = rootRef.child("Users");
+
+        // Adds a listener to go through all users
+        usersRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                Iterable<DataSnapshot> allUsers = dataSnapshot.getChildren();
+                for (DataSnapshot user : allUsers) {
+                    // If the user is not yourself
+                    if (!user.getKey().equals(currentUserID)) {
+                        // Add that user to your friends, and add yourself as their friend
+                        friendsRef.child(currentUserID).child(user.getKey()).child("date").setValue(currentDate);
+                        friendsRef.child(user.getKey()).child(currentUserID).child("date").setValue(currentDate);
+                    }
+                }
+            }
+            @Override
+            public void onCancelled(DatabaseError databaseError) { }
+        });
+
+
     }
 
 

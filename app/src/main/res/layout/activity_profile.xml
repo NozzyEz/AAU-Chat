@@ -62,7 +62,7 @@
         android:layout_marginBottom="110dp"
         android:background="@drawable/roundbutton"
         android:backgroundTint="@color/colorAccent"
-        android:text="@string/send_friend_req"
+        android:text="@string/block_user"
         android:textColor="@android:color/white" />
 
     <Button
@@ -76,7 +76,7 @@
         android:layout_marginTop="19dp"
         android:background="@drawable/roundbutton"
         android:backgroundTint="@color/colorAccent"
-        android:text="@string/decline_friend_req"
+        android:text="@string/new_chat"
         android:textColor="@android:color/white" />
 
 </RelativeLayout>

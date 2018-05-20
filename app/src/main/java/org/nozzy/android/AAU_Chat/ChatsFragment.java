@@ -54,8 +54,6 @@ public class ChatsFragment extends BaseFragment {
     private DatabaseReference mUsersDatabase;
     private FirebaseAuth mAuth;
     private String mCurrent_user_id;
-    private ArrayList<String> mBlockedUsers;
-    private ArrayList<String> mBlockedChats;
 
     public ChatsFragment() {
         // Required empty public constructor
@@ -101,59 +99,6 @@ public class ChatsFragment extends BaseFragment {
         mChatsDatabase = mRootDatabase.child("Chats");
         mChatsDatabase.keepSynced(true);
 
-
-        // TODO WIP
-        // Instantiates the list of users who are blocked
-        mBlockedUsers = new ArrayList<>();
-        mBlockedChats = new ArrayList<>();
-        mUsersDatabase.child(mCurrent_user_id).addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                if (dataSnapshot.hasChild("blocked")) {
-                    Iterable<DataSnapshot> blockedUsers = dataSnapshot.child("blocked").getChildren();
-                    for (DataSnapshot blockedUser : blockedUsers)
-                        mBlockedUsers.add(blockedUser.getKey());
-                }
-
-                Query userChatQuery = mConvDatabase.orderByChild("timestamp");
-                userChatQuery.addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(DataSnapshot dataSnapshot) {
-                        Iterable<DataSnapshot> userChats = dataSnapshot.getChildren();
-                        for (DataSnapshot userChat : userChats) {
-                            final String chatKey = userChat.getKey();
-
-                            mChatsDatabase.child(chatKey).child("members").addListenerForSingleValueEvent(new ValueEventListener() {
-                                @Override
-                                public void onDataChange(DataSnapshot dataSnapshot) {
-                                    if (dataSnapshot.getChildrenCount() == 2) {
-                                        Iterable<DataSnapshot> chatMembers = dataSnapshot.getChildren();
-                                        for (DataSnapshot chatMember : chatMembers) {
-                                            if (!chatMember.getKey().equals(mCurrent_user_id)) {
-                                                if (mBlockedUsers.contains(chatMember.getKey()))
-                                                    mBlockedChats.add(chatKey);
-                                            }
-                                        }
-                                    }
-                                }
-                                @Override
-                                public void onCancelled(DatabaseError databaseError) { }
-                            });
-
-
-                        }
-                    }
-                    @Override
-                    public void onCancelled(DatabaseError databaseError) { }
-                });
-            }
-            @Override
-            public void onCancelled(DatabaseError databaseError) { }
-        });
-
-
-
-
         // Inflate the layout for this fragment
         return mMainView;
     }
@@ -179,11 +124,6 @@ public class ChatsFragment extends BaseFragment {
 
                 // Gets the id of the chat
                 final String list_chat_id = getRef(i).getKey();
-
-                if (mBlockedChats.contains(list_chat_id))
-                    convViewHolder.hideLayout();
-                else convViewHolder.showLayout();
-
 
                 // Database reference to the messages
                 DatabaseReference messageDatabase = mChatsDatabase.child(list_chat_id).child("messages");

@@ -14,11 +14,9 @@
     <string name="default_status">Hi there, I\'m using AAU Chat</string>
     <string name="change_image">Change Image</string>
     <string name="change_status">Change status</string>
-    <string name="send_friend_req">Send Friend request</string>
-    <string name="cancel_friend_req">Cancel Friend request</string>
-    <string name="decline_friend_req">Decline Friend Request</string>
-    <string name="accept_friend_req">Accept Friend Request</string>
-    <string name="unfriend">Unfriend this person</string>
+    <string name="block_user">Block this User</string>
+    <string name="unblock_user">Unblock this User</string>
+    <string name="new_chat">Start a New Chat</string>
     <string name="enter_message">Enter Message…</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
