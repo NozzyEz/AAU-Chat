@@ -65,16 +65,13 @@ import static android.view.View.VISIBLE;
 // This activity is used for chatting with other users.
 public class ChatActivity extends AppCompatActivity {
 
-    // ID of the user being chatted with
-    // It will only be used if the type of the chat is "direct"
-    private String mDirectUserID;
-
     // Parameters of the chat
     private String mChatID;
     private String mChatType;
     private String mChatName;
     private String mChatImage;
     private String mChatRole;
+    private ArrayList<String> mChatMembers = new ArrayList<>();
     private long mChatUserCount;
 
     private DatabaseReference mRootRef;
@@ -173,9 +170,9 @@ public class ChatActivity extends AppCompatActivity {
                         // If it's not the current user
                         if (!member.getKey().equals(mCurrentUserID)) {
                             // Gets the ID of that other member
-                            mDirectUserID = member.getKey();
+                            mChatMembers.add(member.getKey());
                             // Reference to that user to get his data
-                            DatabaseReference userRef = mRootRef.child("Users").child(mDirectUserID);
+                            DatabaseReference userRef = mRootRef.child("Users").child(mChatMembers.get(0));
                             userRef.addListenerForSingleValueEvent(new ValueEventListener() {
                                 @Override
                                 public void onDataChange(DataSnapshot dataSnapshot) {
@@ -252,6 +249,12 @@ public class ChatActivity extends AppCompatActivity {
                             }
                         });
                     }
+
+                    // Get all members of the group
+                    Iterable<DataSnapshot> members = dataSnapshot.child("members").getChildren();
+                    for (DataSnapshot member : members)
+                        if (!member.getKey().equals(mCurrentUserID))
+                            mChatMembers.add(member.getKey());
 
                     // If the user is an admin
                     if (mChatRole.equals("admin")) {
@@ -388,7 +391,7 @@ public class ChatActivity extends AppCompatActivity {
 
                 // References to the messages and the notifications in the database
                 final String messages_ref = "Chats" + "/" + mChatID + "/" + "messages";
-                final String notification_ref = "Notifications/" + mDirectUserID;
+                final String notification_ref = "Notifications" + "/";
 
                 // Gets the semi-random key of the message about to be stored
                 DatabaseReference user_message_push = mRootRef.child("Chats").child(mChatID).child("messages").push();
@@ -418,7 +421,8 @@ public class ChatActivity extends AppCompatActivity {
                         // Put the message and the notification into their corresponding tables
                         Map<String, Object> messageUserMap = new HashMap<>();
                         messageUserMap.put(messages_ref + "/" + push_id, messageMap);
-                        messageUserMap.put(notification_ref + "/" + push_id, notifyMap);
+                        for (String member : mChatMembers)
+                            messageUserMap.put(notification_ref + member + "/" + push_id, notifyMap);
 
                         // Attempts to store all data in the database
                         mRootRef.updateChildren(messageUserMap, new DatabaseReference.CompletionListener() {
@@ -733,8 +737,8 @@ public class ChatActivity extends AppCompatActivity {
         // Checks if the message isn't empty
         if (!TextUtils.isEmpty(message)) {
             // Reference to the messages in the Chats table in the database and for the notifications table as well
-            String messages_ref = "Chats/" + mChatID + "/" + "messages";
-            String notification_ref = "Notifications/" + mDirectUserID;
+            String messages_ref = "Chats" + "/" + mChatID + "/" + "messages";
+            String notification_ref = "Notifications" + "/";
 
             // Gets the semi-random key of the message about to be stored
             DatabaseReference user_message_push = mRootRef.child("Chats").child(mChatID).child("messages").push();
@@ -757,7 +761,8 @@ public class ChatActivity extends AppCompatActivity {
             // Put this message into the messages table inside the current chat
             Map<String, Object> messageUserMap = new HashMap<>();
             messageUserMap.put(messages_ref + "/" + push_id, messageMap);
-            messageUserMap.put(notification_ref + "/" + push_id, notifyMap);
+            for (String member : mChatMembers)
+                messageUserMap.put(notification_ref + member + "/" + push_id, notifyMap);
 
             // Refreshes the text window to be empty
             mChatMessageView.setText("");

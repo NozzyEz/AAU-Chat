@@ -12,6 +12,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
@@ -24,6 +25,9 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
+
+import java.util.ArrayList;
+import java.util.Set;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
@@ -68,7 +72,6 @@ public class ChatsFragment extends BaseFragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-
         // The main view which holds all the fragments
         mMainView = inflater.inflate(R.layout.fragment_chats, container, false);
 
@@ -93,7 +96,6 @@ public class ChatsFragment extends BaseFragment {
         mUsersDatabase.keepSynced(true);
         mChatsDatabase = mRootDatabase.child("Chats");
         mChatsDatabase.keepSynced(true);
-
 
         // Inflate the layout for this fragment
         return mMainView;
@@ -127,7 +129,7 @@ public class ChatsFragment extends BaseFragment {
                 // By default, the message box will say that there are no messages
                 // This gets replaced by the following query which tries to get the last message
                 convViewHolder.setMessage("No messages yet.", true);
-                
+
                 // Query to get the last message in a conversation
                 Query lastMessageQuery = messageDatabase.limitToLast(1);
                 lastMessageQuery.addChildEventListener(new ChildEventListener() {
