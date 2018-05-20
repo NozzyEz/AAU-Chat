@@ -16,7 +16,7 @@
     <string name="change_status">Change status</string>
     <string name="block_user">Block this User</string>
     <string name="unblock_user">Unblock this User</string>
-    <string name="new_chat">Start a New Chat</string>
+    <string name="new_direct_chat">Start a New Chat</string>
     <string name="enter_message">Enter Message…</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>

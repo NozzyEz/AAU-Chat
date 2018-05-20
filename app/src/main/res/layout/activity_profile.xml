@@ -76,7 +76,7 @@
         android:layout_marginTop="19dp"
         android:background="@drawable/roundbutton"
         android:backgroundTint="@color/colorAccent"
-        android:text="@string/new_chat"
+        android:text="@string/new_direct_chat"
         android:textColor="@android:color/white" />
 
 </RelativeLayout>
