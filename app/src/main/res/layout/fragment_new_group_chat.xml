@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    tools:context="org.nozzy.android.AAU_Chat.UsersActivity">
+    tools:context="org.nozzy.android.AAU_Chat.MainActivity">
 
 
     <TextView
@@ -12,7 +12,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center_horizontal"
-        android:layout_below="@id/users_appBar"
+        android:layout_below="@id/appBarLayout"
         android:padding="12dp"
         android:text="Select users to start conversation"
         android:textColor="@color/colorPrimaryDark" />

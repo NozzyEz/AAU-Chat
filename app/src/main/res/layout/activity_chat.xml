@@ -16,7 +16,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_above="@+id/chat_bottom_bar"
-        android:layout_below="@+id/chat_app_bar">
+        android:layout_below="@+id/tvPinedMessages">
 
         <android.support.v7.widget.RecyclerView
             android:id="@+id/chat_messages_list"
@@ -25,6 +25,18 @@
 
         </android.support.v7.widget.RecyclerView>
     </android.support.v4.widget.SwipeRefreshLayout>
+
+    <TextView
+        android:id="@+id/tvPinedMessages"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/chat_app_bar"
+        android:padding="12dp"
+        android:maxLines="1"
+        android:ellipsize="end"
+        android:background="@color/ColorChat"
+        android:text="Sample text message"
+        android:textColor="@color/colorPrimaryDark" />
 
     <LinearLayout
         android:id="@+id/chat_bottom_bar"

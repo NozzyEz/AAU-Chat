@@ -57,7 +57,7 @@
             android:screenOrientation="portrait"
             android:theme="@style/Base.Theme.AppCompat" />
         <activity
-            android:name=".UsersActivity"
+            android:name=".PinnedMessagesActivity"
             android:parentActivityName=".MainActivity"
             android:screenOrientation="portrait" />
         <activity

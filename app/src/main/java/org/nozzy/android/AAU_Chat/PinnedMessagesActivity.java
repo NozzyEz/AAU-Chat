@@ -20,12 +20,10 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.EditText;
-import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -60,7 +58,7 @@ import id.zelory.compressor.Compressor;
 
 
 // This activity is used for chatting with other users.
-public class ChatActivity extends AppCompatActivity {
+public class PinnedMessagesActivity extends AppCompatActivity {
 
     // ID of the user being chatted with
     // It will only be used if the type of the chat is "direct"
@@ -88,18 +86,17 @@ public class ChatActivity extends AppCompatActivity {
     private CircleImageView mProfileImage;
     private FirebaseAuth mAuth;
     private String mCurrentUserID;
-    private TextView tvPinedMessages;
 
-    private ImageButton mChatAddBtn;
-    private ImageButton mChatSendBtn;
-    private EditText mChatMessageView;
+//    private ImageButton mChatAddBtn;
+//    private ImageButton mChatSendBtn;
+//    private EditText mChatMessageView;
 
     private RecyclerView mMessagesList;
     private SwipeRefreshLayout mRefreshLayout;
 
     private final List<Messages> messagesList = new ArrayList<>();
     private LinearLayoutManager mLinearLayout;
-    private MessageAdapter mAdapter;
+    private PinsAdapter mAdapter;
 
     // Variables for displaying messages
     private static final int TOTAL_ITEMS_TO_LOAD = 10;
@@ -115,7 +112,7 @@ public class ChatActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_chat);
+        setContentView(R.layout.activity_pinned_messages);
 
         // Setting up the Firebase references
         mRootRef = FirebaseDatabase.getInstance().getReference();
@@ -144,11 +141,10 @@ public class ChatActivity extends AppCompatActivity {
         mTitleView = findViewById(R.id.custom_bar_title);
         mLastSeenView = findViewById(R.id.custom_bar_seen);
         mProfileImage = findViewById(R.id.custom_bar_image);
-        tvPinedMessages = findViewById(R.id.tvPinedMessages);
 
-        mChatAddBtn = findViewById(R.id.chat_add_btn);
-        mChatSendBtn = findViewById(R.id.chat_send_btn);
-        mChatMessageView = findViewById(R.id.chat_message_view);
+//        mChatAddBtn = findViewById(R.id.chat_add_btn);
+//        mChatSendBtn = findViewById(R.id.chat_send_btn);
+//        mChatMessageView = findViewById(R.id.chat_message_view);
 
         // Sets the name, image and online values
         // Adds a listener to get all the chat values
@@ -291,7 +287,7 @@ public class ChatActivity extends AppCompatActivity {
 
 
         // UI
-        mAdapter = new MessageAdapter(messagesList, this, mChatID);
+        mAdapter = new PinsAdapter(messagesList, this, mChatID);
 
         mMessagesList = findViewById(R.id.chat_messages_list);
         mRefreshLayout = findViewById(R.id.message_swipe_layout);
@@ -310,42 +306,33 @@ public class ChatActivity extends AppCompatActivity {
         updateSeen();
 
         // Button event for sending a message
-        mChatSendBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                sendMessage();
-            }
-        });
-
-        tvPinedMessages.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent pinnedMessagesIntent = new Intent(getApplicationContext(), PinnedMessagesActivity.class);
-                pinnedMessagesIntent.putExtra("chat_id", mChatID);
-                startActivity(pinnedMessagesIntent);
-            }
-        });
-
-        // Button event for sending an image
-        mChatAddBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                // Ask for permission to read storage data (needed for newer versions of Android)
-                if (checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE)
-                        != PackageManager.PERMISSION_GRANTED) {
-                    // MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE is an
-                    // app-defined int constant that should be quite unique
-                    requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
-                            MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE);
-                    return;
-                }
-                // Start the default gallery picker, which will compress and send the image
-                Intent galleryIntent = new Intent();
-                galleryIntent.setType("image/*");
-                galleryIntent.setAction(Intent.ACTION_GET_CONTENT);
-                startActivityForResult(Intent.createChooser(galleryIntent, "Select Image"), MESSAGE_GALLERY_PICK);
-            }
-        });
+//        mChatSendBtn.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                sendMessage();
+//            }
+//        });
+//
+//        // Button event for sending an image
+//        mChatAddBtn.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                // Ask for permission to read storage data (needed for newer versions of Android)
+//                if (checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE)
+//                        != PackageManager.PERMISSION_GRANTED) {
+//                    // MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE is an
+//                    // app-defined int constant that should be quite unique
+//                    requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
+//                            MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE);
+//                    return;
+//                }
+//                // Start the default gallery picker, which will compress and send the image
+//                Intent galleryIntent = new Intent();
+//                galleryIntent.setType("image/*");
+//                galleryIntent.setAction(Intent.ACTION_GET_CONTENT);
+//                startActivityForResult(Intent.createChooser(galleryIntent, "Select Image"), MESSAGE_GALLERY_PICK);
+//            }
+//        });
 
         // Sets a listener whenever we refresh for older messages
         mRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
@@ -372,7 +359,7 @@ public class ChatActivity extends AppCompatActivity {
                 File imageToCompress = new File(getPath(this, data.getData()));
 
                 // Creates a compressor, loads the image onto it
-                File compressedImage = new Compressor(ChatActivity.this)
+                File compressedImage = new Compressor(this)
                         .setQuality(25)
                         .compressToFile(imageToCompress);
 
@@ -483,7 +470,7 @@ public class ChatActivity extends AppCompatActivity {
                         String download_url = taskSnapshot.getDownloadUrl().toString();
                         // Change the chat image value in the database
                         mRootRef.child("Chats").child(mChatID).child("chat_image").setValue(download_url);
-                        Toast.makeText(ChatActivity.this, "Chat image changed", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getApplication(), "Chat image changed", Toast.LENGTH_SHORT).show();
                     }
                 });
 
@@ -499,60 +486,107 @@ public class ChatActivity extends AppCompatActivity {
     // Method for loading in the first messages
     private void loadMessages() {
 
-        // Reference for getting messages
-        DatabaseReference messageRef = mRootRef.child("Chats").child(mChatID).child("messages");
-
-        // A query to load the last 10 messages, from the oldest to the newest one
-        Query messageQuery = messageRef.limitToLast(TOTAL_ITEMS_TO_LOAD);
-
-        // Adds a listener to messages
-        messageQuery.addChildEventListener(new ChildEventListener() {
+        DatabaseReference pinnedRef = mRootRef.child("Chats").child(mChatID).child("pinned");
+        pinnedRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
-            // Triggers whenever a new message is added
-            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                Messages message = dataSnapshot.getValue(Messages.class);
-                String messageKey = dataSnapshot.getKey();
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                Iterable<DataSnapshot> pinnedMessages = dataSnapshot.getChildren();
+                for (DataSnapshot pinnedMessage : pinnedMessages) {
+                    final String messageKey = pinnedMessage.getKey();
 
-                // Set the Key value to the message - this is used in-app for deleting and pinning messages
-                message.setKey(messageKey);
+                    DatabaseReference messageRef = mRootRef.child("Chats").child(mChatID).child("messages").child(messageKey);
+                    messageRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(DataSnapshot dataSnapshot) {
+                            Messages message = dataSnapshot.getValue(Messages.class);
 
-                // If it's the first (oldest) message in that set
-                if (itemPos == 0) {
-                    // Set the last key and previous key to that message's key
-                    mLastKey = messageKey;
-                    mPrevKey = messageKey;
+                            // Set the Key value to the message - this is used in-app for deleting and pinning messages
+                            message.setKey(messageKey);
+
+                            // If it's the first (oldest) message in that set
+                            if (itemPos == 0) {
+                                // Set the last key and previous key to that message's key
+                                mLastKey = messageKey;
+                                mPrevKey = messageKey;
+                            }
+
+                            // Increment the position so that other messages don't get counted as first
+                            itemPos++;
+
+                            // Adds the new message to the list
+                            messagesList.add(message);
+                            mAdapter.notifyDataSetChanged();
+
+                            // Scroll the view to the bottom when a message is sent or received.
+                            mMessagesList.scrollToPosition(messagesList.size() - 1);
+
+                            // Stops the refreshing
+                            mRefreshLayout.setRefreshing(false);
+                        }
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {}
+                    });
+
                 }
-
-                // Increment the position so that other messages don't get counted as first
-                itemPos++;
-
-                // Adds the new message to the list
-                messagesList.add(message);
-                mAdapter.notifyDataSetChanged();
-
-                // Scroll the view to the bottom when a message is sent or received.
-                mMessagesList.scrollToPosition(messagesList.size() - 1);
-
-                // Stops the refreshing
-                mRefreshLayout.setRefreshing(false);
             }
-
             @Override
-            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-            }
-
-            @Override
-            public void onChildRemoved(DataSnapshot dataSnapshot) {
-            }
-
-            @Override
-            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-            }
+            public void onCancelled(DatabaseError databaseError) {}
         });
+
+        // Reference for getting messages
+
+//
+//        // A query to load the last 10 messages, from the oldest to the newest one
+//        Query messageQuery = messageRef.limitToLast(TOTAL_ITEMS_TO_LOAD);
+//
+//        // Adds a listener to messages
+//        messageQuery.addChildEventListener(new ChildEventListener() {
+//            @Override
+//            // Triggers whenever a new message is added
+//            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+//                Messages message = dataSnapshot.getValue(Messages.class);
+//                String messageKey = dataSnapshot.getKey();
+//
+//                // Set the Key value to the message - this is used in-app for deleting and pinning messages
+//                message.setKey(messageKey);
+//
+//                // If it's the first (oldest) message in that set
+//                if (itemPos == 0) {
+//                    // Set the last key and previous key to that message's key
+//                    mLastKey = messageKey;
+//                    mPrevKey = messageKey;
+//                }
+//
+//                // Increment the position so that other messages don't get counted as first
+//                itemPos++;
+//
+//                // Adds the new message to the list
+//                messagesList.add(message);
+//                mAdapter.notifyDataSetChanged();
+//
+//                // Scroll the view to the bottom when a message is sent or received.
+//                mMessagesList.scrollToPosition(messagesList.size() - 1);
+//
+//                // Stops the refreshing
+//                mRefreshLayout.setRefreshing(false);
+//            }
+//
+//            @Override
+//            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+//            }
+//
+//            @Override
+//            public void onChildRemoved(DataSnapshot dataSnapshot) {
+//            }
+//
+//            @Override
+//            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+//            }
+//
+//            @Override
+//            public void onCancelled(DatabaseError databaseError) {
+//            }
+//        });
 
     }
 
@@ -625,56 +659,56 @@ public class ChatActivity extends AppCompatActivity {
     }
 
     // Method for sending a simple text message
-    private void sendMessage() {
-
-        // Gets the message text
-        String message = mChatMessageView.getText().toString();
-        // Checks if the message isn't empty
-        if (!TextUtils.isEmpty(message)) {
-            // Reference to the messages in the Chats table in the database and for the notifications table as well
-            String messages_ref = "Chats/" + mChatID + "/" + "messages";
-            String notification_ref = "Notifications/" + mDirectUserID;
-
-            // Gets the semi-random key of the message about to be stored
-            DatabaseReference user_message_push = mRootRef.child("Chats").child(mChatID).child("messages").push();
-            String push_id = user_message_push.getKey();
-
-            // A hashmap for storing a message
-            Map<String, Object> messageMap = new HashMap<>();
-            messageMap.put("from", mCurrentUserID);
-            messageMap.put("message", message);
-            messageMap.put("time", ServerValue.TIMESTAMP);
-            messageMap.put("type", "text");
-
-            // A Hashmap to store the notification
-            Map<String, Object> notifyMap = new HashMap<>();
-            notifyMap.put("from", mCurrentUserID);
-            notifyMap.put("type", "message");
-            notifyMap.put("chat_id", mChatID);
-            notifyMap.put("chat_message", message);
-
-            // Put this message into the messages table inside the current chat
-            Map<String, Object> messageUserMap = new HashMap<>();
-            messageUserMap.put(messages_ref + "/" + push_id, messageMap);
-            messageUserMap.put(notification_ref + "/" + push_id, notifyMap);
-
-            // Refreshes the text window to be empty
-            mChatMessageView.setText("");
-
-            // Attempts to put all data into the database
-            mRootRef.updateChildren(messageUserMap, new DatabaseReference.CompletionListener() {
-                @Override
-                public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
-                    if (databaseError != null) {
-                        Log.d("CHAT_LOG", databaseError.getMessage());
-                    }
-                }
-            });
-
-            // Updates the chat's timestamp for each user
-            updateChatTimestamp();
-        }
-    }
+//    private void sendMessage() {
+//
+//        // Gets the message text
+//        String message = mChatMessageView.getText().toString();
+//        // Checks if the message isn't empty
+//        if (!TextUtils.isEmpty(message)) {
+//            // Reference to the messages in the Chats table in the database and for the notifications table as well
+//            String messages_ref = "Chats/" + mChatID + "/" + "messages";
+//            String notification_ref = "Notifications/" + mDirectUserID;
+//
+//            // Gets the semi-random key of the message about to be stored
+//            DatabaseReference user_message_push = mRootRef.child("Chats").child(mChatID).child("messages").push();
+//            String push_id = user_message_push.getKey();
+//
+//            // A hashmap for storing a message
+//            Map<String, Object> messageMap = new HashMap<>();
+//            messageMap.put("from", mCurrentUserID);
+//            messageMap.put("message", message);
+//            messageMap.put("time", ServerValue.TIMESTAMP);
+//            messageMap.put("type", "text");
+//
+//            // A Hashmap to store the notification
+//            Map<String, Object> notifyMap = new HashMap<>();
+//            notifyMap.put("from", mCurrentUserID);
+//            notifyMap.put("type", "message");
+//            notifyMap.put("chat_id", mChatID);
+//            notifyMap.put("chat_message", message);
+//
+//            // Put this message into the messages table inside the current chat
+//            Map<String, Object> messageUserMap = new HashMap<>();
+//            messageUserMap.put(messages_ref + "/" + push_id, messageMap);
+//            messageUserMap.put(notification_ref + "/" + push_id, notifyMap);
+//
+//            // Refreshes the text window to be empty
+//            mChatMessageView.setText("");
+//
+//            // Attempts to put all data into the database
+//            mRootRef.updateChildren(messageUserMap, new DatabaseReference.CompletionListener() {
+//                @Override
+//                public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
+//                    if (databaseError != null) {
+//                        Log.d("CHAT_LOG", databaseError.getMessage());
+//                    }
+//                }
+//            });
+//
+//            // Updates the chat's timestamp for each user
+//            updateChatTimestamp();
+//        }
+//    }
 
     private void showEditNameDialog(String oldName) {
         // Building the edit message dialog
@@ -695,7 +729,7 @@ public class ChatActivity extends AppCompatActivity {
                 String newName = editText.getText().toString();
                 mRootRef.child("Chats").child(mChatID).child("chat_name").setValue(newName);
                 mTitleView.setText(newName);
-                Toast.makeText(ChatActivity.this, "Chat name changed", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), "Chat name changed", Toast.LENGTH_SHORT).show();
             }
         });
         // Sets the title and action of the "Cancel" button
@@ -894,7 +928,7 @@ public class ChatActivity extends AppCompatActivity {
      * @return The value of the _data column, which is typically a file path.
      */
     private static String getDataColumn(Context context, Uri uri, String selection,
-                                       String[] selectionArgs) {
+                                        String[] selectionArgs) {
 
         Cursor cursor = null;
         final String column = "_data";
