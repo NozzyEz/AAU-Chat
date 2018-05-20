@@ -5,6 +5,7 @@
     <color name="colorAccent">#95014e</color>
     <color name="ColorProfile">#3f3e3e</color>
     <color name="ColorChat">#bcbcbc</color>
+    <color name="ColorBG">#FFFF</color>
 
     <item name="visible" type="id"/>
     <item name="masked" type="id"/>
