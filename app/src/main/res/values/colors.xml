@@ -5,6 +5,7 @@
     <color name="colorAccent">#95014e</color>
     <color name="ColorProfile">#3f3e3e</color>
     <color name="ColorChat">#bcbcbc</color>
+    <color name="ColorBG">#FFFF</color>
 
     <color name="LoginActivity">#34e7f6ee</color>
 

@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/ColorProfile"
+    android:background="@color/ColorBG"
     tools:context="org.nozzy.android.AAU_Chat.SettingsActivity">
 
     <de.hdodenhof.circleimageview.CircleImageView
@@ -27,7 +27,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
         android:text="@string/display_name"
-        android:textColor="@android:color/white"
+        android:textColor="@android:color/black"
         android:textSize="30sp"
         android:textStyle="normal"
         app:layout_constraintLeft_toLeftOf="parent"
@@ -43,7 +43,7 @@
         android:paddingStart="20dp"
         android:text="@string/default_status"
         android:textAlignment="center"
-        android:textColor="@android:color/white"
+        android:textColor="@android:color/black"
         android:textStyle="bold"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
@@ -54,19 +54,21 @@
         android:layout_width="170dp"
         android:layout_height="43dp"
         android:layout_marginBottom="16dp"
-        android:background="@android:color/white"
+        android:background="@drawable/buttonshape"
         android:text="@string/change_image"
+
         android:textColor="@color/colorPrimaryDark"
         app:layout_constraintBottom_toTopOf="@+id/settings_status_btn"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent" />
+
 
     <Button
         android:id="@+id/settings_status_btn"
         android:layout_width="170dp"
         android:layout_height="43dp"
         android:layout_marginBottom="20dp"
-        android:background="@color/colorAccent"
+        android:background="@drawable/roundbutton"
         android:text="@string/change_status"
         android:textColor="@android:color/white"
         app:layout_constraintBottom_toBottomOf="parent"
