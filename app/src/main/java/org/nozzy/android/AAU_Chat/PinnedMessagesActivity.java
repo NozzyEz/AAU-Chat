@@ -1,12 +1,8 @@
 package org.nozzy.android.AAU_Chat;
 
-import android.Manifest;
-import android.app.AlertDialog;
 import android.content.ContentUris;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Build;
@@ -23,7 +19,6 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -35,7 +30,6 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.Query;
 import com.google.firebase.database.ServerValue;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
@@ -138,6 +132,8 @@ public class PinnedMessagesActivity extends AppCompatActivity {
 
         actionBar.setCustomView(action_bar_view);
 
+
+
         mTitleView = findViewById(R.id.custom_bar_title);
         mLastSeenView = findViewById(R.id.custom_bar_seen);
         mProfileImage = findViewById(R.id.custom_bar_image);
@@ -203,13 +199,13 @@ public class PinnedMessagesActivity extends AppCompatActivity {
                                     String online = dataSnapshot.child("online").getValue().toString();
                                     // If the user is online, set the text at the top to 'Online'
                                     if (online.equals("true")) {
-                                        mLastSeenView.setText("Online");
+                                        mLastSeenView.setText("Pinned messages");
                                     } else {
                                         // If the user isn't online, turns the timestamp into a long value
                                         long lastTime = Long.parseLong(online);
                                         // Converts it into a readable format, sets the text at the top to that value
                                         String lastSeenTime = GetTimeAgo.getTimeAgo(lastTime, getApplicationContext());
-                                        mLastSeenView.setText(lastSeenTime);
+                                        mLastSeenView.setText("Pinned messages");
                                     }
                                 }
 
@@ -244,39 +240,8 @@ public class PinnedMessagesActivity extends AppCompatActivity {
                         });
                     }
 
-                    // If the user is an admin
-                    if (mChatRole.equals("admin")) {
-                        // Adds a listener to the chat title to change it
-                        mTitleView.setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                showEditNameDialog(mChatName);
-                            }
-                        });
-                        // Adds a listener to the chat image to change it
-                        mProfileImage.setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                // Ask for permission to read storage data (needed for newer versions of Android)
-                                if (checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE)
-                                        != PackageManager.PERMISSION_GRANTED) {
-                                    // MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE is an
-                                    // app-defined int constant that should be quite unique
-                                    requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
-                                            MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE);
-                                    return;
-                                }
-                                // Start the default gallery picker, which will lead into a cropper
-                                Intent galleryIntent = new Intent();
-                                galleryIntent.setType("image/*");
-                                galleryIntent.setAction(Intent.ACTION_GET_CONTENT);
-                                startActivityForResult(Intent.createChooser(galleryIntent, "Select Image"), CHAT_IMAGE_GALLERY_PICK);
-                            }
-                        });
-                    }
-
                     // The online indicator displays the number of members in the chat instead
-                    mLastSeenView.setText("Members: " + mChatUserCount);
+                    mLastSeenView.setText("Pinned messages");
                 }
             }
 
@@ -284,6 +249,8 @@ public class PinnedMessagesActivity extends AppCompatActivity {
             public void onCancelled(DatabaseError databaseError) {
             }
         });
+
+
 
 
         // UI
@@ -303,36 +270,7 @@ public class PinnedMessagesActivity extends AppCompatActivity {
         loadMessages();
 
         // Updates the last seen message of the current user
-        updateSeen();
-
-        // Button event for sending a message
-//        mChatSendBtn.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                sendMessage();
-//            }
-//        });
-//
-//        // Button event for sending an image
-//        mChatAddBtn.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                // Ask for permission to read storage data (needed for newer versions of Android)
-//                if (checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE)
-//                        != PackageManager.PERMISSION_GRANTED) {
-//                    // MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE is an
-//                    // app-defined int constant that should be quite unique
-//                    requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
-//                            MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE);
-//                    return;
-//                }
-//                // Start the default gallery picker, which will compress and send the image
-//                Intent galleryIntent = new Intent();
-//                galleryIntent.setType("image/*");
-//                galleryIntent.setAction(Intent.ACTION_GET_CONTENT);
-//                startActivityForResult(Intent.createChooser(galleryIntent, "Select Image"), MESSAGE_GALLERY_PICK);
-//            }
-//        });
+       // updateSeen();
 
         // Sets a listener whenever we refresh for older messages
         mRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
@@ -341,7 +279,7 @@ public class PinnedMessagesActivity extends AppCompatActivity {
                 // Increments current page of messages loaded
                 itemPos = 0;
                 // Loads older messages
-                loadMoreMessages();
+               // loadMoreMessages();
             }
         });
     }
@@ -532,216 +470,9 @@ public class PinnedMessagesActivity extends AppCompatActivity {
             @Override
             public void onCancelled(DatabaseError databaseError) {}
         });
-
-        // Reference for getting messages
-
-//
-//        // A query to load the last 10 messages, from the oldest to the newest one
-//        Query messageQuery = messageRef.limitToLast(TOTAL_ITEMS_TO_LOAD);
-//
-//        // Adds a listener to messages
-//        messageQuery.addChildEventListener(new ChildEventListener() {
-//            @Override
-//            // Triggers whenever a new message is added
-//            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-//                Messages message = dataSnapshot.getValue(Messages.class);
-//                String messageKey = dataSnapshot.getKey();
-//
-//                // Set the Key value to the message - this is used in-app for deleting and pinning messages
-//                message.setKey(messageKey);
-//
-//                // If it's the first (oldest) message in that set
-//                if (itemPos == 0) {
-//                    // Set the last key and previous key to that message's key
-//                    mLastKey = messageKey;
-//                    mPrevKey = messageKey;
-//                }
-//
-//                // Increment the position so that other messages don't get counted as first
-//                itemPos++;
-//
-//                // Adds the new message to the list
-//                messagesList.add(message);
-//                mAdapter.notifyDataSetChanged();
-//
-//                // Scroll the view to the bottom when a message is sent or received.
-//                mMessagesList.scrollToPosition(messagesList.size() - 1);
-//
-//                // Stops the refreshing
-//                mRefreshLayout.setRefreshing(false);
-//            }
-//
-//            @Override
-//            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-//            }
-//
-//            @Override
-//            public void onChildRemoved(DataSnapshot dataSnapshot) {
-//            }
-//
-//            @Override
-//            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
-//            }
-//
-//            @Override
-//            public void onCancelled(DatabaseError databaseError) {
-//            }
-//        });
-
     }
 
-    // Method for loading in older messages when refreshing
-    private void loadMoreMessages() {
 
-        // Reference for getting messages
-        DatabaseReference messagesRef = mRootRef.child("Chats").child(mChatID).child("messages");
-
-        // Query for getting the specific 10 messages which end at the oldest currently displayed message
-        // Note - actually loads in 11 messages, but the last one is a repeat, so it isn't shown.
-        Query messageQuery = messagesRef.orderByKey().endAt(mLastKey).limitToLast(TOTAL_ITEMS_TO_LOAD + 1);
-
-        // For each of these messages
-        messageQuery.addChildEventListener(new ChildEventListener() {
-            @Override
-            // When each message is added
-            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                // Get the text and id of the message
-                Messages message = dataSnapshot.getValue(Messages.class);
-                String messageKey = dataSnapshot.getKey();
-                // Set the Key value to the message - this is used in-app for deleting and pinning messages
-                message.setKey(messageKey);
-
-                // Loads the message if it's not the last one (since that one is already on the screen)
-                // If it is the last one, set the previous last key to the new last one
-                if (!messageKey.equals(mPrevKey)) {
-                    messagesList.add(itemPos++, message);
-                } else {
-                    mPrevKey = mLastKey;
-                }
-
-                // If it's the first message, set the new last key to that message's key
-                // Note - this does not affect the current query which goes until the last key, only the next one
-                if (itemPos == 1) {
-                    mLastKey = messageKey;
-
-                    mAdapter.notifyDataSetChanged();
-
-                    // Stops the refreshing from continuing
-                    mRefreshLayout.setRefreshing(false);
-                    // Scrolls to the bottom of older messages, effectively showing you the first message
-                    mLinearLayout.scrollToPositionWithOffset(itemPos - 1, 0);
-                } else {
-                    mAdapter.notifyDataSetChanged();
-
-                    // Stops the refreshing from continuing
-                    mRefreshLayout.setRefreshing(false);
-                    // Scrolls to the bottom of older messages, effectively showing you the first message
-                    mLinearLayout.scrollToPositionWithOffset(itemPos - 1, 0);
-                }
-            }
-
-            @Override
-            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-            }
-
-            @Override
-            public void onChildRemoved(DataSnapshot dataSnapshot) {
-            }
-
-            @Override
-            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-            }
-        });
-    }
-
-    // Method for sending a simple text message
-//    private void sendMessage() {
-//
-//        // Gets the message text
-//        String message = mChatMessageView.getText().toString();
-//        // Checks if the message isn't empty
-//        if (!TextUtils.isEmpty(message)) {
-//            // Reference to the messages in the Chats table in the database and for the notifications table as well
-//            String messages_ref = "Chats/" + mChatID + "/" + "messages";
-//            String notification_ref = "Notifications/" + mDirectUserID;
-//
-//            // Gets the semi-random key of the message about to be stored
-//            DatabaseReference user_message_push = mRootRef.child("Chats").child(mChatID).child("messages").push();
-//            String push_id = user_message_push.getKey();
-//
-//            // A hashmap for storing a message
-//            Map<String, Object> messageMap = new HashMap<>();
-//            messageMap.put("from", mCurrentUserID);
-//            messageMap.put("message", message);
-//            messageMap.put("time", ServerValue.TIMESTAMP);
-//            messageMap.put("type", "text");
-//
-//            // A Hashmap to store the notification
-//            Map<String, Object> notifyMap = new HashMap<>();
-//            notifyMap.put("from", mCurrentUserID);
-//            notifyMap.put("type", "message");
-//            notifyMap.put("chat_id", mChatID);
-//            notifyMap.put("chat_message", message);
-//
-//            // Put this message into the messages table inside the current chat
-//            Map<String, Object> messageUserMap = new HashMap<>();
-//            messageUserMap.put(messages_ref + "/" + push_id, messageMap);
-//            messageUserMap.put(notification_ref + "/" + push_id, notifyMap);
-//
-//            // Refreshes the text window to be empty
-//            mChatMessageView.setText("");
-//
-//            // Attempts to put all data into the database
-//            mRootRef.updateChildren(messageUserMap, new DatabaseReference.CompletionListener() {
-//                @Override
-//                public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
-//                    if (databaseError != null) {
-//                        Log.d("CHAT_LOG", databaseError.getMessage());
-//                    }
-//                }
-//            });
-//
-//            // Updates the chat's timestamp for each user
-//            updateChatTimestamp();
-//        }
-//    }
-
-    private void showEditNameDialog(String oldName) {
-        // Building the edit message dialog
-        AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
-        LayoutInflater inflater = (LayoutInflater) this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        final View dialogView = inflater.inflate(R.layout.dialog_edit_message, null);
-        dialogBuilder.setView(dialogView);
-
-        // Edit text field for editing the message
-        final EditText editText = dialogView.findViewById(R.id.edit1);
-        editText.setText(oldName);
-
-        // Sets the title of the dialog
-        dialogBuilder.setTitle("Edit the chat name");
-        // Sets the title and action of the "Done" button
-        dialogBuilder.setPositiveButton("Done", new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int whichButton) {
-                String newName = editText.getText().toString();
-                mRootRef.child("Chats").child(mChatID).child("chat_name").setValue(newName);
-                mTitleView.setText(newName);
-                Toast.makeText(getApplicationContext(), "Chat name changed", Toast.LENGTH_SHORT).show();
-            }
-        });
-        // Sets the title and action of the "Cancel" button
-        dialogBuilder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int whichButton) {
-            }
-        });
-
-        // Shows the dialog
-        AlertDialog b = dialogBuilder.create();
-        b.show();
-    }
 
     @Override
     public void onStart() {
@@ -766,7 +497,7 @@ public class PinnedMessagesActivity extends AppCompatActivity {
             mRootRef.child("Users").child(mCurrentUserID).child("online").setValue(ServerValue.TIMESTAMP);
         }
 
-        mMessageRef.removeEventListener(mMessageAddedListener);
+      //  mMessageRef.removeEventListener(mMessageAddedListener);
     }
 
     // Method used for updating the chat's timestamp for each user
@@ -802,41 +533,6 @@ public class PinnedMessagesActivity extends AppCompatActivity {
         });
     }
 
-    // Method used for updating seen values
-    private void updateSeen() {
-        // Reference to the seen value of the current user
-        final DatabaseReference seenRef = mRootRef.child("Chats").child(mChatID).child("seen").child(mCurrentUserID);
-
-        // Reference to all messages of this chat
-        mMessageRef = mRootRef.child("Chats").child(mChatID).child("messages");
-
-        // Query to get the last message added
-        Query lastMessageQuery = mMessageRef.limitToLast(1);
-
-        mMessageAddedListener = lastMessageQuery.addChildEventListener(new ChildEventListener() {
-            @Override
-            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                // Set the seen value to that new message
-                seenRef.setValue(dataSnapshot.getKey());
-            }
-
-            @Override
-            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-            }
-
-            @Override
-            public void onChildRemoved(DataSnapshot dataSnapshot) {
-            }
-
-            @Override
-            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-            }
-        });
-    }
 
     // Used by MessageAdapter to refresh messages after one of them has been edited/deleted
     protected void refreshMessages() {

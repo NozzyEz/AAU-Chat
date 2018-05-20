@@ -21,7 +21,6 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ServerValue;
 import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.NetworkPolicy;
@@ -208,10 +207,9 @@ public class PinsAdapter extends RecyclerView.Adapter<PinsAdapter.PinsViewHolder
                 // If the user is an admin and it's their message, they should be able to edit, delete and pin it
                 if (mChatRole.equals("admin") && c.getFrom().equals(current_user_id)) {
                     // The selection will have two options - pin or delete the message
-                    CharSequence options[] = new CharSequence[]{"Pin Message", "Edit Message", "Delete Message"};
+                    CharSequence options[] = new CharSequence[]{"Unpin Message"};
                     // An alert dialog is displayed with these two options
                     AlertDialog.Builder builder = new AlertDialog.Builder(context);
-                    builder.setTitle("Select Options");
                     builder.setItems(options, new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialogInterface, int i) {
@@ -219,17 +217,8 @@ public class PinsAdapter extends RecyclerView.Adapter<PinsAdapter.PinsViewHolder
                             switch (i) {
                                 case 0:
                                     // Adds the message to the pinned table
-                                    mChatRef.child("pinned").child(c.getKey()).setValue(ServerValue.TIMESTAMP);
+                                    mChatRef.child("pinned").child(c.getKey()).removeValue();
                                     Toast.makeText(context, "Message pinned", Toast.LENGTH_SHORT).show();
-                                    break;
-                                case 1:
-                                    // Opens up an edit message dialog
-                                    showEditMessageDialog(c.getKey(), c.getMessage());
-                                    break;
-                                case 2:
-                                    // Removes the message from the messages table
-                                    mChatRef.child("messages").child(c.getKey()).removeValue();
-                                    Toast.makeText(context, "Message deleted", Toast.LENGTH_SHORT).show();
                                     context.refreshMessages();
                                     break;
                             }
@@ -240,10 +229,9 @@ public class PinsAdapter extends RecyclerView.Adapter<PinsAdapter.PinsViewHolder
                 // Else, if the user is an admin and it's someone else's message, they should be able to delete and pin it
                 else if (mChatRole.equals("admin")) {
                     // The selection will have two options - pin or delete the message
-                    CharSequence options[] = new CharSequence[]{"Pin Message", "Delete Message"};
+                    CharSequence options[] = new CharSequence[]{"Unpin Message"};
                     // An alert dialog is displayed with these two options
                     AlertDialog.Builder builder = new AlertDialog.Builder(context);
-                    builder.setTitle("Select Options");
                     builder.setItems(options, new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialogInterface, int i) {
@@ -251,13 +239,8 @@ public class PinsAdapter extends RecyclerView.Adapter<PinsAdapter.PinsViewHolder
                             switch (i) {
                                 case 0:
                                     // Adds the message to the pinned table
-                                    mChatRef.child("pinned").child(c.getKey()).setValue(ServerValue.TIMESTAMP);
+                                    mChatRef.child("pinned").child(c.getKey()).removeValue();
                                     Toast.makeText(context, "Message pinned", Toast.LENGTH_SHORT).show();
-                                    break;
-                                case 1:
-                                    // Removes the message from the messages table
-                                    mChatRef.child("messages").child(c.getKey()).removeValue();
-                                    Toast.makeText(context, "Message deleted", Toast.LENGTH_SHORT).show();
                                     context.refreshMessages();
                                     break;
                             }

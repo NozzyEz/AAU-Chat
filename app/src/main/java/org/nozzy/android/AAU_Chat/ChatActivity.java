@@ -26,6 +26,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -57,6 +58,8 @@ import java.util.Map;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 import id.zelory.compressor.Compressor;
+
+import static android.view.View.VISIBLE;
 
 
 // This activity is used for chatting with other users.
@@ -96,6 +99,7 @@ public class ChatActivity extends AppCompatActivity {
 
     private RecyclerView mMessagesList;
     private SwipeRefreshLayout mRefreshLayout;
+    private RelativeLayout pinnedMessagesLayout;
 
     private final List<Messages> messagesList = new ArrayList<>();
     private LinearLayoutManager mLinearLayout;
@@ -145,6 +149,7 @@ public class ChatActivity extends AppCompatActivity {
         mLastSeenView = findViewById(R.id.custom_bar_seen);
         mProfileImage = findViewById(R.id.custom_bar_image);
         tvPinedMessages = findViewById(R.id.tvPinedMessages);
+        pinnedMessagesLayout = findViewById(R.id.pinnedMessagesLayout);
 
         mChatAddBtn = findViewById(R.id.chat_add_btn);
         mChatSendBtn = findViewById(R.id.chat_send_btn);
@@ -306,6 +311,8 @@ public class ChatActivity extends AppCompatActivity {
         // Loads the first messages
         loadMessages();
 
+        loadPinnedMessage();
+
         // Updates the last seen message of the current user
         updateSeen();
 
@@ -317,7 +324,7 @@ public class ChatActivity extends AppCompatActivity {
             }
         });
 
-        tvPinedMessages.setOnClickListener(new View.OnClickListener() {
+        pinnedMessagesLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent pinnedMessagesIntent = new Intent(getApplicationContext(), PinnedMessagesActivity.class);
@@ -622,6 +629,100 @@ public class ChatActivity extends AppCompatActivity {
             public void onCancelled(DatabaseError databaseError) {
             }
         });
+    }
+
+    private void loadPinnedMessage() {
+
+        DatabaseReference pinnedRef = mRootRef.child("Chats").child(mChatID).child("pinned");
+        Query lastPinnedMessage = pinnedRef.limitToLast(1);
+        lastPinnedMessage.addChildEventListener(new ChildEventListener() {
+
+            @Override
+            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                    DatabaseReference messageRef = mRootRef.child("Chats").child(mChatID).child("messages").child(dataSnapshot.getKey());
+                    messageRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(DataSnapshot dataSnapshot) {
+                            pinnedMessagesLayout.setVisibility(VISIBLE);
+                            tvPinedMessages.setText(dataSnapshot.child("message").getValue().toString());
+                        }
+
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
+
+                        }
+                    });
+            }
+
+            @Override
+            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+
+            }
+
+            @Override
+            public void onChildRemoved(DataSnapshot dataSnapshot) {
+
+            }
+
+            @Override
+            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+
+
+
+//
+//        pinnedRef.addListenerForSingleValueEvent(new ValueEventListener() {
+//            @Override
+//            public void onDataChange(DataSnapshot dataSnapshot) {
+//                Iterable<DataSnapshot> pinnedMessages = dataSnapshot.getChildren();
+//                for (DataSnapshot pinnedMessage : pinnedMessages) {
+//                    final String messageKey = pinnedMessage.getKey();
+//
+//                    DatabaseReference messageRef = mRootRef.child("Chats").child(mChatID).child("messages").child(messageKey);
+//                    messageRef.addListenerForSingleValueEvent(new ValueEventListener() {
+//                        @Override
+//                        public void onDataChange(DataSnapshot dataSnapshot) {
+//                            Messages message = dataSnapshot.getValue(Messages.class);
+//
+//                            // Set the Key value to the message - this is used in-app for deleting and pinning messages
+//                            message.setKey(messageKey);
+//
+//                            // If it's the first (oldest) message in that set
+//                            if (itemPos == 0) {
+//                                // Set the last key and previous key to that message's key
+//                                mLastKey = messageKey;
+//                                mPrevKey = messageKey;
+//                            }
+//
+//                            // Increment the position so that other messages don't get counted as first
+//                            itemPos++;
+//
+//                            // Adds the new message to the list
+//                            messagesList.add(message);
+//                            mAdapter.notifyDataSetChanged();
+//
+//                            // Scroll the view to the bottom when a message is sent or received.
+//                            mMessagesList.scrollToPosition(messagesList.size() - 1);
+//
+//                            // Stops the refreshing
+//                            mRefreshLayout.setRefreshing(false);
+//                        }
+//                        @Override
+//                        public void onCancelled(DatabaseError databaseError) {}
+//                    });
+//
+//                }
+//            }
+//            @Override
+//            public void onCancelled(DatabaseError databaseError) {}
+//        });
     }
 
     // Method for sending a simple text message
