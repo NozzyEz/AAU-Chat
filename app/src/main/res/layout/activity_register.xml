@@ -16,70 +16,91 @@
     <TextView
         android:id="@+id/login_label"
         android:layout_width="wrap_content"
-        android:layout_height="24dp"
+        android:layout_height="29dp"
         android:text="@string/create_a_new_account"
         android:textColor="@android:color/black"
-        android:textSize="18sp"
+        android:textSize="25sp"
+        android:layout_gravity="center"
+        android:textAppearance="@style/Base.TextAppearance.AppCompat.Body1"
+
         />
 
 
     <android.support.design.widget.TextInputEditText
         android:id="@+id/reg_display_name"
-        android:layout_width="match_parent"
+        android:layout_width="350dp"
         android:layout_height="wrap_content"
-        android:hint="@string/display_name" />
+        android:hint="@string/display_name"
+        android:layout_gravity="center"
+        android:paddingTop="40dp"/>
 
 
     <android.support.design.widget.TextInputEditText
         android:id="@+id/login_email"
-        android:layout_width="match_parent"
+        android:layout_width="350dp"
         android:layout_height="wrap_content"
-
+        android:layout_gravity="center"
         android:hint="@string/email_address"
         android:inputType="textEmailAddress" />
 
 
     <android.support.design.widget.TextInputEditText
-        android:layout_width="match_parent"
+        android:layout_width="350dp"
         android:layout_height="wrap_content"
         android:hint="@string/password"
         android:inputType="textPassword"
-        android:id="@+id/login_password"/>
+        android:id="@+id/login_password"
+        android:layout_gravity="center"/>
 
     <android.support.design.widget.TextInputEditText
-        android:layout_width="match_parent"
+        android:layout_width="350dp"
         android:layout_height="wrap_content"
-        android:hint="@string/password"
+        android:hint="@string/repeat_password"
         android:inputType="textPassword"
-        android:id="@+id/repeat_password"/>
+        android:id="@+id/repeat_password"
+        android:layout_gravity="center"/>
 
     <TextView
-        android:text="Do sth here"
-        android:id="@+id/textVew"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_width="350dp"
+        android:layout_height="30dp"
+        android:text="@string/choose_studyprogramme"
+        android:layout_gravity="center"
+        android:textAppearance="@style/Base.TextAppearance.AppCompat.Body1"
 
+        android:textSize="20sp"/>
     <Spinner
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/semester_register"
-        android:entries="@array/semester_list"
-        android:prompt="@string/select_semester"/>
-    <Spinner
-        android:layout_width="match_parent"
+        android:layout_width="350dp"
         android:layout_height="wrap_content"
         android:id="@+id/list_with_studyprogramme_register"
         android:entries="@array/courses_list"
-        android:prompt="@string/select_course"/>
+        android:prompt="@string/select_course"
+        android:layout_gravity="center"/>
+    <TextView
+        android:text="@string/choose_semester"
+        android:id="@+id/textVew"
+        android:layout_width="350dp"
+        android:layout_height="30dp"
+        android:layout_gravity="center"
+      android:textAppearance="@style/Base.TextAppearance.AppCompat.Body1"
+        android:textSize="20sp"/>
 
+    <Spinner
+        android:layout_width="350dp"
+        android:layout_height="wrap_content"
+        android:id="@+id/semester_register"
+        android:entries="@array/semester_list"
+        android:prompt="@string/select_semester"
+        android:layout_gravity="center"/>
     <Button
         android:id="@+id/reg_create_btn"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-
-        android:background="@color/colorAccent"
+        android:layout_width="220dp"
+        android:layout_height="35dp"
+        android:background="@drawable/rounded_button_login_activity"
         android:text="@string/create_account"
-        android:textColor="@android:color/white" />
+        android:textColor="@android:color/white"
+        android:layout_gravity="center"
+        android:layout_marginTop="40dp"
+        />
 
 
 </LinearLayout>

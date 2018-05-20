@@ -4,6 +4,7 @@
     <string name="display_name">Display name</string>
     <string name="email_address">Email address</string>
     <string name="password">Password</string>
+    <string name="repeat_password">Repeat password</string>
     <string name="create_account">Create Account</string>
     <string name="log_out">Log Out</string>
     <string name="create_a_new_account">Create a new Account</string>
@@ -52,4 +53,7 @@
         <item>8</item>
         <item>9</item>
     </string-array>
+
+    <string name="choose_semester">Choose your study semester </string>
+    <string name="choose_studyprogramme">Choose your study programme</string>
 </resources>
