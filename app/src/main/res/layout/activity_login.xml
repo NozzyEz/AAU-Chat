@@ -7,26 +7,16 @@
     tools:context=".LoginActivity"
     android:orientation="vertical">
 
-    <include
-        android:id="@+id/login_toolbar"
-        layout="@layout/app_bar_layout"
-        android:layout_width="411dp"
-        android:layout_height="wrap_content" />
 
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_weight="0.5"
-        android:orientation="vertical">
 
         <android.support.design.widget.TextInputEditText
             android:id="@+id/username_login_activity"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:inputType="textEmailAddress"
-            android:hint="E-mail address"
-            android:layout_marginTop="70dp"
+            android:hint="@string/email_address"
+            android:layout_marginTop="100dp"
             />
 
         <android.support.design.widget.TextInputEditText
@@ -35,7 +25,7 @@
             android:layout_height="wrap_content"
             android:paddingTop="20dp"
             android:inputType="textPassword"
-            android:hint="Password"
+            android:hint="@string/password"
             android:layout_marginTop="40dp"/>
 
         <Button
@@ -52,18 +42,60 @@
             />
 
 
+    <LinearLayout
+        android:layout_width="400dp"
+        android:layout_height="70dp"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="15dp"
+            android:layout_marginTop="30dp"
+            android:fontFamily="sans-serif-condensed"
+            android:text="@string/do_not_have_account"
+            android:textAlignment="textStart"
+            android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+            android:textSize="18sp"
+            android:id="@+id/do_not_have_account_text_view"/>
+
         <Button
-                android:id="@+id/reset_password_button"
-                android:layout_width="220dp"
-                android:layout_height="30dp"
-                android:text="@string/forgot_password"
-                android:layout_marginTop="30dp"
-                android:layout_marginStart="65dp"
-                android:background="@drawable/rounder_button_transparent_login_activity"/>
-
-
-
-
+            android:id="@+id/register_account"
+            android:layout_width="120dp"
+            android:layout_height="20dp"
+            android:layout_marginStart="35dp"
+            android:layout_marginTop="30dp"
+            android:background="@drawable/rounder_button_transparent_login_activity"
+            android:text="@string/register_account"
+            android:textAppearance="@style/TextAppearance.AppCompat.Body1"/>
     </LinearLayout>
 
+    <LinearLayout
+        android:layout_width="400dp"
+        android:layout_height="70dp"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/forgot_password_text_view"
+            android:layout_marginStart="15dp"
+            android:layout_marginTop="30dp"
+            android:fontFamily="sans-serif-condensed"
+            android:text="@string/password_Forgot"
+            android:textAlignment="textStart"
+            android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+            android:textSize="18sp" />
+
+        <Button
+            android:id="@+id/reset_password_button"
+            android:layout_width="120dp"
+            android:layout_height="20dp"
+            android:layout_marginStart="69dp"
+            android:layout_marginTop="30dp"
+            android:background="@drawable/rounder_button_transparent_login_activity"
+            android:text="@string/forgot_passwords"
+            android:textAppearance="@style/TextAppearance.AppCompat.Body1"/>
+
+    </LinearLayout>
 </LinearLayout>
