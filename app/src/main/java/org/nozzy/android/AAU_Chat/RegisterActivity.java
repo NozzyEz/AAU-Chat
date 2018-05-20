@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.Spinner;
@@ -32,7 +33,7 @@ import java.util.HashMap;
 // This activity is accessed from the start activity when the user taps the register new account
 // button. In this activity we facilitate this functionality by letting the user sign up with their
 // email, name and password.
-public class RegisterActivity extends AppCompatActivity {
+public class RegisterActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener{
 
     // UI
     private TextInputLayout mDisplayName;
@@ -79,6 +80,23 @@ public class RegisterActivity extends AppCompatActivity {
         mEmail = findViewById(R.id.login_email);
         mPassword = findViewById(R.id.login_password);
         mCreateBtn = findViewById(R.id.reg_create_btn);
+
+        mCoursesSpinner=findViewById(R.id.list_with_studyprogramme_register);
+        mSemesterSpinner=findViewById(R.id.semester_register);
+
+        mSemesterSpinner.setOnItemSelectedListener(this);
+        mCoursesSpinner.setOnItemSelectedListener(this);
+        //setting up the array with choices for the user
+        mCharSequenceArrayAdapterCourses=ArrayAdapter.createFromResource(this, R.array.courses_list, R.layout.spinner_text_view);
+        mCharSequenceArrayAdapterSemester=ArrayAdapter.createFromResource(this, R.array.semester_list, R.layout.spinner_text_view);
+
+
+        mCharSequenceArrayAdapterCourses.setDropDownViewResource(R.layout.support_simple_spinner_dropdown_item);
+        mCharSequenceArrayAdapterSemester.setDropDownViewResource(R.layout.support_simple_spinner_dropdown_item);
+
+        //adding to the spinner the arrayAdapter, or adding the items in the spinner
+        mCoursesSpinner.setAdapter(mCharSequenceArrayAdapterCourses);
+        mSemesterSpinner.setAdapter(mCharSequenceArrayAdapterSemester);
 
         // Here we make a listener for the create account button, so that when it is tapped we can
         // start to proceed with the data the user has put into our form
@@ -183,5 +201,15 @@ public class RegisterActivity extends AppCompatActivity {
                 }
             }
         });
+    }
+
+    @Override
+    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+
+    }
+
+    @Override
+    public void onNothingSelected(AdapterView<?> parent) {
+
     }
 }
