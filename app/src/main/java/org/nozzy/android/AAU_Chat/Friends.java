@@ -4,16 +4,16 @@ package org.nozzy.android.AAU_Chat;
 // Used for displaying all friends in a RecyclerView in FriendsFragment.
 public class Friends {
 
-    public String date;
+    public String name;
 
     public Friends(){
 
     }
 
-    public Friends(String date) { this.date = date; }
+    public Friends(String name) { this.name = name; }
 
-    public String getDate() { return date; }
+    public String getName() { return name; }
 
-    public void setDate(String date) { this.date = date; }
+    public void setName(String name) { this.name = name; }
 
 }

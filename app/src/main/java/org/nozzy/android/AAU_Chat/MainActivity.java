@@ -2,12 +2,10 @@ package org.nozzy.android.AAU_Chat;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
-import android.media.Image;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
@@ -18,12 +16,11 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.text.Layout;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -72,6 +69,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private TextView mProfileName;
     private TextView mProfileInfo;
 
+    public Toolbar getToolbar(){
+        return toolbar;
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -79,19 +80,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         // Get the current instance of our authentication system
         mAuth = FirebaseAuth.getInstance();
 
-        if (mAuth.getCurrentUser() == null) {
-            sendToStart();
-        } else {
-            changeContentFragment(getSupportFragmentManager(), ChatsFragment.getFragmentTag(), new ChatsFragment(), R.id.flFragmentsContainer, false);
-        }
-
-
-
         // Toolbar setup
         toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setTitle("AAU Chat");
-
 
         final DrawerLayout drawer = findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -99,8 +91,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         drawer.addDrawerListener(toggle);
         toggle.syncState();
 
+        if (mAuth.getCurrentUser() == null) {
+            sendToStart();
+        } else {
+            changeContentFragment(getSupportFragmentManager(), ChatsFragment.getFragmentTag(), new ChatsFragment(), R.id.flFragmentsContainer, false, ChatsFragment.getFragmentTitle());
+        }
 
-        // TODO: Comemnting
+        // TODO: Commenting
         final NavigationView navigationView = findViewById(R.id.nav_view);
 
         final View header = navigationView.getHeaderView(0);
@@ -110,6 +107,14 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         mProfileThumb = header.findViewById(R.id.nav_bar_profile_image);
         mProfileName = header.findViewById(R.id.nav_profile_name);
         mProfileInfo = header.findViewById(R.id.nav_profile_info);
+
+        header.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                changeContentFragment(getSupportFragmentManager(), SettingsFragment.getFragmentTag(),new SettingsFragment(),R.id.flFragmentsContainer,false, SettingsFragment.getFragmentTitle());
+                drawer.closeDrawer(Gravity.LEFT);
+            }
+        });
 
 
         navigationView.setNavigationItemSelectedListener(this);
@@ -320,23 +325,45 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         transaction.commitAllowingStateLoss();
     }
+
+    public void changeContentFragment(FragmentManager fm, String fragmentTag, BaseFragment frag, int containerId, boolean shouldAddToBackStack, String title) {
+
+        // Check fragment manager to see if fragment exists
+        currentFragment = fm.popBackStackImmediate(fragmentTag, 0)
+                ? (BaseFragment) fm.findFragmentByTag(fragmentTag)
+                : frag;
+
+        FragmentTransaction transaction = fm.beginTransaction();
+        transaction.replace(containerId, frag, fragmentTag);
+        if (shouldAddToBackStack) {
+            transaction.addToBackStack(fragmentTag);
+        }
+
+        transaction.commitAllowingStateLoss();
+
+        // Change title of the action bar
+        getSupportActionBar().setTitle(title);
+    }
+
+
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
         if (id == R.id.email_burger_menu) {
-            changeContentFragment(getSupportFragmentManager(), FriendsFragment.getFragmentTag(),new FriendsFragment(),R.id.flFragmentsContainer,false);
+            changeContentFragment(getSupportFragmentManager(), FriendsFragment.getFragmentTag(),new FriendsFragment(),R.id.flFragmentsContainer,false, FriendsFragment.getFragmentTitle());
         } else if (id == R.id.all_users_burger_menu) {
-            changeContentFragment(getSupportFragmentManager(), UsersFragment.getFragmentTag(),new UsersFragment(),R.id.flFragmentsContainer,false);
+            changeContentFragment(getSupportFragmentManager(), UsersFragment.getFragmentTag(),new UsersFragment(),R.id.flFragmentsContainer,false, UsersFragment.getFragmentTitle());
         } else if (id == R.id.chats_burger_menu) {
-            changeContentFragment(getSupportFragmentManager(), ChatsFragment.getFragmentTag(),new ChatsFragment(),R.id.flFragmentsContainer,false);
+            changeContentFragment(getSupportFragmentManager(), ChatsFragment.getFragmentTag(),new ChatsFragment(),R.id.flFragmentsContainer,false, ChatsFragment.getFragmentTitle());
         } else if (id == R.id.settings_profile_burger_menu) {
-            changeContentFragment(getSupportFragmentManager(), SettingsFragment.getFragmentTag(),new SettingsFragment(),R.id.flFragmentsContainer,false);
+            changeContentFragment(getSupportFragmentManager(), SettingsFragment.getFragmentTag(),new SettingsFragment(),R.id.flFragmentsContainer,false, SettingsFragment.getFragmentTitle());
         } else if (id == R.id.log_out_burger_menu) {
             if (mAuth.getCurrentUser() != null) {
                 mUserRef.child("online").setValue(ServerValue.TIMESTAMP);
             }
+            setEmptyDeviceToken();
             FirebaseAuth.getInstance().signOut();
             sendToStart();
         }
@@ -351,6 +378,20 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         mUserRef = FirebaseDatabase.getInstance().getReference().child("Users").child(mAuth.getCurrentUser().getUid());
         // Get the device token from firebase
         String deviceToken = FirebaseInstanceId.getInstance().getToken();
+        // And put that token into the current users database entry, so that it is updated whenever the user opens the app
+        mUserRef.child("device_token").setValue(deviceToken).addOnCompleteListener(new OnCompleteListener<Void>() {
+            @Override
+            public void onComplete(@NonNull Task<Void> task) {
+                Log.d("string", "onComplete: Works");
+            }
+        });
+
+    }
+    public void setEmptyDeviceToken() {
+
+        mUserRef = FirebaseDatabase.getInstance().getReference().child("Users").child(mAuth.getCurrentUser().getUid());
+        // Get the device token from firebase
+        String deviceToken = "";
         // And put that token into the current users database entry, so that it is updated whenever the user opens the app
         mUserRef.child("device_token").setValue(deviceToken).addOnCompleteListener(new OnCompleteListener<Void>() {
             @Override

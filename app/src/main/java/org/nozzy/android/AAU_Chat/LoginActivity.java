@@ -1,21 +1,34 @@
 package org.nozzy.android.AAU_Chat;
 
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
 import android.support.annotation.NonNull;
-import android.support.design.widget.TextInputLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.text.SpannableString;
+import android.text.Spanned;
+import android.text.TextPaint;
 import android.text.TextUtils;
+import android.text.method.LinkMovementMethod;
+import android.text.style.ClickableSpan;
+import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.iid.FirebaseInstanceId;
@@ -24,9 +37,12 @@ public class LoginActivity extends AppCompatActivity {
 
     // UI
     private Toolbar mToolbar;
-    private TextInputLayout mLoginEmail;
-    private TextInputLayout mLoginPassword;
+    private EditText mLoginEmail;
+    private EditText mLoginPassword;
     private Button mLogin_btn;
+    private static final String TAG = "Login Activity";
+    private TextView mNoAccount;
+    private TextView mPassForgot;
 
     private ProgressDialog mLoginProgress;
 
@@ -40,14 +56,12 @@ public class LoginActivity extends AppCompatActivity {
         setContentView(R.layout.activity_login);
 
         // Setting up the UI
-        mToolbar = findViewById(R.id.login_toolbar);
-        setSupportActionBar(mToolbar);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setTitle("Login");
+        mLoginEmail = findViewById(R.id.username_login_activity);
+        mLoginPassword = findViewById(R.id.password_login_activity);
+        mLogin_btn = findViewById(R.id.login_button);
 
-        mLoginEmail = findViewById(R.id.login_email);
-        mLoginPassword = findViewById(R.id.login_password);
-        mLogin_btn = findViewById(R.id.login_btn);
+//        mNoAccount = findViewById(R.id.sign_up);
+//        mPassForgot = findViewById(R.id.forgot_password);
 
         mLoginProgress = new ProgressDialog(this);
 
@@ -61,10 +75,10 @@ public class LoginActivity extends AppCompatActivity {
             public void onClick(View view) {
 
                 // Gets the typed in email and password
-                String email = mLoginEmail.getEditText().getText().toString();
-                String password = mLoginPassword.getEditText().getText().toString();
+                String email = mLoginEmail.getText().toString();
+                String password = mLoginPassword.getText().toString();
 
-                if (!TextUtils.isEmpty(email) || !TextUtils.isEmpty(password)) {
+                if (!(TextUtils.isEmpty(email) || TextUtils.isEmpty(password))) {
                     // If both fields are filled in, shows a progress dialog (loading screen)
                     mLoginProgress.setTitle("Logging in");
                     mLoginProgress.setMessage("Please wait while logging in");
@@ -80,6 +94,52 @@ public class LoginActivity extends AppCompatActivity {
 
             }
         });
+
+
+        // Clickable part of the string where you can sign up for a new account
+        SpannableString ss1 = new SpannableString(getResources().getString(R.string.do_not_have_account));
+        ClickableSpan clickableSpan1 = new ClickableSpan() {
+            @Override
+            public void onClick(View textView) {
+                startActivity(new Intent(LoginActivity.this, RegisterActivity.class));
+            }
+            @Override
+            public void updateDrawState(TextPaint ds) {
+                super.updateDrawState(ds);
+                ds.setUnderlineText(false);
+                ds.setColor(getResources().getColor(R.color.colorPrimary, getTheme()));
+            }
+        };
+        ss1.setSpan(clickableSpan1, 23, 30, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+
+        TextView textView1 = findViewById(R.id.sign_up);
+        textView1.setText(ss1);
+        textView1.setMovementMethod(LinkMovementMethod.getInstance());
+        textView1.setHighlightColor(Color.TRANSPARENT);
+
+
+        // Clickable part of the string where you can reset your password
+        SpannableString ss2 = new SpannableString(getResources().getString(R.string.password_forgot));
+        ClickableSpan clickableSpan2 = new ClickableSpan() {
+            @Override
+            public void onClick(View textView) {
+                showPasswordResetDialog(mLoginEmail.getText().toString());
+            }
+            @Override
+            public void updateDrawState(TextPaint ds) {
+                super.updateDrawState(ds);
+                ds.setUnderlineText(false);
+                ds.setColor(getResources().getColor(R.color.colorPrimary, getTheme()));
+            }
+        };
+        ss2.setSpan(clickableSpan2, 17, 27, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+
+        TextView textView2 = findViewById(R.id.forgot_password);
+        textView2.setText(ss2);
+        textView2.setMovementMethod(LinkMovementMethod.getInstance());
+        textView2.setHighlightColor(Color.TRANSPARENT);
+
+
     }
 
     // Method for logging the user in
@@ -91,29 +151,80 @@ public class LoginActivity extends AppCompatActivity {
                     // Hides the progress dialog
                     mLoginProgress.dismiss();
 
-                    // Adding the device token to the user upon logging in
-                    String user_id = mAuth.getCurrentUser().getUid();
-                    String deviceToken = FirebaseInstanceId.getInstance().getToken();
+                    if (!mAuth.getCurrentUser().isEmailVerified()) {
+                        mAuth.signOut();
+                        mLoginProgress.dismiss();
+                        Toast.makeText(LoginActivity.this, "Account not verified.\nPlease check your email", Toast.LENGTH_LONG).show();
+                    } else {
 
-                    // Starts the MainActivity
-                    mUserDatabase.child(user_id).child("device_token").setValue(deviceToken).addOnCompleteListener(new OnCompleteListener<Void>() {
-                        @Override
-                        public void onComplete(@NonNull Task<Void> task) {
-                            Intent mainIntent = new Intent(LoginActivity.this, MainActivity.class);
-                            mainIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                            startActivity(mainIntent);
-                            finish();
+                        // Adding the device token to the user upon logging in
+                        String user_id = mAuth.getCurrentUser().getUid();
+                        String deviceToken = FirebaseInstanceId.getInstance().getToken();
 
-                        }
-                    });
+                        // Starts the MainActivity
+                        mUserDatabase.child(user_id).child("device_token").setValue(deviceToken).addOnCompleteListener(new OnCompleteListener<Void>() {
+                            @Override
+                            public void onComplete(@NonNull Task<Void> task) {
+                                Intent mainIntent = new Intent(LoginActivity.this, MainActivity.class);
+                                mainIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                                startActivity(mainIntent);
+                                finish();
 
-                } else {
+                            }
+                        });
+
+                    }
+                }
+                else {
                     // If there is an error while logging in, hide the progress dialog and show the error
                     mLoginProgress.hide();
-                    Toast.makeText(LoginActivity.this, "user could not be logged in," +
-                            " please check and try again", Toast.LENGTH_LONG).show();
+                    Toast.makeText(LoginActivity.this, "User could not be logged in,\n" +
+                            "please check and try again", Toast.LENGTH_LONG).show();
                 }
+
             }
         });
     }
+
+    // Method for showing the password reset dialog
+    private void showPasswordResetDialog(final String email) {
+        // Building the edit dialog
+        AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
+        LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        final View dialogView = inflater.inflate(R.layout.dialog_edit_message, null);
+        dialogBuilder.setView(dialogView);
+
+        // Edit text field for editing the message
+        final EditText editText = dialogView.findViewById(R.id.edit1);
+        editText.setText(email);
+
+        // Sets the title of the dialog
+        dialogBuilder.setTitle("Enter your email");
+        // Sets the title and action of the "Done" button
+        dialogBuilder.setPositiveButton("Send", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int whichButton) {
+                String resetEmail = editText.getText().toString();
+
+                mAuth.sendPasswordResetEmail(resetEmail).addOnCompleteListener(new OnCompleteListener<Void>() {
+                     @Override
+                     public void onComplete(@NonNull Task<Void> task) {
+                         if (task.isSuccessful()) {
+                             Toast.makeText(LoginActivity.this, "Check your email to continue", Toast.LENGTH_LONG).show();
+                         } else
+                             Toast.makeText(LoginActivity.this, "Email not found", Toast.LENGTH_LONG).show();
+                     }
+                 });
+            }
+        });
+        // Sets the title and action of the "Cancel" button
+        dialogBuilder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int whichButton) { }
+        });
+
+        // Shows the dialog
+        AlertDialog b = dialogBuilder.create();
+        b.show();
+    }
+
+
 }

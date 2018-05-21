@@ -1,9 +1,10 @@
 <resources>
     <string name="app_name">AAU Chat</string>
     <string name="need_a_new_account">Need a new Account?</string>
-    <string name="display_name">Display name</string>
-    <string name="email_address">Email address</string>
+    <string name="display_name">Name</string>
+    <string name="email_address">AAU email address</string>
     <string name="password">Password</string>
+    <string name="repeat_password">Repeat password</string>
     <string name="create_account">Create Account</string>
     <string name="log_out">Log Out</string>
     <string name="create_a_new_account">Create a new Account</string>
@@ -14,12 +15,37 @@
     <string name="default_status">Hi there, I\'m using AAU Chat</string>
     <string name="change_image">Change Image</string>
     <string name="change_status">Change status</string>
-    <string name="send_friend_req">Send Friend request</string>
-    <string name="cancel_friend_req">Cancel Friend request</string>
-    <string name="decline_friend_req">Decline Friend Request</string>
-    <string name="accept_friend_req">Accept Friend Request</string>
-    <string name="unfriend">Unfriend this person</string>
+    <string name="block_user">Block this User</string>
+    <string name="unblock_user">Unblock this User</string>
+    <string name="new_direct_chat">Start a New Chat</string>
     <string name="enter_message">Enter Message…</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="cancel">cancel</string>
+    <string name="new_chat">New group</string>
+
+    <string name="reset_password">Reset password</string>
+    <string name="forgot_passwords">Recover it</string>
+    <string name="password_forgot">Forgot password? Click here</string>
+    <string name="do_not_have_account">Don\'t have an account? Sign up</string>
+    <string name="register_account">Register here</string>
+
+    <string name="select_course">Study Programme</string>
+    <string-array name="courses_list">
+        <item>Select your study programme…</item>
+        <item>ITCOM</item>
+        <item>MED</item>
+        <item>BIO</item>
+        <item>MOE</item>
+    </string-array>
+
+    <string name="select_semester">Study Year</string>
+    <string-array name="semester_list">
+        <item>Select your study year…</item>
+        <item>2014</item>
+        <item>2015</item>
+        <item>2016</item>
+        <item>2017</item>
+        <item>2018</item>
+    </string-array>
 </resources>

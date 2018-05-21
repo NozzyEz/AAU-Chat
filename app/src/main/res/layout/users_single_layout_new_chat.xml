@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:id="@+id/rlSingleUser"
+    android:layout_height="wrap_content">
+
+    <de.hdodenhof.circleimageview.CircleImageView
+        android:id="@+id/user_single_image"
+        android:layout_alignParentStart="true"
+        android:layout_width="64dp"
+        android:layout_height="64dp"
+        android:layout_marginBottom="15dp"
+        android:layout_marginStart="15dp"
+        android:layout_marginTop="15dp"
+        android:src="@drawable/generic" />
+
+    <TextView
+        android:id="@+id/user_single_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignTop="@+id/user_single_image"
+        android:layout_marginStart="30dp"
+        android:layout_toEndOf="@+id/user_single_image"
+        android:text="Display Name"
+        android:textColor="@android:color/black"
+        android:textSize="18sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/user_single_status"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignStart="@+id/user_single_name"
+        android:layout_below="@+id/user_single_name"
+        android:layout_marginTop="10dp"
+        android:layout_toStartOf="@id/cbSelectUser"
+        android:text="user default status"
+        android:maxLines="1"
+        android:ellipsize="end"/>
+
+    <!--<ImageView-->
+    <!--android:id="@+id/user_online_indicator"-->
+    <!--android:layout_width="20dp"-->
+    <!--android:layout_height="20dp"-->
+    <!--android:layout_alignParentEnd="true"-->
+    <!--android:layout_centerVertical="true"-->
+    <!--android:layout_marginEnd="10dp"-->
+    <!--android:visibility="gone"-->
+    <!--app:srcCompat="@drawable/online" />-->
+
+
+    <android.support.v7.widget.AppCompatCheckBox
+        android:id="@+id/cbSelectUser"
+        android:layout_width="wrap_content"
+        android:layout_height="20dp"
+        android:layout_alignParentEnd="true"
+        android:layout_centerVertical="true"
+        android:clickable="false"
+        android:visibility="visible"
+        />
+
+
+</RelativeLayout>

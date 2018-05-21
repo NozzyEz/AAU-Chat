@@ -69,9 +69,8 @@ public class SettingsFragment extends BaseFragment {
 
     private ProgressDialog mProgressDialog;
 
-    @Override
-    public String getFragmentTitle() {
-        return "Requests";
+    public static String getFragmentTitle() {
+        return "Profile";
     }
 
     @Override
@@ -183,15 +182,6 @@ public class SettingsFragment extends BaseFragment {
                 // Starts the activity with the request code GALLERY_PICK, which is caught in the onActivityResult method
                 startActivityForResult(Intent.createChooser(galleryIntent, "SELECT IMAGE"), GALLERY_PICK);
 
-                // start picker to get image for cropping and then use the image in cropping
-                // activity, this one allows for the user to pick the app they want to use to select the image,
-                // including the camera
-                /*
-                CropImage.activity()
-                        .setGuidelines(CropImageView.Guidelines.ON)
-                        .start(SettingsActivity.this);
-                */
-
             }
         });
 
@@ -285,6 +275,7 @@ public class SettingsFragment extends BaseFragment {
                                         Map update_hashMap = new HashMap();
                                         update_hashMap.put("image", download_url);
                                         update_hashMap.put("thumb_image", thumb_downloadUrl);
+
 
                                         // Updates the image and thumb_image values of the user in the database
                                         mUserDatabase.updateChildren(update_hashMap).addOnCompleteListener(new OnCompleteListener<Void>() {
