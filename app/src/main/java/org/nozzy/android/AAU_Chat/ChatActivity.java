@@ -799,9 +799,13 @@ public class ChatActivity extends AppCompatActivity {
         dialogBuilder.setPositiveButton("Done", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int whichButton) {
                 String newName = editText.getText().toString();
-                mRootRef.child("Chats").child(mChatID).child("chat_name").setValue(newName);
-                mTitleView.setText(newName);
-                Toast.makeText(ChatActivity.this, "Chat name changed", Toast.LENGTH_SHORT).show();
+                if (newName.equals(""))
+                    Toast.makeText(ChatActivity.this, "Name can't be empty!", Toast.LENGTH_LONG).show();
+                else {
+                    mRootRef.child("Chats").child(mChatID).child("chat_name").setValue(newName);
+                    mTitleView.setText(newName);
+                    Toast.makeText(ChatActivity.this, "Chat name changed", Toast.LENGTH_SHORT).show();
+                }
             }
         });
         // Sets the title and action of the "Cancel" button

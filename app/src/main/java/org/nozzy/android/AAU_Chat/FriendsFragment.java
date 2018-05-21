@@ -1,8 +1,6 @@
 package org.nozzy.android.AAU_Chat;
 
-
 import android.support.v4.app.Fragment;
-
 
 // This fragment shows all of the user's friends in a recycler view
 /**
@@ -11,16 +9,6 @@ import android.support.v4.app.Fragment;
 public class FriendsFragment extends BaseFragment {
 
     // UI
-//    private RecyclerView mFriendsList;
-//
-//    private View mMainView;
-//
-//    // Firebase
-//    private DatabaseReference mRootRef;
-//    private DatabaseReference mFriendsDatabase;
-//    private DatabaseReference mUsersDatabase;
-//    private FirebaseAuth mAuth;
-//    private String mCurrent_user_id;
 
     public FriendsFragment() {
         // Required empty public constructor
@@ -28,10 +16,8 @@ public class FriendsFragment extends BaseFragment {
 
     private static final String TAG = FriendsFragment.class.getSimpleName();
 
-
-    @Override
-    public String getFragmentTitle() {
-        return "Friends";
+    public static String getFragmentTitle() {
+        return "Email";
     }
 
     @Override
@@ -163,7 +149,7 @@ public class FriendsFragment extends BaseFragment {
 //        startActivity(profileIntent);
 //    }
 //
-//    // A ViewHolder class made for displaying a single friend in the recycler view
+    // A ViewHolder class made for displaying a single friend in the recycler view
 //    public static class FriendsViewHolder extends RecyclerView.ViewHolder {
 //
 //        View mView;

@@ -21,6 +21,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ServerValue;
 import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.NetworkPolicy;
@@ -99,8 +100,6 @@ public class PinsAdapter extends RecyclerView.Adapter<PinsAdapter.PinsViewHolder
 
     @Override
     public void onBindViewHolder(final PinsAdapter.PinsViewHolder holder, final int position) {
-
-
 
         // Gets the current message from the list
         final Messages c = mMessageList.get(position);
@@ -186,7 +185,6 @@ public class PinsAdapter extends RecyclerView.Adapter<PinsAdapter.PinsViewHolder
 
         }
 
-
         // To show the time the message has been sent we first have to retrieve the value from firebase,
         // we do that through our messages class, like any other entry
         Long time = c.getTime();
@@ -203,117 +201,37 @@ public class PinsAdapter extends RecyclerView.Adapter<PinsAdapter.PinsViewHolder
         holder.messageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
-                // If the user is an admin and it's their message, they should be able to edit, delete and pin it
-                if (mChatRole.equals("admin") && c.getFrom().equals(current_user_id)) {
-                    // The selection will have two options - pin or delete the message
-                    CharSequence options[] = new CharSequence[]{"Unpin Message"};
-                    // An alert dialog is displayed with these two options
-                    AlertDialog.Builder builder = new AlertDialog.Builder(context);
-                    builder.setItems(options, new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialogInterface, int i) {
-                            // Click event for each item: 0 for pinning the message, 1 for editing, 2 for deleting it
-                            switch (i) {
-                                case 0:
-                                    // Adds the message to the pinned table
-                                    mChatRef.child("pinned").child(c.getKey()).removeValue();
-                                    Toast.makeText(context, "Message pinned", Toast.LENGTH_SHORT).show();
-                                    context.refreshMessages();
-                                    break;
-                            }
-                        }
-                    });
-                    builder.show();
-                }
-                // Else, if the user is an admin and it's someone else's message, they should be able to delete and pin it
-                else if (mChatRole.equals("admin")) {
-                    // The selection will have two options - pin or delete the message
-                    CharSequence options[] = new CharSequence[]{"Unpin Message"};
-                    // An alert dialog is displayed with these two options
-                    AlertDialog.Builder builder = new AlertDialog.Builder(context);
-                    builder.setItems(options, new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialogInterface, int i) {
-                            // Click event for each item: 0 for pinning the message 1 for deleting it
-                            switch (i) {
-                                case 0:
-                                    // Adds the message to the pinned table
-                                    mChatRef.child("pinned").child(c.getKey()).removeValue();
-                                    Toast.makeText(context, "Message pinned", Toast.LENGTH_SHORT).show();
-                                    context.refreshMessages();
-                                    break;
-                            }
-                        }
-                    });
-                    builder.show();
-                }
-                // Else, If the user is not an admin, they should be able to edit and delete their own messages
-                else if (c.getFrom().equals(current_user_id)) {
-                    // The selection will have two options - pin or delete the message
-                    CharSequence options[] = new CharSequence[]{"Edit Message", "Delete Message"};
-                    // An alert dialog is displayed with these two options
-                    AlertDialog.Builder builder = new AlertDialog.Builder(context);
-                    builder.setTitle("Select Options");
-                    builder.setItems(options, new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialogInterface, int i) {
-                            // Click event for each item: 0 for editing the message, 1 for deleting it
-                            switch (i) {
-                                case 0:
-                                    // Opens up an edit message dialog
-                                    showEditMessageDialog(c.getKey(), c.getMessage());
-                                    break;
-                                case 1:
-                                    // Removes the message from the messages table
-                                    mChatRef.child("messages").child(c.getKey()).removeValue();
-                                    Toast.makeText(context, "Message deleted", Toast.LENGTH_SHORT).show();
-                                    context.refreshMessages();
-                                    break;
-                            }
-                        }
-                    });
-                    builder.show();
-                }
-
-
+                // If the user is an admin or it's their message, they can unpin it
+                if (mChatRole.equals("admin") || c.getFrom().equals(current_user_id))
+                    showAlertDialog(c, "Unpin Message");
             }
         });
     }
 
-    private void showEditMessageDialog(final String messageKey, String oldMessage) {
-        // Building the edit message dialog
-        AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(context);
-        LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        final View dialogView = inflater.inflate(R.layout.dialog_edit_message, null);
-        dialogBuilder.setView(dialogView);
-
-        // Edit text field for editing the message
-        final EditText editText = dialogView.findViewById(R.id.edit1);
-        editText.setText(oldMessage);
-
-        // Sets the title of the dialog
-        dialogBuilder.setTitle("Edit the message");
-        // Sets the title and action of the "Done" button
-        dialogBuilder.setPositiveButton("Done", new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int whichButton) {
-                String newMessage = editText.getText().toString();
-                mChatRef.child("messages").child(messageKey).child("message").setValue(newMessage);
-                Toast.makeText(context, "Message edited", Toast.LENGTH_SHORT).show();
-                context.refreshMessages();
-            }
-        });
-        // Sets the title and action of the "Cancel" button
-        dialogBuilder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int whichButton) { }
-        });
-
-        // Shows the dialog
-        AlertDialog b = dialogBuilder.create();
-        b.show();
+    // A method for showing the message options
+    private void showAlertDialog(final Messages c, String... options) {
+        // Start building the alert dialog
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        builder.setTitle("Select Options");
+        // The dialog depends on the options put in
+        if (options.length == 1) {
+            builder.setItems(options, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialogInterface, int i) {
+                    // Click event for each item: 0 for unpinning the message
+                    switch (i) {
+                        case 0:
+                            // Unpins the message
+                            mChatRef.child("pinned").child(c.getKey()).removeValue();
+                            Toast.makeText(context, "Message unpinned", Toast.LENGTH_SHORT).show();
+                            context.refreshMessages();
+                            break;
+                    }
+                }
+            });
+        }
+        builder.show();
     }
-
-
 
     @Override
     public int getItemCount() {

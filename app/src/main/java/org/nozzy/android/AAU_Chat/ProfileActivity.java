@@ -183,7 +183,7 @@ public class ProfileActivity extends AppCompatActivity {
                     // Sets the current state to "User is Blocked"
                     setCurrentState(2);
                     // Shows a toast that the user has been blocked
-                    Toast.makeText(ProfileActivity.this, "User Blocked", Toast.LENGTH_LONG).show();
+                    Toast.makeText(ProfileActivity.this, "User Blocked", Toast.LENGTH_SHORT).show();
                 }
 
                 // If the user has already been blocked, this button can unblock the user
@@ -194,7 +194,7 @@ public class ProfileActivity extends AppCompatActivity {
                     // Sets the current state to "Friends"
                     setCurrentState(1);
                     // Shows a toast that the user has been unblocked
-                    Toast.makeText(ProfileActivity.this, "User Unblocked", Toast.LENGTH_LONG).show();
+                    Toast.makeText(ProfileActivity.this, "User Unblocked", Toast.LENGTH_SHORT).show();
                 }
 
                 //--------YOU ARE BLOCKED--------//
@@ -346,11 +346,15 @@ public class ProfileActivity extends AppCompatActivity {
     // Method to unblock the user currently being viewed
     private void unblockUser(final String blockedUser) {
 
-        // DateTime to get the current time
-        final String currentDate = DateFormat.getDateTimeInstance().format(new Date());
-
         // Add yourself to the user's friend list
-        mRootRef.child("Friends").child(blockedUser).child(mCurrentUserID).child("date").setValue(currentDate);
+        mRootRef.child("Users").child(mCurrentUserID).child("name").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                mRootRef.child("Friends").child(blockedUser).child(mCurrentUserID).child("name").setValue(dataSnapshot.getValue(String.class));
+            }
+            @Override
+            public void onCancelled(DatabaseError databaseError) { }
+        });
 
         final DatabaseReference userBlockedRef = mRootRef.child("Users").child(mCurrentUserID).child("blocked").child(blockedUser);
         final DatabaseReference blockedUserChatsRef = mRootRef.child("Users").child(blockedUser).child("chats");

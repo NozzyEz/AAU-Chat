@@ -61,9 +61,8 @@ public class ChatsFragment extends BaseFragment {
         return TAG;
     }
 
-    @Override
-    public String getFragmentTitle() {
-        return "";
+    public static String getFragmentTitle() {
+        return "All Chats";
     }
 
     @Override

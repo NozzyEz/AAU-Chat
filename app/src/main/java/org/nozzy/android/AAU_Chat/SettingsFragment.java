@@ -69,9 +69,8 @@ public class SettingsFragment extends BaseFragment {
 
     private ProgressDialog mProgressDialog;
 
-    @Override
-    public String getFragmentTitle() {
-        return "Requests";
+    public static String getFragmentTitle() {
+        return "Profile";
     }
 
     @Override

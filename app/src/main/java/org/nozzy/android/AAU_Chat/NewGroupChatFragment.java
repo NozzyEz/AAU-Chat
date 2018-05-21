@@ -61,19 +61,9 @@ public class NewGroupChatFragment extends BaseFragment {
 
     private static final String TAG = SettingsFragment.class.getSimpleName();
 
-    @Override
-    public String getFragmentTitle() { return  "New Group"; }
-    @Override
-    protected int getCurrentFragmentLayout() {
-        return R.layout.fragment_new_group_chat;
-    }
-
-    public static String getFragmentTag() {
-        return TAG;
-    }
-
     private RecyclerView mUsersList;
     private DatabaseReference mUsersDatabase;
+    private DatabaseReference mFriendsDatabase;
     private FirebaseAuth mAuth;
     private String mCurrentUserID;
     private EditText etSearch;
@@ -94,6 +84,19 @@ public class NewGroupChatFragment extends BaseFragment {
 
     private ArrayList<String> users = new ArrayList<>();
 
+    public static String getFragmentTitle() {
+        return "New Group Chat";
+    }
+
+    @Override
+    protected int getCurrentFragmentLayout() {
+        return R.layout.fragment_new_group_chat;
+    }
+
+    public static String getFragmentTag() {
+        return TAG;
+    }
+
 
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
@@ -104,16 +107,6 @@ public class NewGroupChatFragment extends BaseFragment {
         dialogBuilder = new AlertDialog.Builder(getContext());
 
         mImageStorage = FirebaseStorage.getInstance().getReference();
-
-//        ((MainActivity)getActivity()).getToolbar().setNavigationIcon(R.drawable.ic_back);
-//        ((MainActivity)getActivity()).getToolbar().setNavigationOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                getActivity().onBackPressed();
-//            }
-//        });
-
-
 
         final FloatingActionButton fab = view.findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -140,16 +133,16 @@ public class NewGroupChatFragment extends BaseFragment {
         // and finally we point our database reference to the Users database
         mUsersDatabase = FirebaseDatabase.getInstance().getReference().child("Users");
         mUsersDatabase.keepSynced(true);
+        mFriendsDatabase = FirebaseDatabase.getInstance().getReference().child("Friends");
+        mFriendsDatabase.keepSynced(true);
 
         mAuth = FirebaseAuth.getInstance();
         mCurrentUserID = mAuth.getCurrentUser().getUid();
 
         etSearch = getView().findViewById(R.id.etSearch);
         setupSearchInput();
-
-
-
     }
+
     @Override
     public void onStart() {
         super.onStart();
@@ -171,82 +164,6 @@ public class NewGroupChatFragment extends BaseFragment {
 
             }
         });
-
-        searchUser(searchString);
-
-    }
-
-    public static class UsersViewHolder extends RecyclerView.ViewHolder {
-
-        final RelativeLayout.LayoutParams params;
-
-        View mView;
-        RelativeLayout rlSingleUser;
-        private String mStatus;
-        CheckBox checkBox;
-
-        public UsersViewHolder(View itemView) {
-            super(itemView);
-            mView = itemView;
-
-
-            checkBox = itemView.findViewById(R.id.cbSelectUser);
-            rlSingleUser = itemView.findViewById(R.id.rlSingleUser);
-            params = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
-                    ViewGroup.LayoutParams.WRAP_CONTENT);
-        }
-        private void changeState() {
-            if (checkBox.isChecked())
-                checkBox.setChecked(false);
-            else
-                checkBox.setChecked(true);
-        }
-
-        private void hideLayout() {
-            params.height = 0;
-            rlSingleUser.setLayoutParams(params);
-        }
-        private void showLayout() {
-            params.height = ViewGroup.LayoutParams.WRAP_CONTENT;
-            rlSingleUser.setLayoutParams(params);
-        }
-
-
-        // Sets the name for the name text field
-        public void setName(String name) {
-            TextView mUserNameView = mView.findViewById(R.id.user_single_name);
-            mUserNameView.setText(name);
-        }
-
-        // Sets the status for the status text field
-        public void setStatus(String status) {
-            TextView mStatusView = mView.findViewById(R.id.user_single_status);
-            mStatusView.setText(status);
-        }
-        // Sets the image for the image view
-        public void setUserImage(final String userImage, final Context ctx) {
-            final CircleImageView mUserImageView = mView.findViewById(R.id.user_single_image);
-            Picasso.with(ctx).load(userImage).networkPolicy(NetworkPolicy.OFFLINE)
-                    .placeholder(R.drawable.generic).into(mUserImageView, new Callback() {
-                @Override
-                public void onSuccess() { }
-                @Override
-                public void onError() {
-                    Picasso.with(ctx).load(userImage).placeholder(R.drawable.generic).into(mUserImageView);
-                }
-            });
-        }
-    }
-
-    @Override
-    public void onPause() {
-        super.onPause();
-        mUsersDatabase.child(mCurrentUserID).child("online").setValue(ServerValue.TIMESTAMP);
-
-    }
-    @Override
-    public void onResume(){
-        super.onResume();
         searchUser(searchString);
     }
 
@@ -287,19 +204,8 @@ public class NewGroupChatFragment extends BaseFragment {
                 // Starts the activity with the request code GALLERY_PICK, which is caught in the onActivityResult method
                 startActivityForResult(Intent.createChooser(galleryIntent, "SELECT IMAGE"), GALLERY_PICK);
 
-                // start picker to get image for cropping and then use the image in cropping
-                // activity, this one allows for the user to pick the app they want to use to select the image,
-                // including the camera
-                /*
-                CropImage.activity()
-                        .setGuidelines(CropImageView.Guidelines.ON)
-                        .start(SettingsActivity.this);
-                */
-
             }
         });
-
-
 
         dialogBuilder.setView(dialogView);
         final EditText edt = dialogView.findViewById(R.id.etChatName);
@@ -321,7 +227,10 @@ public class NewGroupChatFragment extends BaseFragment {
         AlertDialog b = dialogBuilder.create();
         b.show();
     }
+
     private void sendToChat(ArrayList<String> list_users, String chatName) {
+
+        if (chatName.equals("")) chatName = "New Chat";
 
         // Generates chat ID
         // Adding the chat with timestamp to the Users table
@@ -347,72 +256,85 @@ public class NewGroupChatFragment extends BaseFragment {
         chatIntent.putExtra("chat_id", push_id);
         startActivity(chatIntent);
     }
-    private void searchUser(String searchString) {
-        // Query is being passed with information from edittext
-        Query searchQuery = mUsersDatabase.orderByChild("name").startAt(searchString).endAt(searchString + "\uf8ff");
 
-        // We setup our Firebase recycler adapter with help from our Users class, a UsersViewHolder class, and the layout we have created to show users.
-        final FirebaseRecyclerAdapter<Users, NewGroupChatFragment.UsersViewHolder> firebaseRecyclerAdapter = new FirebaseRecyclerAdapter<Users, NewGroupChatFragment.UsersViewHolder>(
-                Users.class,
+    private void searchUser(String searchString) {
+        // Query is being passed with information from EditText
+        Query searchQuery = mFriendsDatabase.child(mCurrentUserID).orderByChild("name").startAt(searchString).endAt(searchString + "\uf8ff");
+
+        // Adapts the users friends to the RecyclerView
+        FirebaseRecyclerAdapter<Friends, UsersFragment.FriendsViewHolder> friendsRecyclerViewAdapter = new FirebaseRecyclerAdapter<Friends, UsersFragment.FriendsViewHolder>(
+                Friends.class,
                 R.layout.users_single_layout_new_chat,
-                NewGroupChatFragment.UsersViewHolder.class,
+                UsersFragment.FriendsViewHolder.class,
                 searchQuery
         ) {
             @Override
-            // This method is used to populate our RecyclerView with each of our users
-            protected void populateViewHolder(final NewGroupChatFragment.UsersViewHolder viewHolder, Users model, final int position) {
+            // This method is used to populate our RecyclerView with each of our friends
+            protected void populateViewHolder(final UsersFragment.FriendsViewHolder friendsViewHolder, final Friends friends, int position) {
 
-                if (name.equals(model.getName())) {
-                    viewHolder.hideLayout();
-                }
-                else {
-                    viewHolder.showLayout();
+                // Gets the ID of the friend
+                final String list_user_id = getRef(position).getKey();
 
-                    // Inside each view we retrieve the value for name, status and image with our Users class, and set it to the view as needed
-                    viewHolder.setName(model.getName());
-                    viewHolder.setStatus(model.getStatus());
-                    viewHolder.setUserImage(model.getThumbImage(), getActivity().getApplicationContext());
+                // Adds a listener to each friend in the database in order to update the list in real time
+                mUsersDatabase.child(list_user_id).addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
 
-                    // Then we get the user ID for the view
-                    final String user_id = getRef(position).getKey();
+                        final String userName = dataSnapshot.child("name").getValue().toString();
+                        final String userStatus = dataSnapshot.child("status").getValue().toString();
+                        final String userThumb = dataSnapshot.child("thumb_image").getValue().toString();
 
-                    // When the user clicks on the view, we then pass the correct user ID to the intent
-                    // that leads them to the ProfileActivity, so that we can show the correct information
-                    // in that Activity
-                    if(users.contains(user_id)){
-                        viewHolder.checkBox.setChecked(true);
-                    } else {
-                        viewHolder.checkBox.setChecked(false);
+                        // Inside each view we retrieve the value for name, date and image with our Friends class, and set it to the view as needed
+                        friendsViewHolder.setName(userName);
+                        friendsViewHolder.setStatus(userStatus);
+                        friendsViewHolder.setThumb(userThumb, getContext());
+
+                        // When the user clicks on the view, we then pass the correct user ID to the intent
+                        // that leads them to the ProfileActivity, so that we can show the correct information
+                        // in that Activity
+                        if(users.contains(list_user_id)){
+                            friendsViewHolder.checkBox.setChecked(true);
+                        } else {
+                            friendsViewHolder.checkBox.setChecked(false);
+                        }
+                        friendsViewHolder.mView.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                    if(users.contains(list_user_id)){
+                                        users.remove(users.indexOf(list_user_id));
+                                    } else {
+                                        users.add(list_user_id);
+                                    }
+                                    Log.e ("List",(Arrays.toString(users.toArray())));
+                                    friendsViewHolder.changeState();
+                            }
+                        });
                     }
 
-
-                    viewHolder.mView.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View view) {
-
-                                //Toast.makeText(getActivity(),user_id,Toast.LENGTH_SHORT).show();
-//                                viewHolder.checkBox.setVisibility(View.VISIBLE);
-                                if(users.contains(user_id)){
-                                    users.remove(users.indexOf(user_id));
-                                } else {
-                                    users.add(user_id);
-                                }
-                                Log.e ("List",(Arrays.toString(users.toArray())));
-                                viewHolder.changeState();
-
-
-
-                        }
-                    });
-
-
-                }
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+                    }
+                });
             }
         };
-        // Finally we set the adapter for our recycler view
-        mUsersList.setAdapter(firebaseRecyclerAdapter);
+
+        // Finally, puts all of the friends into our RecyclerView
+        mUsersList.setAdapter(friendsRecyclerViewAdapter);
+
     }
 
+    @Override
+    public void onPause() {
+        super.onPause();
+        mUsersDatabase.child(mCurrentUserID).child("online").setValue(ServerValue.TIMESTAMP);
+
+    }
+
+    @Override
+    public void onResume(){
+        super.onResume();
+        searchUser(searchString);
+    }
 
     @Override
     // We use this method when an image is being picked, in here the user picks an image from their
@@ -432,7 +354,6 @@ public class NewGroupChatFragment extends BaseFragment {
                     .setAspectRatio(1,1)
                     .setMinCropWindowSize(500, 500)
                     .start(getActivity(), this);
-
         }
 
         // Checks if the activity was the image cropper
@@ -480,41 +401,30 @@ public class NewGroupChatFragment extends BaseFragment {
                 // Another byte array for the thumb image (God knows why)
                 final byte[] finalThumb_byte = thumb_byte;
 
-                // Attempts to put the image into the database
-//                filepath.putFile(resultUri).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
-//                    @Override
-//                    public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
-//                        if (task.isSuccessful()) {
-//
-//                            // Gets the download link to the image that we just uploaded
-//                            final String download_url = task.getResult().getDownloadUrl().toString();
 
-                            // Creates a task to upload the compressed image in the form of a byte array to the database
-                            UploadTask uploadTask = thumb_filepath.putBytes(finalThumb_byte);
-                            uploadTask.addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
-                                @Override
-                                public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> thumb_task) {
-                                    if(thumb_task.isSuccessful()) {
-                                        // Gets the download link to the thumbnail that we just uploaded
-                                        String thumb_downloadUrl = thumb_task.getResult().getDownloadUrl().toString();
+                // Creates a task to upload the compressed image in the form of a byte array to the database
+                UploadTask uploadTask = thumb_filepath.putBytes(finalThumb_byte);
+                uploadTask.addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> thumb_task) {
+                        if(thumb_task.isSuccessful()) {
+                            // Gets the download link to the thumbnail that we just uploaded
+                            String thumb_downloadUrl = thumb_task.getResult().getDownloadUrl().toString();
 
-//                                        mRootRef = FirebaseDatabase.getInstance().getReference();
-                                        mRootRef.child("Chats").child(push_id).child("chat_image").setValue(thumb_downloadUrl);
-                                        mProgressDialog.dismiss();
-                                        addedImage = true;
+                            mRootRef.child("Chats").child(push_id).child("chat_image").setValue(thumb_downloadUrl);
+                            mProgressDialog.dismiss();
+                            addedImage = true;
 
-                                    } else {
-                                        // Shows a toast if the thumbnail upload was unsuccessful
-                                        Toast.makeText(getContext(), "Error in uploading thumbnail", Toast.LENGTH_LONG).show();
-                                        mProgressDialog.dismiss();
+                        } else {
+                            // Shows a toast if the thumbnail upload was unsuccessful
+                            Toast.makeText(getContext(), "Error in uploading thumbnail", Toast.LENGTH_LONG).show();
+                            mProgressDialog.dismiss();
 
-                                    }
+                        }
 
-                                }
-                            });
+                    }
+                });
 
-            } else if (resultCode == CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) {
-                Exception error = result.getError();
             }
         }
     }
