@@ -241,6 +241,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
                         case 2:
                             // Removes the message from the messages table
                             mChatRef.child("messages").child(c.getKey()).removeValue();
+                            mChatRef.child("pinned").child(c.getKey()).removeValue();
                             Toast.makeText(context, "Message deleted", Toast.LENGTH_SHORT).show();
                             context.refreshMessages();
                             break;
@@ -259,6 +260,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
                                 break;
                             case 1:
                                 mChatRef.child("messages").child(c.getKey()).removeValue();
+                                mChatRef.child("pinned").child(c.getKey()).removeValue();
                                 Toast.makeText(context, "Message deleted", Toast.LENGTH_SHORT).show();
                                 context.refreshMessages();
                                 break;
@@ -273,8 +275,10 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
                             case 0:
                                 mChatRef.child("pinned").child(c.getKey()).setValue(ServerValue.TIMESTAMP);
                                 Toast.makeText(context, "Message pinned", Toast.LENGTH_SHORT).show();
+                                break;
                             case 1:
                                 mChatRef.child("messages").child(c.getKey()).removeValue();
+                                mChatRef.child("pinned").child(c.getKey()).removeValue();
                                 Toast.makeText(context, "Message deleted", Toast.LENGTH_SHORT).show();
                                 context.refreshMessages();
                                 break;
@@ -290,6 +294,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
                     switch (i) {
                         case 0:
                             mChatRef.child("messages").child(c.getKey()).removeValue();
+                            mChatRef.child("pinned").child(c.getKey()).removeValue();
                             Toast.makeText(context, "Message deleted", Toast.LENGTH_SHORT).show();
                             context.refreshMessages();
                             break;
