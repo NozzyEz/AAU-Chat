@@ -4,6 +4,7 @@
     <string name="display_name">Display name</string>
     <string name="email_address">Email address</string>
     <string name="password">Password</string>
+    <string name="repeat_password">Repeat password</string>
     <string name="create_account">Create Account</string>
     <string name="log_out">Log Out</string>
     <string name="create_a_new_account">Create a new Account</string>
@@ -22,4 +23,34 @@
     <string name="navigation_drawer_close">Close navigation drawer</string>
     <string name="cancel">cancel</string>
     <string name="new_chat">New group</string>
+
+    <string name="reset_password">Reset password</string>
+    <string name="forgot_passwords">Recover it</string>
+    <string name="password_Forgot">Forgot password?</string>
+    <string name="do_not_have_account">Don\'t have an account?</string>
+    <string name="register_account">Register here</string>
+
+    <string name="select_course">Select the study programme</string>
+    <string-array name="courses_list">
+        <item>ITCOM</item>
+        <item>MED</item>
+        <item>BIO</item>
+        <item>MOE</item>
+
+    </string-array>
+
+    <string name="select_semester">Semester</string>
+
+
+    <string-array name="semester_list">
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+        <item>4</item>
+        <item>5</item>
+        <item>6</item>
+    </string-array>
+
+    <string name="choose_semester">Choose your study semester </string>
+    <string name="choose_studyprogramme">Choose your study programme</string>
 </resources>

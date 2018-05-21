@@ -4,12 +4,16 @@ import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.design.widget.TextInputEditText;
 import android.support.design.widget.TextInputLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.Spinner;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -38,14 +42,20 @@ import java.util.HashMap;
 // This activity is accessed from the startImageSelection activity when the user taps the register new account
 // button. In this activity we facilitate this functionality by letting the user sign up with their
 // email, name and password.
-public class RegisterActivity extends AppCompatActivity {
+public class RegisterActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener{
 
     // UI
-    private TextInputLayout mDisplayName;
-    private TextInputLayout mEmail;
-    private TextInputLayout mPassword;
+    private TextInputEditText mDisplayName;
+    private TextInputEditText mEmail;
+    private TextInputEditText mPassword;
     private Button mCreateBtn;
     private Toolbar mToolbar;
+    private Spinner mSemesterSpinner;
+    private Spinner mCoursesSpinner;
+    private TextInputEditText mRepeatPassword;
+    private ArrayAdapter<CharSequence> mCharSequenceArrayAdapterCourses;
+    private ArrayAdapter<CharSequence> mCharSequenceArrayAdapterSemester;
+
 
     private ProgressDialog mRegProgress;
 
@@ -80,15 +90,32 @@ public class RegisterActivity extends AppCompatActivity {
         mPassword = findViewById(R.id.login_password);
         mCreateBtn = findViewById(R.id.reg_create_btn);
 
+        mCoursesSpinner=findViewById(R.id.list_with_studyprogramme_register);
+        mSemesterSpinner=findViewById(R.id.semester_register);
+
+        mSemesterSpinner.setOnItemSelectedListener(this);
+        mCoursesSpinner.setOnItemSelectedListener(this);
+        //setting up the array with choices for the user
+        mCharSequenceArrayAdapterCourses=ArrayAdapter.createFromResource(this, R.array.courses_list, R.layout.spinner_text_view);
+        mCharSequenceArrayAdapterSemester=ArrayAdapter.createFromResource(this, R.array.semester_list, R.layout.spinner_text_view);
+
+
+        mCharSequenceArrayAdapterCourses.setDropDownViewResource(R.layout.support_simple_spinner_dropdown_item);
+        mCharSequenceArrayAdapterSemester.setDropDownViewResource(R.layout.support_simple_spinner_dropdown_item);
+
+        //adding to the spinner the arrayAdapter, or adding the items in the spinner
+        mCoursesSpinner.setAdapter(mCharSequenceArrayAdapterCourses);
+        mSemesterSpinner.setAdapter(mCharSequenceArrayAdapterSemester);
+
         // Here we make a listener for the create account button, so that when it is tapped we can
         // startImageSelection to proceed with the data the user has put into our form
         mCreateBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 
-                String display_name = mDisplayName.getEditText().getText().toString();
-                String email = mEmail.getEditText().getText().toString();
-                String password = mPassword.getEditText().getText().toString();
+                String display_name = mDisplayName.getText().toString();
+                String email = mEmail.getText().toString();
+                String password = mPassword.getText().toString();
 
                 // Here we check to make sure that all the text fields has information put in so that the app does not crash
                 if (!TextUtils.isEmpty(display_name) && !TextUtils.isEmpty(email) && !TextUtils.isEmpty(password)) {
@@ -275,4 +302,15 @@ public class RegisterActivity extends AppCompatActivity {
     }
 
 
+    @Override
+    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+
+    }
+
+    @Override
+    public void onNothingSelected(AdapterView<?> parent) {
+
+    }
 }
+
+

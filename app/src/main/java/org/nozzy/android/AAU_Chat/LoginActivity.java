@@ -8,8 +8,11 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -24,9 +27,13 @@ public class LoginActivity extends AppCompatActivity {
 
     // UI
     private Toolbar mToolbar;
-    private TextInputLayout mLoginEmail;
-    private TextInputLayout mLoginPassword;
+    private EditText mLoginEmail;
+    private EditText mLoginPassword;
     private Button mLogin_btn;
+    private Button mResetPassword;
+    private static final String TAG="Login Activity";
+    private TextView mNoAccount;
+    private TextView mPassForgt;
 
     private ProgressDialog mLoginProgress;
 
@@ -40,14 +47,18 @@ public class LoginActivity extends AppCompatActivity {
         setContentView(R.layout.activity_login);
 
         // Setting up the UI
-        mToolbar = findViewById(R.id.login_toolbar);
-        setSupportActionBar(mToolbar);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setTitle("Login");
+//        mToolbar = findViewById(R.id.login_toolbar);
+//        setSupportActionBar(mToolbar);
+//        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+//        getSupportActionBar().setTitle("Login");
 
-        mLoginEmail = findViewById(R.id.login_email);
-        mLoginPassword = findViewById(R.id.login_password);
-        mLogin_btn = findViewById(R.id.login_btn);
+        mLoginEmail = findViewById(R.id.username_login_activity);
+        mLoginPassword = findViewById(R.id.password_login_activity);
+        mLogin_btn = findViewById(R.id.login_button);
+
+        mResetPassword=findViewById(R.id.reset_password_button);
+        mNoAccount=findViewById(R.id.do_not_have_account_text_view);
+        mPassForgt=findViewById(R.id.forgot_password_text_view);
 
         mLoginProgress = new ProgressDialog(this);
 
@@ -61,8 +72,8 @@ public class LoginActivity extends AppCompatActivity {
             public void onClick(View view) {
 
                 // Gets the typed in email and password
-                String email = mLoginEmail.getEditText().getText().toString();
-                String password = mLoginPassword.getEditText().getText().toString();
+                String email = mLoginEmail.getText().toString();
+                String password = mLoginPassword.getText().toString();
 
                 if (!TextUtils.isEmpty(email) || !TextUtils.isEmpty(password)) {
                     // If both fields are filled in, shows a progress dialog (loading screen)
@@ -80,6 +91,30 @@ public class LoginActivity extends AppCompatActivity {
 
             }
         });
+        //reset password with e-mail
+        mResetPassword.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                String emailAddress = mLoginEmail.getText().toString();
+
+                mAuth.sendPasswordResetEmail(emailAddress)
+                        .addOnCompleteListener(new OnCompleteListener<Void>() {
+                            @Override
+                            public void onComplete(@NonNull Task<Void> task) {
+                                if (task.isSuccessful()) {
+                                    Log.d(TAG, "Email not sent.");
+                                }
+                                else
+                                    Log.d(TAG, "email was sent");
+                            }
+                        });
+
+
+
+            }
+        });
+
     }
 
     // Method for logging the user in
@@ -116,4 +151,7 @@ public class LoginActivity extends AppCompatActivity {
             }
         });
     }
+
+
+
 }
