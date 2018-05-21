@@ -239,7 +239,7 @@ public class RegisterActivity extends AppCompatActivity implements AdapterView.O
                                 addToChannels(uid, tags);
 
                                 // Adding the user to everyone's friend list
-                                addToFriends(uid);
+                                addToFriends(uid, display_name);
 
                                 mAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
                                     @Override
@@ -340,10 +340,9 @@ public class RegisterActivity extends AppCompatActivity implements AdapterView.O
     }
 
     // A method to add all users to the friends list
-    private void addToFriends(final String currentUserID) {
+    private void addToFriends(final String currentUserID, final String currentUserName) {
 
-        // DateTime to get the current time
-        final String currentDate = DateFormat.getDateTimeInstance().format(new Date());
+
 
         // Root reference
         final DatabaseReference rootRef = FirebaseDatabase.getInstance().getReference();
@@ -362,7 +361,7 @@ public class RegisterActivity extends AppCompatActivity implements AdapterView.O
                     if (!user.getKey().equals(currentUserID)) {
                         // Add that user to your friends, and add yourself as their friend
                         friendsRef.child(currentUserID).child(user.getKey()).child("name").setValue(user.child("name").getValue(String.class));
-                        friendsRef.child(user.getKey()).child(currentUserID).child("name").setValue(user.child("name").getValue(String.class));
+                        friendsRef.child(user.getKey()).child(currentUserID).child("name").setValue(currentUserName);
                     }
                 }
             }
