@@ -217,6 +217,7 @@ public class RegisterActivity extends AppCompatActivity implements AdapterView.O
                     userMap.put("name", display_name);
                     userMap.put("status", course + " " + semester);
                     userMap.put("image", "default");
+                    userMap.put("online", "never");
                     userMap.put("thumb_image", "default");
                     userMap.put("tags", tagsMap);
 

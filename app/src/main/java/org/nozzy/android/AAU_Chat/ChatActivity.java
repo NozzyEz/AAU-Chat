@@ -210,7 +210,10 @@ public class ChatActivity extends AppCompatActivity {
                                     // If the user is online, set the text at the top to 'Online'
                                     if (online.equals("true")) {
                                         mLastSeenView.setText("Online");
-                                    } else {
+                                    } else if (online.equals("never")) {
+                                        mLastSeenView.setText("User not verified");
+                                    }
+                                    else {
                                         // If the user isn't online, turns the timestamp into a long value
                                         long lastTime = Long.parseLong(online);
                                         // Converts it into a readable format, sets the text at the top to that value

@@ -292,7 +292,10 @@ public class ChatsFragment extends BaseFragment {
             ImageView userOnlineView = mView.findViewById(R.id.user_online_indicator);
             if(online_status.equals("true")){
                 userOnlineView.setVisibility(View.VISIBLE);
-            } else {
+            } else if (online_status.equals("never")) {
+                userOnlineView.setVisibility(View.GONE);
+            }
+            else {
                 userOnlineView.setVisibility(View.GONE);
             }
 
