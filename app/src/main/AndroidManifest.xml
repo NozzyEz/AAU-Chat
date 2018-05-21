@@ -46,9 +46,6 @@
             android:parentActivityName=".StartActivity"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".SettingsActivity"
-            android:screenOrientation="portrait" />
-        <activity
             android:name=".StatusActivity"
             android:parentActivityName=".SettingsActivity"
             android:screenOrientation="portrait" />
@@ -57,7 +54,7 @@
             android:screenOrientation="portrait"
             android:theme="@style/Base.Theme.AppCompat" />
         <activity
-            android:name=".UsersActivity"
+            android:name=".PinnedMessagesActivity"
             android:parentActivityName=".MainActivity"
             android:screenOrientation="portrait" />
         <activity

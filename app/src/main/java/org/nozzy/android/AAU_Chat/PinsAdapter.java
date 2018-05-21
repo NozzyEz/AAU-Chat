@@ -32,20 +32,20 @@ import java.util.List;
 import de.hdodenhof.circleimageview.CircleImageView;
 
 // A custom adapter meant for adapting a list of messages into a RecyclerView.
-public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageViewHolder>{
+public class PinsAdapter extends RecyclerView.Adapter<PinsAdapter.PinsViewHolder>{
 
     private List<Messages> mMessageList;
     private FirebaseAuth mAuth;
     private DatabaseReference mUsersDatabase;
-    private ChatActivity context;
+    private PinnedMessagesActivity context;
     private String mChatID;
     private String mChatRole;
     private DatabaseReference mChatRef;
     private String current_user_id;
 
-    public MessageAdapter(List<Messages> mMessageList, Context context, String chatID) {
+    public PinsAdapter(List<Messages> mMessageList, Context context, String chatID) {
         this.mMessageList = mMessageList;
-        this.context = (ChatActivity) context;
+        this.context = (PinnedMessagesActivity) context;
         this.mChatID = chatID;
         this.mChatRef = FirebaseDatabase.getInstance().getReference().child("Chats").child(mChatID);
 
@@ -67,13 +67,13 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
 
     @Override
     // Setting up the view for holding a single message
-    public MessageViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public PinsViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View v = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.message_single_layout, parent, false);
-        return new MessageViewHolder(v);
+        return new PinsViewHolder(v);
     }
 
-    public class MessageViewHolder extends RecyclerView.ViewHolder {
+    public class PinsViewHolder extends RecyclerView.ViewHolder {
 
         // UI of a single message
         public TextView displayName;
@@ -84,7 +84,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
         public View messageView;
 
 
-        public MessageViewHolder(View itemView) {
+        public PinsViewHolder(View itemView) {
             super(itemView);
             // Setting up the UI
             messageView = itemView.findViewById(R.id.message_single_layout);
@@ -99,9 +99,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
     }
 
     @Override
-    public void onBindViewHolder(final MessageAdapter.MessageViewHolder holder, final int position) {
-
-
+    public void onBindViewHolder(final PinsAdapter.PinsViewHolder holder, final int position) {
 
         // Gets the current message from the list
         final Messages c = mMessageList.get(position);
@@ -187,7 +185,6 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
 
         }
 
-
         // To show the time the message has been sent we first have to retrieve the value from firebase,
         // we do that through our messages class, like any other entry
         Long time = c.getTime();
@@ -200,19 +197,13 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
         holder.messageTime.setText(convertedTime);
 
 
-        // A listener on each message for pinning, editing or deleting the message
+        // A listener on each message for pinning or deleting
         holder.messageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                // The options depend on whether the user is an admin, whether the message is theirs and whether it's a text message
-                if (mChatRole.equals("admin") && c.getType().equals("text") && c.getFrom().equals(current_user_id))
-                    showAlertDialog(c, "Pin Message", "Edit Message", "Delete Message");
-                else if (c.getType().equals("text") && c.getFrom().equals(current_user_id))
-                    showAlertDialog(c, "Edit Message", "Delete Message");
-                else if (mChatRole.equals("admin") && c.getType().equals("text"))
-                    showAlertDialog(c, "Pin Message", "Delete Message");
-                else if (mChatRole.equals("admin") || c.getFrom().equals(current_user_id))
-                    showAlertDialog(c, "Delete Message");
+                // If the user is an admin or it's their message, they can unpin it
+                if (mChatRole.equals("admin") || c.getFrom().equals(current_user_id))
+                    showAlertDialog(c, "Unpin Message");
             }
         });
     }
@@ -223,118 +214,24 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
         builder.setTitle("Select Options");
         // The dialog depends on the options put in
-        if (options.length == 3) {
+        if (options.length == 1) {
             builder.setItems(options, new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialogInterface, int i) {
-                    // Click event for each item: 0 for pinning the message, 1 for editing, 2 for deleting it
+                    // Click event for each item: 0 for unpinning the message
                     switch (i) {
                         case 0:
-                            // Adds the message to the pinned table
-                            mChatRef.child("pinned").child(c.getKey()).setValue(ServerValue.TIMESTAMP);
-                            Toast.makeText(context, "Message pinned", Toast.LENGTH_SHORT).show();
-                            break;
-                        case 1:
-                            // Opens up an edit message dialog
-                            showEditMessageDialog(c.getKey(), c.getMessage());
-                            break;
-                        case 2:
-                            // Removes the message from the messages table
-                            mChatRef.child("messages").child(c.getKey()).removeValue();
-                            Toast.makeText(context, "Message deleted", Toast.LENGTH_SHORT).show();
+                            // Unpins the message
+                            mChatRef.child("pinned").child(c.getKey()).removeValue();
+                            Toast.makeText(context, "Message unpinned", Toast.LENGTH_SHORT).show();
                             context.refreshMessages();
                             break;
                     }
                 }
             });
         }
-        else if (options.length == 2) {
-            if (options[1].equals("Edit Message")) {
-                builder.setItems(options, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        switch (i) {
-                            case 0:
-                                showEditMessageDialog(c.getKey(), c.getMessage());
-                                break;
-                            case 1:
-                                mChatRef.child("messages").child(c.getKey()).removeValue();
-                                Toast.makeText(context, "Message deleted", Toast.LENGTH_SHORT).show();
-                                context.refreshMessages();
-                                break;
-                        }
-                    }
-                });
-            } else {
-                builder.setItems(options, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        switch (i) {
-                            case 0:
-                                mChatRef.child("pinned").child(c.getKey()).setValue(ServerValue.TIMESTAMP);
-                                Toast.makeText(context, "Message pinned", Toast.LENGTH_SHORT).show();
-                            case 1:
-                                mChatRef.child("messages").child(c.getKey()).removeValue();
-                                Toast.makeText(context, "Message deleted", Toast.LENGTH_SHORT).show();
-                                context.refreshMessages();
-                                break;
-                        }
-                    }
-                });
-            }
-        }
-        else {
-            builder.setItems(options, new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialogInterface, int i) {
-                    switch (i) {
-                        case 0:
-                            mChatRef.child("messages").child(c.getKey()).removeValue();
-                            Toast.makeText(context, "Message deleted", Toast.LENGTH_SHORT).show();
-                            context.refreshMessages();
-                            break;
-                    }
-                }
-            });
-        }
-
-
         builder.show();
     }
-
-    private void showEditMessageDialog(final String messageKey, String oldMessage) {
-        // Building the edit message dialog
-        AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(context);
-        LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        final View dialogView = inflater.inflate(R.layout.dialog_edit_message, null);
-        dialogBuilder.setView(dialogView);
-
-        // Edit text field for editing the message
-        final EditText editText = dialogView.findViewById(R.id.edit1);
-        editText.setText(oldMessage);
-
-        // Sets the title of the dialog
-        dialogBuilder.setTitle("Edit the message");
-        // Sets the title and action of the "Done" button
-        dialogBuilder.setPositiveButton("Done", new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int whichButton) {
-                String newMessage = editText.getText().toString();
-                mChatRef.child("messages").child(messageKey).child("message").setValue(newMessage);
-                Toast.makeText(context, "Message edited", Toast.LENGTH_SHORT).show();
-                context.refreshMessages();
-            }
-        });
-        // Sets the title and action of the "Cancel" button
-        dialogBuilder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int whichButton) { }
-        });
-
-        // Shows the dialog
-        AlertDialog b = dialogBuilder.create();
-        b.show();
-    }
-
-
 
     @Override
     public int getItemCount() {

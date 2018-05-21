@@ -31,7 +31,7 @@
         android:layout_marginBottom="10dp"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
-        android:background="@color/colorAccent"
+        android:background="@drawable/rounded_button_login_activity"
         android:paddingLeft="20dp"
         android:paddingRight="20dp"
         android:text="@string/already_have_an_account"
@@ -49,13 +49,14 @@
         android:layout_marginBottom="80dp"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
-        android:background="@android:color/white"
+        android:background="@drawable/rounder_button_transparent_login_activity"
         android:paddingLeft="20dp"
         android:paddingRight="20dp"
         android:text="@string/need_a_new_account"
         android:textColor="@color/colorPrimary"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        />
 
 </android.support.constraint.ConstraintLayout>

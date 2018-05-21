@@ -23,11 +23,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
-import com.squareup.picasso.Callback;
-import com.squareup.picasso.NetworkPolicy;
 import com.squareup.picasso.Picasso;
-
-import java.util.Set;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
@@ -65,14 +61,12 @@ public class ChatsFragment extends BaseFragment {
         return TAG;
     }
 
-    @Override
-    public String getFragmentTitle() {
-        return "";
+    public static String getFragmentTitle() {
+        return "All Chats";
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-
         // The main view which holds all the fragments
         mMainView = inflater.inflate(R.layout.fragment_chats, container, false);
 
@@ -97,7 +91,6 @@ public class ChatsFragment extends BaseFragment {
         mUsersDatabase.keepSynced(true);
         mChatsDatabase = mRootDatabase.child("Chats");
         mChatsDatabase.keepSynced(true);
-
 
         // Inflate the layout for this fragment
         return mMainView;
@@ -131,7 +124,7 @@ public class ChatsFragment extends BaseFragment {
                 // By default, the message box will say that there are no messages
                 // This gets replaced by the following query which tries to get the last message
                 convViewHolder.setMessage("No messages yet.", true);
-                
+
                 // Query to get the last message in a conversation
                 Query lastMessageQuery = messageDatabase.limitToLast(1);
                 lastMessageQuery.addChildEventListener(new ChildEventListener() {
@@ -203,7 +196,7 @@ public class ChatsFragment extends BaseFragment {
                                         public void onDataChange(DataSnapshot dataSnapshot) {
                                             // Gets the name, image and online values of the member
                                             final String directMemberName = dataSnapshot.child("name").getValue().toString();
-                                            final String directMemberImage = dataSnapshot.child("image").getValue().toString();
+                                            final String directMemberImage = dataSnapshot.child("thumb_image").getValue().toString();
                                             final String directMemberOnline = dataSnapshot.child("online").getValue().toString();
 
                                             // Sets the name, image and the online value accordingly
@@ -299,7 +292,10 @@ public class ChatsFragment extends BaseFragment {
             ImageView userOnlineView = mView.findViewById(R.id.user_online_indicator);
             if(online_status.equals("true")){
                 userOnlineView.setVisibility(View.VISIBLE);
-            } else {
+            } else if (online_status.equals("never")) {
+                userOnlineView.setVisibility(View.GONE);
+            }
+            else {
                 userOnlineView.setVisibility(View.GONE);
             }
 

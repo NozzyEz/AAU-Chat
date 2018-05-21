@@ -21,7 +21,5 @@ public abstract class BaseFragment extends Fragment {
         return view;
     }
 
-    public abstract String getFragmentTitle();
-
     protected abstract int getCurrentFragmentLayout();
 }
