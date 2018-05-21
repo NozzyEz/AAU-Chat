@@ -80,10 +80,6 @@ public class StatusActivity extends AppCompatActivity {
                             // Hides the progress dialog
                             mProgress.dismiss();
 
-                            // Sending the user back to the settings activity once the task is successful
-//                            Intent settingsIntent = new Intent(StatusActivity.this, SettingsActivity.class);
-//                            ((ResultReceiver)getIntent().getParcelableExtra("finisher")).send(1, new Bundle());
-//                            startActivity(settingsIntent);
                             onBackPressed();
                             finish();
 

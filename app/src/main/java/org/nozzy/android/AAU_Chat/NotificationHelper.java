@@ -55,27 +55,6 @@ public class NotificationHelper extends ContextWrapper{
         return mManager;
     }
 
-    // This is how the friend request notification is set up
-    public NotificationCompat.Builder getChannel1FriendReqNotification(String title, String message, String click_action, String from_user_id) {
-
-        // Here we create an intent to send the user to the profile activity of whom sent them a request
-        Intent resultIntent = new Intent(click_action);
-        // With it we pass the user ID of the sender along with the intent
-        resultIntent.putExtra("user_id", from_user_id);
-
-        // This intent is pending and ready to execute when the user taps it from within the app
-        PendingIntent resultPendingIntent = PendingIntent.getActivity(this, 0, resultIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-
-        // And here we return the notification back to the FirebaseMessagingService class for showing
-        return new NotificationCompat.Builder(getApplicationContext(),CHANNEL_ID_1)
-                .setContentTitle(title)
-                .setContentText(message)
-                .setAutoCancel(true)
-                .setSmallIcon(R.drawable.notification_icon)
-                .setContentIntent(resultPendingIntent);
-
-    }
-
     // This is how the message notification is set up
     public NotificationCompat.Builder getChannel1MessageNotification(String title, String message, String click_action, String chat_id) {
 

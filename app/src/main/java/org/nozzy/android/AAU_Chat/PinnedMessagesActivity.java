@@ -256,7 +256,6 @@ public class PinnedMessagesActivity extends AppCompatActivity {
     protected void refreshMessages() {
         // Works fine for editing messages. Buggy with deleting
         messagesList.clear();
-//        mAdapter.notifyDataSetChanged();
         loadMessages();
     }
 

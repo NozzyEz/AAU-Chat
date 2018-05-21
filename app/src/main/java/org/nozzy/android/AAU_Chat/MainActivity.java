@@ -54,12 +54,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private FirebaseAuth mAuth;
     private Toolbar toolbar;
 
-//    private ViewPager mViewPager;
-//    private SectionsPagerAdapter mSectionsPagerAdapter;
-
     private DatabaseReference mUserRef;
-
-  //  private TabLayout mTabLayout;
 
     private BaseFragment currentFragment;
 
@@ -116,7 +111,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             }
         });
 
-
         navigationView.setNavigationItemSelectedListener(this);
 
         if (mAuth.getCurrentUser() != null) {
@@ -142,7 +136,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
                 }
 
-
             });
 
             // Get the device token from firebase
@@ -158,7 +151,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     private void setSideNavBar(String name, final String image, String info, final String thumbnail) {
-
 
         // Set the background to a blurred profile image
         Picasso.with(getApplicationContext()).load(image).transform(new BlurTransformation(getApplicationContext(), 10, 10))
@@ -180,7 +172,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     mProfileName.setTextColor(Color.WHITE);
                     mProfileInfo.setTextColor(Color.WHITE);
                 }
-
 
             }
 
@@ -402,9 +393,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     }
 
-
-
-
     // Method to create a channel and add all relevant users to it
     private void createChannel(String name, String image, final ArrayList<String> includes) {
 
@@ -457,4 +445,3 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         });
     }
 }
-

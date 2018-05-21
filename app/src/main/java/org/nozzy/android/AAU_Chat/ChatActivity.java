@@ -61,7 +61,6 @@ import id.zelory.compressor.Compressor;
 
 import static android.view.View.VISIBLE;
 
-
 // This activity is used for chatting with other users.
 public class ChatActivity extends AppCompatActivity {
 
@@ -300,7 +299,6 @@ public class ChatActivity extends AppCompatActivity {
             }
         });
 
-
         // UI
         mAdapter = new MessageAdapter(messagesList, this, mChatID);
 
@@ -312,7 +310,6 @@ public class ChatActivity extends AppCompatActivity {
         mMessagesList.setLayoutManager(mLinearLayout);
 
         mMessagesList.setAdapter(mAdapter);
-
 
         // Loads the first messages
         loadMessages();
@@ -455,7 +452,6 @@ public class ChatActivity extends AppCompatActivity {
                 Toast.makeText(this, "Error in compression", Toast.LENGTH_LONG).show();
             }
         }
-
 
         // Checks if the activity was the chat image gallery picker - if so, start the cropper
         if (requestCode == CHAT_IMAGE_GALLERY_PICK && resultCode == RESULT_OK) {
@@ -682,54 +678,6 @@ public class ChatActivity extends AppCompatActivity {
             }
         });
 
-
-
-//
-//        pinnedRef.addListenerForSingleValueEvent(new ValueEventListener() {
-//            @Override
-//            public void onDataChange(DataSnapshot dataSnapshot) {
-//                Iterable<DataSnapshot> pinnedMessages = dataSnapshot.getChildren();
-//                for (DataSnapshot pinnedMessage : pinnedMessages) {
-//                    final String messageKey = pinnedMessage.getKey();
-//
-//                    DatabaseReference messageRef = mRootRef.child("Chats").child(mChatID).child("messages").child(messageKey);
-//                    messageRef.addListenerForSingleValueEvent(new ValueEventListener() {
-//                        @Override
-//                        public void onDataChange(DataSnapshot dataSnapshot) {
-//                            Messages message = dataSnapshot.getValue(Messages.class);
-//
-//                            // Set the Key value to the message - this is used in-app for deleting and pinning messages
-//                            message.setKey(messageKey);
-//
-//                            // If it's the first (oldest) message in that set
-//                            if (itemPos == 0) {
-//                                // Set the last key and previous key to that message's key
-//                                mLastKey = messageKey;
-//                                mPrevKey = messageKey;
-//                            }
-//
-//                            // Increment the position so that other messages don't get counted as first
-//                            itemPos++;
-//
-//                            // Adds the new message to the list
-//                            messagesList.add(message);
-//                            mAdapter.notifyDataSetChanged();
-//
-//                            // Scroll the view to the bottom when a message is sent or received.
-//                            mMessagesList.scrollToPosition(messagesList.size() - 1);
-//
-//                            // Stops the refreshing
-//                            mRefreshLayout.setRefreshing(false);
-//                        }
-//                        @Override
-//                        public void onCancelled(DatabaseError databaseError) {}
-//                    });
-//
-//                }
-//            }
-//            @Override
-//            public void onCancelled(DatabaseError databaseError) {}
-//        });
     }
 
     // Method for sending a simple text message
@@ -922,10 +870,8 @@ public class ChatActivity extends AppCompatActivity {
         // Works fine for editing messages. Buggy with deleting
         messagesList.clear();
         itemPos = 0;
-//        mAdapter.notifyDataSetChanged();
         loadMessages();
     }
-
 
     /**
      * Get a file path from a Uri. This will get the the path for Storage Access

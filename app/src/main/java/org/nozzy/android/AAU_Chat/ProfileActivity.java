@@ -63,7 +63,6 @@ public class ProfileActivity extends AppCompatActivity {
         else
             profile_id = getIntent().getStringExtra("user_id");
 
-
         // Here we point the databases to the correct places, as well as fetch the current user, which is not the same as the user for the profile page
         mUsersDatabase = FirebaseDatabase.getInstance().getReference().child("Users");
         mFriendsDatabase = FirebaseDatabase.getInstance().getReference().child("Friends");
@@ -159,12 +158,10 @@ public class ProfileActivity extends AppCompatActivity {
                 });
             }
 
-
             @Override
             public void onCancelled(DatabaseError databaseError) {
             }
         });
-
 
         // This button is for blocking/unblocking the user we are viewing
         // The button will check the current state and the button action being done will be set accordingly
@@ -289,9 +286,6 @@ public class ProfileActivity extends AppCompatActivity {
         mRootRef.child("Users").child(mCurrent_user.getUid()).child("online").setValue(ServerValue.TIMESTAMP);
     }
 
-
-
-
     // Method to block the user currently being viewed
     private void blockUser(final String blockedUser) {
 
@@ -341,8 +335,6 @@ public class ProfileActivity extends AppCompatActivity {
         });
     }
 
-
-
     // Method to unblock the user currently being viewed
     private void unblockUser(final String blockedUser) {
 
@@ -378,7 +370,6 @@ public class ProfileActivity extends AppCompatActivity {
             @Override
             public void onCancelled(DatabaseError databaseError) { }
         });
-
 
     }
 }

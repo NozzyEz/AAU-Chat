@@ -62,7 +62,6 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
             public void onCancelled(DatabaseError databaseError) { }
         });
 
-
     }
 
     @Override
@@ -83,7 +82,6 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
         public ImageView messageImage;
         public View messageView;
 
-
         public MessageViewHolder(View itemView) {
             super(itemView);
             // Setting up the UI
@@ -100,8 +98,6 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
 
     @Override
     public void onBindViewHolder(final MessageAdapter.MessageViewHolder holder, final int position) {
-
-
 
         // Gets the current message from the list
         final Messages c = mMessageList.get(position);
@@ -187,7 +183,6 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
 
         }
 
-
         // To show the time the message has been sent we first have to retrieve the value from firebase,
         // we do that through our messages class, like any other entry
         Long time = c.getTime();
@@ -198,7 +193,6 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
         // TODO: Check if time is yesterday or more, then show different information to the user.
         // And finally we can assign that string to the viewholder's text field
         holder.messageTime.setText(convertedTime);
-
 
         // A listener on each message for pinning, editing or deleting the message
         holder.messageView.setOnClickListener(new View.OnClickListener() {
@@ -303,7 +297,6 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
             });
         }
 
-
         builder.show();
     }
 
@@ -338,8 +331,6 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
         AlertDialog b = dialogBuilder.create();
         b.show();
     }
-
-
 
     @Override
     public int getItemCount() {
