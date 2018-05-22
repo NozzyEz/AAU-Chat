@@ -36,13 +36,10 @@ import com.google.firebase.iid.FirebaseInstanceId;
 public class LoginActivity extends AppCompatActivity {
 
     // UI
-    private Toolbar mToolbar;
     private EditText mLoginEmail;
     private EditText mLoginPassword;
     private Button mLogin_btn;
     private static final String TAG = "Login Activity";
-    private TextView mNoAccount;
-    private TextView mPassForgot;
 
     private ProgressDialog mLoginProgress;
 
@@ -59,9 +56,6 @@ public class LoginActivity extends AppCompatActivity {
         mLoginEmail = findViewById(R.id.username_login_activity);
         mLoginPassword = findViewById(R.id.password_login_activity);
         mLogin_btn = findViewById(R.id.login_button);
-
-//        mNoAccount = findViewById(R.id.sign_up);
-//        mPassForgot = findViewById(R.id.forgot_password);
 
         mLoginProgress = new ProgressDialog(this);
 
@@ -95,7 +89,6 @@ public class LoginActivity extends AppCompatActivity {
             }
         });
 
-
         // Clickable part of the string where you can sign up for a new account
         SpannableString ss1 = new SpannableString(getResources().getString(R.string.do_not_have_account));
         ClickableSpan clickableSpan1 = new ClickableSpan() {
@@ -117,7 +110,6 @@ public class LoginActivity extends AppCompatActivity {
         textView1.setMovementMethod(LinkMovementMethod.getInstance());
         textView1.setHighlightColor(Color.TRANSPARENT);
 
-
         // Clickable part of the string where you can reset your password
         SpannableString ss2 = new SpannableString(getResources().getString(R.string.password_forgot));
         ClickableSpan clickableSpan2 = new ClickableSpan() {
@@ -138,7 +130,6 @@ public class LoginActivity extends AppCompatActivity {
         textView2.setText(ss2);
         textView2.setMovementMethod(LinkMovementMethod.getInstance());
         textView2.setHighlightColor(Color.TRANSPARENT);
-
 
     }
 
@@ -225,6 +216,5 @@ public class LoginActivity extends AppCompatActivity {
         AlertDialog b = dialogBuilder.create();
         b.show();
     }
-
 
 }

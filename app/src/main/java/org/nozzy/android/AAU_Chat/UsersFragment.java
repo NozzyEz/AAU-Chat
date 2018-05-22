@@ -1,8 +1,6 @@
 package org.nozzy.android.AAU_Chat;
 
-import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -10,11 +8,9 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.KeyEvent;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.CheckBox;
 import android.widget.EditText;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
@@ -31,7 +27,6 @@ import com.squareup.picasso.NetworkPolicy;
 import com.squareup.picasso.Picasso;
 
 import de.hdodenhof.circleimageview.CircleImageView;
-
 
 public class UsersFragment extends BaseFragment {
 
@@ -99,8 +94,6 @@ public class UsersFragment extends BaseFragment {
 
         mUsersDatabase.child(mCurrentUserID).child("online").setValue("true");
 
-        //username =  mUsersDatabase.child(mCurrentUserID).child("name");
-
         mUsersDatabase.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -118,7 +111,7 @@ public class UsersFragment extends BaseFragment {
     }
 
     private void setupSearchInput() {
-        //Allows to search by pressing enter button on keyboard
+        // Allows to search by pressing enter button on keyboard
         etSearch.clearFocus();
         etSearch.setOnKeyListener(new View.OnKeyListener() {
             @Override

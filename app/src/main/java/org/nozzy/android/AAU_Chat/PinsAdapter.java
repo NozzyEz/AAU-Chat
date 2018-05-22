@@ -62,7 +62,6 @@ public class PinsAdapter extends RecyclerView.Adapter<PinsAdapter.PinsViewHolder
             public void onCancelled(DatabaseError databaseError) { }
         });
 
-
     }
 
     @Override
@@ -82,7 +81,6 @@ public class PinsAdapter extends RecyclerView.Adapter<PinsAdapter.PinsViewHolder
         public CircleImageView profileImage;
         public ImageView messageImage;
         public View messageView;
-
 
         public PinsViewHolder(View itemView) {
             super(itemView);
@@ -195,7 +193,6 @@ public class PinsAdapter extends RecyclerView.Adapter<PinsAdapter.PinsViewHolder
         // TODO: Check if time is yesterday or more, then show different information to the user.
         // And finally we can assign that string to the viewholder's text field
         holder.messageTime.setText(convertedTime);
-
 
         // A listener on each message for pinning or deleting
         holder.messageView.setOnClickListener(new View.OnClickListener() {

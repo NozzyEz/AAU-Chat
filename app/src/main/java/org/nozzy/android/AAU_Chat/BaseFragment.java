@@ -11,7 +11,6 @@ import android.view.ViewGroup;
  * A simple {@link Fragment} subclass.
  */
 
-
 public abstract class BaseFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,

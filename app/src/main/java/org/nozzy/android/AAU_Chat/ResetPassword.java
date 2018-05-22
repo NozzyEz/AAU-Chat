@@ -28,12 +28,11 @@ public class ResetPassword extends AppCompatActivity {
         private FirebaseAuth mAuth;
         private DatabaseReference mUserDatabase;
 
-        private static final String TAG="Reset password";
+        private static final String TAG = "Reset password";
 
         protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.reset_password_activity);
-
 
         mToolbar = findViewById(R.id.reset_toolbar);
         setSupportActionBar(mToolbar);
@@ -43,7 +42,6 @@ public class ResetPassword extends AppCompatActivity {
         mEmail=findViewById(R.id.email_reset_password);
         mResendPassword=findViewById(R.id.reset_password_button);
         mDisplayInfo=findViewById(R.id.type_email_for_forgotten_password);
-
 
         //setting up the firebase reference
             mUserDatabase= FirebaseDatabase.getInstance().getReference().child("Users");
@@ -66,12 +64,7 @@ public class ResetPassword extends AppCompatActivity {
                                 }
                             });
 
-
                 }
             });
-
-
-
-
     }
 }

@@ -1,6 +1,5 @@
 package org.nozzy.android.AAU_Chat;
 
-
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Typeface;
@@ -95,7 +94,6 @@ public class ChatsFragment extends BaseFragment {
         // Inflate the layout for this fragment
         return mMainView;
     }
-
 
     @Override
     public void onStart() {
@@ -301,9 +299,6 @@ public class ChatsFragment extends BaseFragment {
 
         }
 
-
     }
-
-
 
 }

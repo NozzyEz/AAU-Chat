@@ -59,13 +59,11 @@ public class RegisterActivity extends AppCompatActivity implements AdapterView.O
     private ArrayAdapter<CharSequence> mCharSequenceArrayAdapterCourses;
     private ArrayAdapter<CharSequence> mCharSequenceArrayAdapterSemester;
 
-
     private ProgressDialog mRegProgress;
 
     // Firebase
     private FirebaseAuth mAuth;
     private DatabaseReference mDatabase;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -160,7 +158,6 @@ public class RegisterActivity extends AppCompatActivity implements AdapterView.O
                 }
             }
         });
-
 
         mCoursesSpinner.setOnTouchListener(new View.OnTouchListener() {
             @Override
@@ -297,7 +294,6 @@ public class RegisterActivity extends AppCompatActivity implements AdapterView.O
         });
     }
 
-
     // Method to add all relevant channels for the newly registered user
     private void addToChannels(final String currentUserID, final ArrayList<String> tags) {
 
@@ -342,8 +338,6 @@ public class RegisterActivity extends AppCompatActivity implements AdapterView.O
     // A method to add all users to the friends list
     private void addToFriends(final String currentUserID, final String currentUserName) {
 
-
-
         // Root reference
         final DatabaseReference rootRef = FirebaseDatabase.getInstance().getReference();
 
@@ -379,7 +373,6 @@ public class RegisterActivity extends AppCompatActivity implements AdapterView.O
         }
     }
 
-
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
 
@@ -390,5 +383,3 @@ public class RegisterActivity extends AppCompatActivity implements AdapterView.O
 
     }
 }
-
-
