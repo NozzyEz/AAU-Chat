@@ -185,9 +185,7 @@ public class ChatActivity extends AppCompatActivity {
                                         Picasso.with(getApplicationContext()).load(mChatImage).networkPolicy(NetworkPolicy.OFFLINE)
                                                 .placeholder(R.drawable.generic).into(mProfileImage, new Callback() {
                                             @Override
-                                            public void onSuccess() {
-                                            }
-
+                                            public void onSuccess() { }
                                             @Override
                                             public void onError() {
                                                 Picasso.with(getApplicationContext()).load(mChatImage).placeholder(R.drawable.generic).into(mProfileImage);
@@ -195,10 +193,8 @@ public class ChatActivity extends AppCompatActivity {
                                         });
                                     }
                                 }
-
                                 @Override
-                                public void onCancelled(DatabaseError databaseError) {
-                                }
+                                public void onCancelled(DatabaseError databaseError) { }
                             });
                             // Adds a listener to the user being chatted with for setting their current online state
                             userRef.addValueEventListener(new ValueEventListener() {
@@ -220,15 +216,12 @@ public class ChatActivity extends AppCompatActivity {
                                         mLastSeenView.setText(lastSeenTime);
                                     }
                                 }
-
                                 @Override
-                                public void onCancelled(DatabaseError databaseError) {
-                                }
+                                public void onCancelled(DatabaseError databaseError) { }
                             });
                             break;
                         }
                     }
-
                 } else {
                     // Else, if it is a group chat or a channel
                     // Gets the chat's name, image, as well as the count of all members
@@ -242,9 +235,7 @@ public class ChatActivity extends AppCompatActivity {
                         Picasso.with(getApplicationContext()).load(mChatImage).networkPolicy(NetworkPolicy.OFFLINE)
                                 .placeholder(R.drawable.generic).into(mProfileImage, new Callback() {
                             @Override
-                            public void onSuccess() {
-                            }
-
+                            public void onSuccess() { }
                             @Override
                             public void onError() {
                                 Picasso.with(getApplicationContext()).load(mChatImage).placeholder(R.drawable.generic).into(mProfileImage);
@@ -288,15 +279,12 @@ public class ChatActivity extends AppCompatActivity {
                             }
                         });
                     }
-
                     // The online indicator displays the number of members in the chat instead
                     mLastSeenView.setText("Members: " + mChatUserCount);
                 }
             }
-
             @Override
-            public void onCancelled(DatabaseError databaseError) {
-            }
+            public void onCancelled(DatabaseError databaseError) { }
         });
 
         // UI
@@ -634,11 +622,8 @@ public class ChatActivity extends AppCompatActivity {
                             pinnedMessagesLayout.setVisibility(VISIBLE);
                             tvPinedMessages.setText(dataSnapshot.child("message").getValue().toString());
                         }
-
                         @Override
-                        public void onCancelled(DatabaseError databaseError) {
-
-                        }
+                        public void onCancelled(DatabaseError databaseError) { }
                     });
             }
             @Override
@@ -782,22 +767,14 @@ public class ChatActivity extends AppCompatActivity {
                 // Updates the timestamp value representing recent activity
                 mRootRef.child("Users").child(userID).child("chats").child(mChatID).child("timestamp").setValue(ServerValue.TIMESTAMP);
             }
-
             @Override
-            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-            }
-
+            public void onChildChanged(DataSnapshot dataSnapshot, String s) { }
             @Override
-            public void onChildRemoved(DataSnapshot dataSnapshot) {
-            }
-
+            public void onChildRemoved(DataSnapshot dataSnapshot) { }
             @Override
-            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
-            }
-
+            public void onChildMoved(DataSnapshot dataSnapshot, String s) { }
             @Override
-            public void onCancelled(DatabaseError databaseError) {
-            }
+            public void onCancelled(DatabaseError databaseError) { }
         });
     }
 
@@ -818,22 +795,14 @@ public class ChatActivity extends AppCompatActivity {
                 // Set the seen value to that new message
                 seenRef.setValue(dataSnapshot.getKey());
             }
-
             @Override
-            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-            }
-
+            public void onChildChanged(DataSnapshot dataSnapshot, String s) { }
             @Override
-            public void onChildRemoved(DataSnapshot dataSnapshot) {
-            }
-
+            public void onChildRemoved(DataSnapshot dataSnapshot) { }
             @Override
-            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
-            }
-
+            public void onChildMoved(DataSnapshot dataSnapshot, String s) { }
             @Override
-            public void onCancelled(DatabaseError databaseError) {
-            }
+            public void onCancelled(DatabaseError databaseError) { }
         });
     }
 

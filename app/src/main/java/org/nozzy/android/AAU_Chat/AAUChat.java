@@ -46,11 +46,8 @@ public class AAUChat extends Application {
                         mUserDatabase.child("online").onDisconnect().setValue(ServerValue.TIMESTAMP);
                     }
                 }
-
                 @Override
-                public void onCancelled(DatabaseError databaseError) {
-
-                }
+                public void onCancelled(DatabaseError databaseError) { }
             });
 
         }

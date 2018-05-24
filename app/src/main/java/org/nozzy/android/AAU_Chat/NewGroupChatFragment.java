@@ -137,8 +137,6 @@ public class NewGroupChatFragment extends BaseFragment {
 
         mUsersDatabase.child(mCurrentUserID).child("online").setValue("true");
 
-        //username =  mUsersDatabase.child(mCurrentUserID).child("name");
-
         mUsersDatabase.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -191,7 +189,6 @@ public class NewGroupChatFragment extends BaseFragment {
                 galleryIntent.setAction(Intent.ACTION_GET_CONTENT);
                 // Starts the activity with the request code GALLERY_PICK, which is caught in the onActivityResult method
                 startActivityForResult(Intent.createChooser(galleryIntent, "SELECT IMAGE"), GALLERY_PICK);
-
             }
         });
 
@@ -201,7 +198,6 @@ public class NewGroupChatFragment extends BaseFragment {
         //dialogBuilder.setMessage("Enter text below");
         dialogBuilder.setPositiveButton(getResources().getString(R.string.new_chat), new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int whichButton) {
-
                 String message = edt.getText().toString().trim();
                 sendToChat(users,message);
 

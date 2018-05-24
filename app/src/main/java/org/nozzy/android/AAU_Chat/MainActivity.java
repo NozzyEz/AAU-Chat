@@ -128,14 +128,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     final String thumbnail = dataSnapshot.child("thumb_image").getValue().toString();
 
                     setSideNavBar(name, image, info, thumbnail);
-
                 }
 
                 @Override
-                public void onCancelled(DatabaseError databaseError) {
-
-                }
-
+                public void onCancelled(DatabaseError databaseError) { }
             });
 
             // Get the device token from firebase
@@ -143,9 +139,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             // And put that token into the current users database entry, so that it is updated whenever the user opens the app
             mUserRef.child("device_token").setValue(deviceToken).addOnCompleteListener(new OnCompleteListener<Void>() {
                 @Override
-                public void onComplete(@NonNull Task<Void> task) {
-
-                }
+                public void onComplete(@NonNull Task<Void> task) { }
             });
         }
     }
@@ -189,9 +183,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             Picasso.with(getApplicationContext()).load(thumbnail).networkPolicy(NetworkPolicy.OFFLINE)
                     .placeholder(R.drawable.generic).into(mProfileThumb, new Callback() {
                 @Override
-                public void onSuccess() {
-                }
-
+                public void onSuccess() { }
                 @Override
                 public void onError() {
                     // If the image fails to load, set the image to the default one

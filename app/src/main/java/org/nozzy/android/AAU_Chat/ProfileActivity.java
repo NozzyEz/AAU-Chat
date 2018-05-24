@@ -108,9 +108,7 @@ public class ProfileActivity extends AppCompatActivity {
                 Picasso.with(ProfileActivity.this).load(image).networkPolicy(NetworkPolicy.OFFLINE)
                         .placeholder(R.drawable.generic).into(mProfileImage, new Callback() {
                     @Override
-                    public void onSuccess() {
-                    }
-
+                    public void onSuccess() { }
                     @Override
                     public void onError() {
                         // If the image fails to load, set it to the default profile image
@@ -142,24 +140,19 @@ public class ProfileActivity extends AppCompatActivity {
                                     else setCurrentState(3);
                                     mProgressDialog.dismiss();
                                 }
-
                                 @Override
-                                public void onCancelled(DatabaseError databaseError) {
-                                }
+                                public void onCancelled(DatabaseError databaseError) { }
                             });
                         }
                     }
-
                     @Override
                     public void onCancelled(DatabaseError databaseError) {
                         mProgressDialog.dismiss();
                     }
                 });
             }
-
             @Override
-            public void onCancelled(DatabaseError databaseError) {
-            }
+            public void onCancelled(DatabaseError databaseError) { }
         });
 
         // This button is for blocking/unblocking the user we are viewing
