@@ -235,9 +235,6 @@ public class RegisterActivity extends AppCompatActivity implements AdapterView.O
                                 tags.add(semester);
                                 addToChannels(uid, tags);
 
-                                // Adding the user to everyone's friend list
-                                addToFriends(uid, display_name);
-
                                 mAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
                                     @Override
                                     public void onComplete(@NonNull Task<AuthResult> task) {
@@ -251,18 +248,18 @@ public class RegisterActivity extends AppCompatActivity implements AdapterView.O
                                                     else
                                                         Toast.makeText(RegisterActivity.this, "Unable to send verification email", Toast.LENGTH_LONG).show();
 
+                                                    // Adding the user to everyone's friend list
+                                                    addToFriends(uid, display_name);
+
+                                                    mRegProgress.dismiss();
+
+                                                    Intent mainIntent = new Intent(RegisterActivity.this, LoginActivity.class);
+                                                    mainIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                                                    startActivity(mainIntent);
+                                                    finish();
                                                 }
                                             });
                                         }
-
-                                        mAuth.signOut();
-
-                                        mRegProgress.dismiss();
-
-                                        Intent mainIntent = new Intent(RegisterActivity.this, LoginActivity.class);
-                                        mainIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                                        startActivity(mainIntent);
-                                        finish();
                                     }
                                 });
 
@@ -323,6 +320,7 @@ public class RegisterActivity extends AppCompatActivity implements AdapterView.O
                         chatsRef.child(chatID).child("members").child(currentUserID).setValue("user");
                     }
                 }
+                mAuth.signOut();
             }
             @Override
             public void onChildChanged(DataSnapshot dataSnapshot, String s) { }
@@ -345,12 +343,14 @@ public class RegisterActivity extends AppCompatActivity implements AdapterView.O
         final DatabaseReference friendsRef = rootRef.child("Friends");
         final DatabaseReference usersRef = rootRef.child("Users");
 
+
+
         // Adds a listener to go through all users
         usersRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                Iterable<DataSnapshot> allUsers = dataSnapshot.getChildren();
-                for (DataSnapshot user : allUsers) {
+                Iterable<DataSnapshot> users = dataSnapshot.getChildren();
+                for (DataSnapshot user : users) {
                     // If the user is not yourself
                     if (!user.getKey().equals(currentUserID)) {
                         // Add that user to your friends, and add yourself as their friend
