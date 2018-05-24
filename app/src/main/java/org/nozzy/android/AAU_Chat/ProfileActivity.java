@@ -32,7 +32,7 @@ public class ProfileActivity extends AppCompatActivity {
 
     // UI
     private ImageView mProfileImage;
-    private TextView mProfileName, mProfileStatus, mProfileFriendsCount;
+    private TextView mProfileName, mProfileStatus;
     private Button mBlockBtn, mChatBtn;
 
     private ProgressDialog mProgressDialog;
@@ -77,7 +77,6 @@ public class ProfileActivity extends AppCompatActivity {
         mProfileImage = findViewById(R.id.profile_image);
         mProfileName = findViewById(R.id.profile_displayName);
         mProfileStatus = findViewById(R.id.profile_status);
-        mProfileFriendsCount = findViewById(R.id.profile_total_friends);
         mBlockBtn = findViewById(R.id.profile_send_req_btn);
         mChatBtn = findViewById(R.id.profile_decline_req_btn);
 

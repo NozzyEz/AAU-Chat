@@ -180,10 +180,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     mProfileName.setTextColor(Color.WHITE);
                     mProfileInfo.setTextColor(Color.WHITE);
                 }
-
-
             }
-
             @Override
             public void onError() {
                 Picasso.with(getApplicationContext()).load(image).transform(new BlurTransformation(getApplicationContext(), 10, 10)).into(mHeaderBackground);

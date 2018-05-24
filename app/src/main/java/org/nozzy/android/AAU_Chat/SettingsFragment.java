@@ -1,7 +1,10 @@
 package org.nozzy.android.AAU_Chat;
 
 
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
@@ -9,8 +12,10 @@ import android.os.Bundle;
 import android.os.ResultReceiver;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -81,8 +86,6 @@ public class SettingsFragment extends BaseFragment {
         return TAG;
     }
 
-
-
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
@@ -151,18 +154,7 @@ public class SettingsFragment extends BaseFragment {
             @Override
             public void onClick(View view) {
 
-                Intent statusIntent = new Intent(getContext(), StatusActivity.class);
-                String statusValue = mStatus.getText().toString();
-                statusIntent.putExtra("statusValue", statusValue);
-                statusIntent.putExtra("finisher", new ResultReceiver(null) {
-                    @Override
-                    protected void onReceiveResult(int resultCode, Bundle resultData) {
-                        getActivity().onBackPressed();
-
-                    }
-                });
-                startActivityForResult(statusIntent,1);
-//                startActivity(statusIntent);
+                showEditStatusDialog(mStatus.getText().toString());
 
             }
         });
@@ -309,4 +301,39 @@ public class SettingsFragment extends BaseFragment {
             }
         }
     }
+
+    private void showEditStatusDialog(String oldMessage) {
+        // Building the edit status dialog
+        AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(getContext());
+        LayoutInflater inflater = (LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        final View dialogView = inflater.inflate(R.layout.dialog_edit_message, null);
+        dialogBuilder.setView(dialogView);
+
+        // Edit text field for editing the status
+        final EditText editText = dialogView.findViewById(R.id.edit1);
+        editText.setText(oldMessage);
+
+        // Sets the title of the dialog
+        dialogBuilder.setTitle("Edit your status");
+        // Sets the title and action of the "Done" button
+        dialogBuilder.setPositiveButton("Done", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int whichButton) {
+                String newStatus = editText.getText().toString();
+                DatabaseReference usersRef = FirebaseDatabase.getInstance().getReference().child("Users");
+                usersRef.child(mCurrentUser.getUid()).child("status").setValue(newStatus);
+
+                Toast.makeText(getContext(), "Status changed", Toast.LENGTH_SHORT).show();
+            }
+        });
+        // Sets the title and action of the "Cancel" button
+        dialogBuilder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int whichButton) { }
+        });
+
+        // Shows the dialog
+        AlertDialog b = dialogBuilder.create();
+        b.show();
+    }
+
+
 }

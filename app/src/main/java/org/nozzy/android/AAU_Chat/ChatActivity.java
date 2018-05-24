@@ -552,20 +552,13 @@ public class ChatActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-            }
-
+            public void onChildChanged(DataSnapshot dataSnapshot, String s) { }
             @Override
-            public void onChildRemoved(DataSnapshot dataSnapshot) {
-            }
-
+            public void onChildRemoved(DataSnapshot dataSnapshot) { }
             @Override
-            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
-            }
-
+            public void onChildMoved(DataSnapshot dataSnapshot, String s) { }
             @Override
-            public void onCancelled(DatabaseError databaseError) {
-            }
+            public void onCancelled(DatabaseError databaseError) { }
         });
 
     }
@@ -619,22 +612,14 @@ public class ChatActivity extends AppCompatActivity {
                     mLinearLayout.scrollToPositionWithOffset(itemPos - 1, 0);
                 }
             }
-
             @Override
-            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-            }
-
+            public void onChildChanged(DataSnapshot dataSnapshot, String s) { }
             @Override
-            public void onChildRemoved(DataSnapshot dataSnapshot) {
-            }
-
+            public void onChildRemoved(DataSnapshot dataSnapshot) { }
             @Override
-            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
-            }
-
+            public void onChildMoved(DataSnapshot dataSnapshot, String s) { }
             @Override
-            public void onCancelled(DatabaseError databaseError) {
-            }
+            public void onCancelled(DatabaseError databaseError) { }
         });
     }
 
@@ -660,76 +645,15 @@ public class ChatActivity extends AppCompatActivity {
                         }
                     });
             }
-
             @Override
-            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-
-            }
-
+            public void onChildChanged(DataSnapshot dataSnapshot, String s) { }
             @Override
-            public void onChildRemoved(DataSnapshot dataSnapshot) {
-
-            }
-
+            public void onChildRemoved(DataSnapshot dataSnapshot) { }
             @Override
-            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
-
-            }
-
+            public void onChildMoved(DataSnapshot dataSnapshot, String s) { }
             @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
+            public void onCancelled(DatabaseError databaseError) { }
         });
-
-
-
-//
-//        pinnedRef.addListenerForSingleValueEvent(new ValueEventListener() {
-//            @Override
-//            public void onDataChange(DataSnapshot dataSnapshot) {
-//                Iterable<DataSnapshot> pinnedMessages = dataSnapshot.getChildren();
-//                for (DataSnapshot pinnedMessage : pinnedMessages) {
-//                    final String messageKey = pinnedMessage.getKey();
-//
-//                    DatabaseReference messageRef = mRootRef.child("Chats").child(mChatID).child("messages").child(messageKey);
-//                    messageRef.addListenerForSingleValueEvent(new ValueEventListener() {
-//                        @Override
-//                        public void onDataChange(DataSnapshot dataSnapshot) {
-//                            Messages message = dataSnapshot.getValue(Messages.class);
-//
-//                            // Set the Key value to the message - this is used in-app for deleting and pinning messages
-//                            message.setKey(messageKey);
-//
-//                            // If it's the first (oldest) message in that set
-//                            if (itemPos == 0) {
-//                                // Set the last key and previous key to that message's key
-//                                mLastKey = messageKey;
-//                                mPrevKey = messageKey;
-//                            }
-//
-//                            // Increment the position so that other messages don't get counted as first
-//                            itemPos++;
-//
-//                            // Adds the new message to the list
-//                            messagesList.add(message);
-//                            mAdapter.notifyDataSetChanged();
-//
-//                            // Scroll the view to the bottom when a message is sent or received.
-//                            mMessagesList.scrollToPosition(messagesList.size() - 1);
-//
-//                            // Stops the refreshing
-//                            mRefreshLayout.setRefreshing(false);
-//                        }
-//                        @Override
-//                        public void onCancelled(DatabaseError databaseError) {}
-//                    });
-//
-//                }
-//            }
-//            @Override
-//            public void onCancelled(DatabaseError databaseError) {}
-//        });
     }
 
     // Method for sending a simple text message

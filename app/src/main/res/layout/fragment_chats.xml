@@ -4,8 +4,6 @@
     android:layout_height="match_parent"
     tools:context="org.nozzy.android.AAU_Chat.ChatsFragment">
 
-    <!-- TODO: Update blank fragment layout -->
-
     <android.support.v7.widget.RecyclerView
         android:id="@+id/conv_list"
         android:layout_width="match_parent"
