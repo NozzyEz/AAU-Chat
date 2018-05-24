@@ -42,21 +42,10 @@
         android:paddingStart="20dp"
         android:paddingEnd="20dp"/>
 
-    <TextView
-        android:id="@+id/profile_total_friends"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignBottom="@+id/profile_send_req_btn"
-        android:layout_centerHorizontal="true"
-        android:layout_marginBottom="61dp"
-        android:text="Total Friends"
-        android:textColor="@android:color/black" />
-
     <Button
         android:id="@+id/profile_send_req_btn"
         android:layout_width="220dp"
         android:layout_height="40dp"
-
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
         android:layout_marginBottom="110dp"
@@ -69,11 +58,10 @@
         android:id="@+id/profile_decline_req_btn"
         android:layout_width="match_parent"
         android:layout_height="40dp"
-
         android:layout_alignStart="@+id/profile_send_req_btn"
         android:layout_alignEnd="@+id/profile_send_req_btn"
-        android:layout_below="@+id/profile_total_friends"
-        android:layout_marginTop="19dp"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="50dp"
         android:background="@drawable/roundbutton"
         android:backgroundTint="@color/colorAccent"
         android:text="@string/new_direct_chat"

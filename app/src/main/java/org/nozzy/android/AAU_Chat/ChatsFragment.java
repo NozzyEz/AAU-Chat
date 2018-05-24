@@ -61,7 +61,7 @@ public class ChatsFragment extends BaseFragment {
     }
 
     public static String getFragmentTitle() {
-        return "All Chats";
+        return "Chats";
     }
 
     @Override
@@ -264,7 +264,6 @@ public class ChatsFragment extends BaseFragment {
         public void setMessage(String message, boolean isSeen){
             TextView userStatusView = mView.findViewById(R.id.user_single_status);
             userStatusView.setText(message);
-
             if(!isSeen)
                 userStatusView.setTypeface(userStatusView.getTypeface(), Typeface.BOLD);
             else

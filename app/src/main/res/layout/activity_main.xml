@@ -19,10 +19,6 @@
         android:layout_height="wrap_content"
         android:id="@+id/appBarLayout">
 
-    <!--<include layout="@layout/app_bar_layout" -->
-        <!--android:id="@+id/main_page_toolbar" />-->
-
-
         <android.support.v7.widget.Toolbar
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
@@ -30,19 +26,7 @@
             android:background="?attr/colorPrimary"
             app:popupTheme="@style/Platform.ThemeOverlay.AppCompat.Light"/>
 
-        <!--<android.support.design.widget.TabLayout-->
-            <!--android:layout_width="match_parent"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:id="@+id/main_tabs"-->
-            <!--android:theme="@style/Base.ThemeOverlay.AppCompat.Dark.ActionBar" />-->
-
     </android.support.design.widget.AppBarLayout>
-
-    <!--<android.support.v4.view.ViewPager-->
-        <!--android:layout_width="match_parent"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:layout_below="@+id/appBarLayout"-->
-        <!--android:id="@+id/main_tabpager" />-->
 
     <FrameLayout
         android:id="@+id/flFragmentsContainer"

@@ -128,14 +128,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     final String thumbnail = dataSnapshot.child("thumb_image").getValue().toString();
 
                     setSideNavBar(name, image, info, thumbnail);
-
                 }
 
                 @Override
-                public void onCancelled(DatabaseError databaseError) {
-
-                }
-
+                public void onCancelled(DatabaseError databaseError) { }
             });
 
             // Get the device token from firebase
@@ -143,9 +139,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             // And put that token into the current users database entry, so that it is updated whenever the user opens the app
             mUserRef.child("device_token").setValue(deviceToken).addOnCompleteListener(new OnCompleteListener<Void>() {
                 @Override
-                public void onComplete(@NonNull Task<Void> task) {
-
-                }
+                public void onComplete(@NonNull Task<Void> task) { }
             });
         }
     }
@@ -172,9 +166,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     mProfileName.setTextColor(Color.WHITE);
                     mProfileInfo.setTextColor(Color.WHITE);
                 }
-
             }
-
             @Override
             public void onError() {
                 Picasso.with(getApplicationContext()).load(image).transform(new BlurTransformation(getApplicationContext(), 10, 10)).into(mHeaderBackground);
@@ -191,9 +183,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             Picasso.with(getApplicationContext()).load(thumbnail).networkPolicy(NetworkPolicy.OFFLINE)
                     .placeholder(R.drawable.generic).into(mProfileThumb, new Callback() {
                 @Override
-                public void onSuccess() {
-                }
-
+                public void onSuccess() { }
                 @Override
                 public void onError() {
                     // If the image fails to load, set the image to the default one
@@ -226,10 +216,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     public static boolean isDark(Bitmap bitmap){
-        boolean dark=false;
+        boolean dark = false;
 
         float darkThreshold = bitmap.getWidth()*(bitmap.getHeight()/2)*0.95f;
-        int darkPixels=0;
+        int darkPixels = 0;
 
         int[] pixels = new int[bitmap.getWidth()*(bitmap.getHeight()/2)];
         bitmap.getPixels(pixels,0,bitmap.getWidth(),0,bitmap.getHeight()/2,bitmap.getWidth(),bitmap.getHeight()/2);
@@ -240,7 +230,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             int g = Color.green(color);
             int b = Color.blue(color);
             double luminance = (0.299*r+0.0f + 0.587*g+0.0f + 0.114*b+0.0f);
-            if (luminance<150) {
+            if (luminance < 150) {
                 darkPixels++;
             }
         }
@@ -343,7 +333,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         int id = item.getItemId();
 
         if (id == R.id.email_burger_menu) {
-            changeContentFragment(getSupportFragmentManager(), FriendsFragment.getFragmentTag(),new FriendsFragment(),R.id.flFragmentsContainer,false, FriendsFragment.getFragmentTitle());
+            changeContentFragment(getSupportFragmentManager(), EmailFragment.getFragmentTag(),new EmailFragment(),R.id.flFragmentsContainer,false, EmailFragment.getFragmentTitle());
         } else if (id == R.id.all_users_burger_menu) {
             changeContentFragment(getSupportFragmentManager(), UsersFragment.getFragmentTag(),new UsersFragment(),R.id.flFragmentsContainer,false, UsersFragment.getFragmentTitle());
         } else if (id == R.id.chats_burger_menu) {

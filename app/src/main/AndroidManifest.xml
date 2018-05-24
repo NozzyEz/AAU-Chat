@@ -46,10 +46,6 @@
             android:parentActivityName=".StartActivity"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".StatusActivity"
-            android:parentActivityName=".SettingsActivity"
-            android:screenOrientation="portrait" />
-        <activity
             android:name="com.theartofdev.edmodo.cropper.CropImageActivity"
             android:screenOrientation="portrait"
             android:theme="@style/Base.Theme.AppCompat" />

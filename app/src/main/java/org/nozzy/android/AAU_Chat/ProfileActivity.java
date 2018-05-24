@@ -32,7 +32,7 @@ public class ProfileActivity extends AppCompatActivity {
 
     // UI
     private ImageView mProfileImage;
-    private TextView mProfileName, mProfileStatus, mProfileFriendsCount;
+    private TextView mProfileName, mProfileStatus;
     private Button mBlockBtn, mChatBtn;
 
     private ProgressDialog mProgressDialog;
@@ -76,7 +76,6 @@ public class ProfileActivity extends AppCompatActivity {
         mProfileImage = findViewById(R.id.profile_image);
         mProfileName = findViewById(R.id.profile_displayName);
         mProfileStatus = findViewById(R.id.profile_status);
-        mProfileFriendsCount = findViewById(R.id.profile_total_friends);
         mBlockBtn = findViewById(R.id.profile_send_req_btn);
         mChatBtn = findViewById(R.id.profile_decline_req_btn);
 
@@ -109,9 +108,7 @@ public class ProfileActivity extends AppCompatActivity {
                 Picasso.with(ProfileActivity.this).load(image).networkPolicy(NetworkPolicy.OFFLINE)
                         .placeholder(R.drawable.generic).into(mProfileImage, new Callback() {
                     @Override
-                    public void onSuccess() {
-                    }
-
+                    public void onSuccess() { }
                     @Override
                     public void onError() {
                         // If the image fails to load, set it to the default profile image
@@ -143,24 +140,19 @@ public class ProfileActivity extends AppCompatActivity {
                                     else setCurrentState(3);
                                     mProgressDialog.dismiss();
                                 }
-
                                 @Override
-                                public void onCancelled(DatabaseError databaseError) {
-                                }
+                                public void onCancelled(DatabaseError databaseError) { }
                             });
                         }
                     }
-
                     @Override
                     public void onCancelled(DatabaseError databaseError) {
                         mProgressDialog.dismiss();
                     }
                 });
             }
-
             @Override
-            public void onCancelled(DatabaseError databaseError) {
-            }
+            public void onCancelled(DatabaseError databaseError) { }
         });
 
         // This button is for blocking/unblocking the user we are viewing

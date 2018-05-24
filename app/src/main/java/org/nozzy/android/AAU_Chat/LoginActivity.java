@@ -147,7 +147,6 @@ public class LoginActivity extends AppCompatActivity {
                         mLoginProgress.dismiss();
                         Toast.makeText(LoginActivity.this, "Account not verified.\nPlease check your email", Toast.LENGTH_LONG).show();
                     } else {
-
                         // Adding the device token to the user upon logging in
                         String user_id = mAuth.getCurrentUser().getUid();
                         String deviceToken = FirebaseInstanceId.getInstance().getToken();
@@ -160,10 +159,8 @@ public class LoginActivity extends AppCompatActivity {
                                 mainIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                                 startActivity(mainIntent);
                                 finish();
-
                             }
                         });
-
                     }
                 }
                 else {
@@ -172,7 +169,6 @@ public class LoginActivity extends AppCompatActivity {
                     Toast.makeText(LoginActivity.this, "User could not be logged in,\n" +
                             "please check and try again", Toast.LENGTH_LONG).show();
                 }
-
             }
         });
     }
