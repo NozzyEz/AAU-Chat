@@ -333,7 +333,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         int id = item.getItemId();
 
         if (id == R.id.email_burger_menu) {
-            changeContentFragment(getSupportFragmentManager(), FriendsFragment.getFragmentTag(),new FriendsFragment(),R.id.flFragmentsContainer,false, FriendsFragment.getFragmentTitle());
+            changeContentFragment(getSupportFragmentManager(), EmailFragment.getFragmentTag(),new EmailFragment(),R.id.flFragmentsContainer,false, EmailFragment.getFragmentTitle());
         } else if (id == R.id.all_users_burger_menu) {
             changeContentFragment(getSupportFragmentManager(), UsersFragment.getFragmentTag(),new UsersFragment(),R.id.flFragmentsContainer,false, UsersFragment.getFragmentTitle());
         } else if (id == R.id.chats_burger_menu) {

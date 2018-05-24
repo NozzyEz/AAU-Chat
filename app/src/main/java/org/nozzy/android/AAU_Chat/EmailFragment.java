@@ -7,15 +7,15 @@ import android.support.v4.app.Fragment;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class FriendsFragment extends BaseFragment {
+public class EmailFragment extends BaseFragment {
 
     // UI
 
-    public FriendsFragment() {
+    public EmailFragment() {
         // Required empty public constructor
     }
 
-    private static final String TAG = FriendsFragment.class.getSimpleName();
+    private static final String TAG = EmailFragment.class.getSimpleName();
 
     public static String getFragmentTitle() {
         return "Email";
