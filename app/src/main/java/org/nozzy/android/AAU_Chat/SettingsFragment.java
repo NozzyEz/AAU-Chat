@@ -47,7 +47,6 @@ import id.zelory.compressor.Compressor;
 
 import static android.app.Activity.RESULT_OK;
 
-
 /**
  * A simple {@link Fragment} subclass.
  */
@@ -89,7 +88,6 @@ public class SettingsFragment extends BaseFragment {
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-
 
         // First we need to setup the UI
         mImage = getView().findViewById(R.id.settings_image);
@@ -158,7 +156,6 @@ public class SettingsFragment extends BaseFragment {
 
             }
         });
-
 
         // With this button we use an Intent to open up our gallery chooser, for this purpose we use
         // another library called Android Image Cropper, which allows us to pick the image and crop
@@ -267,7 +264,6 @@ public class SettingsFragment extends BaseFragment {
                                         Map update_hashMap = new HashMap();
                                         update_hashMap.put("image", download_url);
                                         update_hashMap.put("thumb_image", thumb_downloadUrl);
-
 
                                         // Updates the image and thumb_image values of the user in the database
                                         mUserDatabase.updateChildren(update_hashMap).addOnCompleteListener(new OnCompleteListener<Void>() {

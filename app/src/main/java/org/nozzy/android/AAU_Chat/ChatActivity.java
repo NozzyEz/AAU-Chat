@@ -61,7 +61,6 @@ import id.zelory.compressor.Compressor;
 
 import static android.view.View.VISIBLE;
 
-
 // This activity is used for chatting with other users.
 public class ChatActivity extends AppCompatActivity {
 
@@ -300,7 +299,6 @@ public class ChatActivity extends AppCompatActivity {
             }
         });
 
-
         // UI
         mAdapter = new MessageAdapter(messagesList, this, mChatID);
 
@@ -312,7 +310,6 @@ public class ChatActivity extends AppCompatActivity {
         mMessagesList.setLayoutManager(mLinearLayout);
 
         mMessagesList.setAdapter(mAdapter);
-
 
         // Loads the first messages
         loadMessages();
@@ -455,7 +452,6 @@ public class ChatActivity extends AppCompatActivity {
                 Toast.makeText(this, "Error in compression", Toast.LENGTH_LONG).show();
             }
         }
-
 
         // Checks if the activity was the chat image gallery picker - if so, start the cropper
         if (requestCode == CHAT_IMAGE_GALLERY_PICK && resultCode == RESULT_OK) {
@@ -846,10 +842,8 @@ public class ChatActivity extends AppCompatActivity {
         // Works fine for editing messages. Buggy with deleting
         messagesList.clear();
         itemPos = 0;
-//        mAdapter.notifyDataSetChanged();
         loadMessages();
     }
-
 
     /**
      * Get a file path from a Uri. This will get the the path for Storage Access

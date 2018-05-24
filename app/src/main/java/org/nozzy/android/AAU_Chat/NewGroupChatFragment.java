@@ -17,13 +17,9 @@ import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageButton;
-import android.widget.RelativeLayout;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
@@ -40,9 +36,6 @@ import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
-import com.squareup.picasso.Callback;
-import com.squareup.picasso.NetworkPolicy;
-import com.squareup.picasso.Picasso;
 import com.theartofdev.edmodo.cropper.CropImage;
 
 import java.io.ByteArrayOutputStream;
@@ -51,11 +44,9 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-import de.hdodenhof.circleimageview.CircleImageView;
 import id.zelory.compressor.Compressor;
 
 import static android.app.Activity.RESULT_OK;
-
 
 public class NewGroupChatFragment extends BaseFragment {
 
@@ -71,7 +62,6 @@ public class NewGroupChatFragment extends BaseFragment {
     private String push_id;
     private ImageButton icon_group;
     private AlertDialog.Builder dialogBuilder;
-
 
     public static String searchString = "";
     public static String name;
@@ -96,7 +86,6 @@ public class NewGroupChatFragment extends BaseFragment {
     public static String getFragmentTag() {
         return TAG;
     }
-
 
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
@@ -125,7 +114,6 @@ public class NewGroupChatFragment extends BaseFragment {
                 }
             }
         });
-
 
         mUsersList.setHasFixedSize(true);
         mUsersList.setLayoutManager(new LinearLayoutManager(getContext()));
@@ -216,7 +204,6 @@ public class NewGroupChatFragment extends BaseFragment {
 
                 String message = edt.getText().toString().trim();
                 sendToChat(users,message);
-
 
             }
         });
@@ -400,7 +387,6 @@ public class NewGroupChatFragment extends BaseFragment {
 
                 // Another byte array for the thumb image (God knows why)
                 final byte[] finalThumb_byte = thumb_byte;
-
 
                 // Creates a task to upload the compressed image in the form of a byte array to the database
                 UploadTask uploadTask = thumb_filepath.putBytes(finalThumb_byte);
