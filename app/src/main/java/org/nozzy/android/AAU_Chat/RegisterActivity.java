@@ -197,8 +197,6 @@ public class RegisterActivity extends AppCompatActivity implements AdapterView.O
                     // Then we point our database reference to that very ID
                     mDatabase = FirebaseDatabase.getInstance().getReference().child("Users").child(uid);
 
-                    String deviceToken = FirebaseInstanceId.getInstance().getToken();
-
                     // A Hashmap to store all tags that the user is in, including programmes
                     HashMap<String, Boolean> tagsMap = new HashMap<>();
                     tagsMap.put(type, true);
@@ -208,7 +206,7 @@ public class RegisterActivity extends AppCompatActivity implements AdapterView.O
                     // Then we create a HashMap and and fill in the users information for that
                     // account, everything but the display name is default values
                     HashMap<String, Object> userMap = new HashMap<>();
-                    userMap.put("device_token", deviceToken);
+                    userMap.put("device_token", "");
                     userMap.put("name", display_name);
                     userMap.put("status", course + " " + semester);
                     userMap.put("image", "default");
@@ -318,7 +316,6 @@ public class RegisterActivity extends AppCompatActivity implements AdapterView.O
                         chatsRef.child(chatID).child("members").child(currentUserID).setValue("user");
                     }
                 }
-                mAuth.signOut();
             }
             @Override
             public void onChildChanged(DataSnapshot dataSnapshot, String s) { }
@@ -354,6 +351,7 @@ public class RegisterActivity extends AppCompatActivity implements AdapterView.O
                         friendsRef.child(user.getKey()).child(currentUserID).child("name").setValue(currentUserName);
                     }
                 }
+                mAuth.signOut();
             }
             @Override
             public void onCancelled(DatabaseError databaseError) { }
