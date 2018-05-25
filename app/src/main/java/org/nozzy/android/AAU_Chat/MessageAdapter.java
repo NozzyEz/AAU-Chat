@@ -244,7 +244,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
             });
         }
         else if (options.length == 2) {
-            if (options[1].equals("Edit Message")) {
+            if (options[0].equals("Edit Message")) {
                 builder.setItems(options, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {

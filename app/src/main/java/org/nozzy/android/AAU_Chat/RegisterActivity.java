@@ -53,7 +53,6 @@ public class RegisterActivity extends AppCompatActivity implements AdapterView.O
     private TextInputEditText mPassword;
     private TextInputEditText mRepeatPassword;
     private Button mCreateBtn;
-    private Toolbar mToolbar;
     private Spinner mSemesterSpinner;
     private Spinner mCoursesSpinner;
     private ArrayAdapter<CharSequence> mCharSequenceArrayAdapterCourses;
@@ -141,9 +140,8 @@ public class RegisterActivity extends AppCompatActivity implements AdapterView.O
                 else if (semesterID == 0)
                     Toast.makeText(RegisterActivity.this, "Please select your study year", Toast.LENGTH_LONG).show();
                 // Check if all fields are filled out
-                else if (TextUtils.isEmpty(display_name) || TextUtils.isEmpty(email) || TextUtils.isEmpty(password) || TextUtils.isEmpty(repeat_password)) {
+                else if (TextUtils.isEmpty(display_name) || TextUtils.isEmpty(email) || TextUtils.isEmpty(password) || TextUtils.isEmpty(repeat_password))
                     Toast.makeText(RegisterActivity.this, "Please fill out all fields", Toast.LENGTH_LONG).show();
-                }
                 else {
                     // Then we startImageSelection our progress dialog with some information for the user so that
                     // they know that we are actively working in the background
@@ -342,8 +340,6 @@ public class RegisterActivity extends AppCompatActivity implements AdapterView.O
         // References to all friends and users
         final DatabaseReference friendsRef = rootRef.child("Friends");
         final DatabaseReference usersRef = rootRef.child("Users");
-
-
 
         // Adds a listener to go through all users
         usersRef.addListenerForSingleValueEvent(new ValueEventListener() {
