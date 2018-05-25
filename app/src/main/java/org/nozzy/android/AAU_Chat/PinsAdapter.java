@@ -199,7 +199,7 @@ public class PinsAdapter extends RecyclerView.Adapter<PinsAdapter.PinsViewHolder
             @Override
             public void onClick(View view) {
                 // If the user is an admin or it's their message, they can unpin it
-                if (mChatRole.equals("admin") || c.getFrom().equals(current_user_id))
+                if (mChatRole.equals("admin"))
                     showAlertDialog(c, "Unpin Message");
             }
         });

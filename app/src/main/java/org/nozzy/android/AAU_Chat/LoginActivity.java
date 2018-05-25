@@ -39,13 +39,11 @@ public class LoginActivity extends AppCompatActivity {
     private EditText mLoginEmail;
     private EditText mLoginPassword;
     private Button mLogin_btn;
-    private static final String TAG = "Login Activity";
 
     private ProgressDialog mLoginProgress;
 
     // Firebase
     private FirebaseAuth mAuth;
-    private DatabaseReference mUserDatabase;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,7 +58,6 @@ public class LoginActivity extends AppCompatActivity {
         mLoginProgress = new ProgressDialog(this);
 
         // Setting up Firebase references
-        mUserDatabase = FirebaseDatabase.getInstance().getReference().child("Users");
         mAuth = FirebaseAuth.getInstance();
 
         // Button action for logging in with the input the user has typed in
@@ -147,20 +144,11 @@ public class LoginActivity extends AppCompatActivity {
                         mLoginProgress.dismiss();
                         Toast.makeText(LoginActivity.this, "Account not verified.\nPlease check your email", Toast.LENGTH_LONG).show();
                     } else {
-                        // Adding the device token to the user upon logging in
-                        String user_id = mAuth.getCurrentUser().getUid();
-                        String deviceToken = FirebaseInstanceId.getInstance().getToken();
-
                         // Starts the MainActivity
-                        mUserDatabase.child(user_id).child("device_token").setValue(deviceToken).addOnCompleteListener(new OnCompleteListener<Void>() {
-                            @Override
-                            public void onComplete(@NonNull Task<Void> task) {
-                                Intent mainIntent = new Intent(LoginActivity.this, MainActivity.class);
-                                mainIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                                startActivity(mainIntent);
-                                finish();
-                            }
-                        });
+                        Intent mainIntent = new Intent(LoginActivity.this, MainActivity.class);
+                        mainIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                        startActivity(mainIntent);
+                        finish();
                     }
                 }
                 else {

@@ -41,7 +41,6 @@ public class UsersFragment extends BaseFragment {
     private EditText etSearch;
 
     public static String searchString = "";
-    public static String name;
 
     public static String getFragmentTitle() {
         return "All Users";
@@ -92,21 +91,6 @@ public class UsersFragment extends BaseFragment {
     public void onStart() {
         super.onStart();
 
-        mUsersDatabase.child(mCurrentUserID).child("online").setValue("true");
-
-        mUsersDatabase.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-
-                // Gets all the relevant user's data from the database
-                name = dataSnapshot.child(mCurrentUserID).child("name").getValue().toString();
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
         searchUser(searchString);
     }
 
