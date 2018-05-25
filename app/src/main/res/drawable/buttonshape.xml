@@ -7,7 +7,10 @@
 <gradient android:startColor="#FFFFFF"
     android:endColor="#FFFFFF"/>
 
-<corners android:radius="3dp" />
+    <corners android:bottomRightRadius="30dp"
+        android:bottomLeftRadius="30dp"
+        android:topRightRadius="30dp"
+        android:topLeftRadius="30dp"/>
 <stroke android:width="5px" android:color="#05ab9d" />
 
 </shape>
