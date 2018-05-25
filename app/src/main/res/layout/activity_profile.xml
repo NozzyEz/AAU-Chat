@@ -28,7 +28,7 @@
         android:layout_marginTop="242dp"
         android:text="@string/display_name"
         android:textColor="@android:color/black"
-        android:textSize="24sp" />
+        android:textSize="30sp" />
 
     <TextView
         android:id="@+id/profile_status"
@@ -39,20 +39,20 @@
         android:layout_marginTop="20dp"
         android:text="@string/default_status"
         android:textColor="@android:color/black"
+        android:textStyle="bold"
         android:paddingStart="20dp"
         android:paddingEnd="20dp"/>
 
     <Button
         android:id="@+id/profile_send_req_btn"
-        android:layout_width="220dp"
+        android:layout_width="170dp"
         android:layout_height="40dp"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
         android:layout_marginBottom="110dp"
-        android:background="@drawable/roundbutton"
-        android:backgroundTint="@color/colorAccent"
+        android:background="@drawable/buttonshape"
         android:text="@string/block_user"
-        android:textColor="@android:color/white" />
+        android:textColor="@color/colorPrimaryDark" />
 
     <Button
         android:id="@+id/profile_decline_req_btn"
@@ -63,7 +63,6 @@
         android:layout_alignParentBottom="true"
         android:layout_marginBottom="50dp"
         android:background="@drawable/roundbutton"
-        android:backgroundTint="@color/colorAccent"
         android:text="@string/new_direct_chat"
         android:textColor="@android:color/white" />
 

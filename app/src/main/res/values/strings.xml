@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">AAU Chat</string>
     <string name="need_a_new_account">Need a new Account?</string>
-    <string name="display_name">Name</string>
+    <string name="display_name">Full name</string>
     <string name="email_address">AAU email address</string>
     <string name="password">Password</string>
     <string name="repeat_password">Repeat password</string>

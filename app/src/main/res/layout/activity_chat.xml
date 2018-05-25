@@ -53,7 +53,7 @@
             android:layout_centerVertical="true"
             android:ellipsize="end"
             android:text="Sample text message"
-            android:textColor="@color/colorPrimaryDark" />
+            android:textColor="@color/ColorBG" />
 
     </RelativeLayout>
 

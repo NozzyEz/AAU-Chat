@@ -163,16 +163,13 @@ public class ProfileActivity extends AppCompatActivity {
 
                 // First we disable the button so the user can only tap it once and not make duplicate queries in our database
                 mBlockBtn.setEnabled(false);
+                mProgressDialog.show();
 
                 // If the current user is already friends with the user being viewed, this button can block the person
                 //--------FRIENDS--------//
                 if (mCurrent_state == 1) {
                     // Blocks the user
                     blockUser(profile_id);
-                    // Sets the current state to "User is Blocked"
-                    setCurrentState(2);
-                    // Shows a toast that the user has been blocked
-                    Toast.makeText(ProfileActivity.this, "User Blocked", Toast.LENGTH_SHORT).show();
                 }
 
                 // If the user has already been blocked, this button can unblock the user
@@ -180,10 +177,6 @@ public class ProfileActivity extends AppCompatActivity {
                 else if (mCurrent_state == 2) {
                     // Unblocks the user
                     unblockUser(profile_id);
-                    // Sets the current state to "Friends"
-                    setCurrentState(1);
-                    // Shows a toast that the user has been unblocked
-                    Toast.makeText(ProfileActivity.this, "User Unblocked", Toast.LENGTH_SHORT).show();
                 }
 
                 //--------YOU ARE BLOCKED--------//
@@ -316,6 +309,11 @@ public class ProfileActivity extends AppCompatActivity {
                                     }
                                 }
                             }
+                            mProgressDialog.dismiss();
+                            // Sets the current state to "User is Blocked"
+                            setCurrentState(2);
+                            // Shows a toast that the user has been blocked
+                            Toast.makeText(ProfileActivity.this, "User Blocked", Toast.LENGTH_SHORT).show();
                         }
                         @Override
                         public void onCancelled(DatabaseError databaseError) { }
@@ -358,6 +356,12 @@ public class ProfileActivity extends AppCompatActivity {
                 }
                 // Removes the blocked user from the blocked list
                 userBlockedRef.removeValue();
+
+                mProgressDialog.dismiss();
+                // Sets the current state to "Friends"
+                setCurrentState(1);
+                // Shows a toast that the user has been unblocked
+                Toast.makeText(ProfileActivity.this, "User Unblocked", Toast.LENGTH_SHORT).show();
             }
             @Override
             public void onCancelled(DatabaseError databaseError) { }

@@ -151,9 +151,7 @@ public class SettingsFragment extends BaseFragment {
         mStatus_btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
                 showEditStatusDialog(mStatus.getText().toString());
-
             }
         });
 
