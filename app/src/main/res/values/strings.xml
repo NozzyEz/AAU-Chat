@@ -9,7 +9,7 @@
     <string name="log_out">Log Out</string>
     <string name="create_a_new_account">Create a new Account</string>
     <string name="already_have_an_account">Already have an Account</string>
-    <string name="welcome_to_the_lapit_chat_app">Welcome to the AAU Chat App</string>
+    <string name="welcome_to_the_aau_chat_app">Welcome to the AAU Chat App</string>
     <string name="login">login</string>
     <string name="login_to_your_account">Login to your account</string>
     <string name="default_status">Hi there, I\'m using AAU Chat</string>
@@ -21,7 +21,7 @@
     <string name="enter_message">Enter Message…</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
-    <string name="cancel">cancel</string>
+    <string name="cancel">Cancel</string>
     <string name="new_chat">New group</string>
 
     <string name="reset_password">Reset password</string>

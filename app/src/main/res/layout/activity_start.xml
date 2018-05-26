@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/colorPrimary"
+    android:background="@color/ColorPrimary"
     tools:context="org.nozzy.android.AAU_Chat.StartActivity"
     tools:layout_editor_absoluteY="25dp">
 
@@ -15,7 +15,7 @@
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
         android:layout_marginBottom="24dp"
-        android:text="@string/welcome_to_the_lapit_chat_app"
+        android:text="@string/welcome_to_the_aau_chat_app"
         android:textColor="@android:color/white"
         android:textSize="24sp"
         app:layout_constraintBottom_toTopOf="@+id/start_login_btn"
@@ -53,7 +53,7 @@
         android:paddingLeft="20dp"
         android:paddingRight="20dp"
         android:text="@string/need_a_new_account"
-        android:textColor="@color/colorPrimary"
+        android:textColor="@color/ColorPrimary"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />

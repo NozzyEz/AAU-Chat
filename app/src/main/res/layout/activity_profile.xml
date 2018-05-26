@@ -52,7 +52,7 @@
         android:layout_marginBottom="110dp"
         android:background="@drawable/buttonshape"
         android:text="@string/block_user"
-        android:textColor="@color/colorPrimaryDark" />
+        android:textColor="@color/ColorPrimaryDark" />
 
     <Button
         android:id="@+id/profile_decline_req_btn"

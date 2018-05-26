@@ -19,7 +19,7 @@
         android:background="@android:color/white"
         android:text="@string/change_image"
         android:src="@drawable/ic_camera"
-        android:textColor="@color/colorPrimaryDark" />
+        android:textColor="@color/ColorPrimaryDark" />
 
     <android.support.v7.widget.AppCompatEditText
         android:id="@+id/etChatName"
