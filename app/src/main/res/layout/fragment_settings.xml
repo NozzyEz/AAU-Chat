@@ -56,7 +56,7 @@
         android:layout_marginBottom="16dp"
         android:background="@drawable/buttonshape"
         android:text="@string/change_image"
-        android:textColor="@color/colorPrimaryDark"
+        android:textColor="@color/ColorPrimaryDark"
         app:layout_constraintBottom_toTopOf="@+id/settings_status_btn"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent" />

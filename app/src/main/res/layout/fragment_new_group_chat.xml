@@ -14,7 +14,7 @@
         android:layout_below="@id/appBarLayout"
         android:padding="12dp"
         android:text="Select users to start conversation"
-        android:textColor="@color/colorPrimaryDark" />
+        android:textColor="@color/ColorPrimaryDark" />
 
     <EditText
         android:id="@+id/etSearch"
