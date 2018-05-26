@@ -309,16 +309,16 @@ public class ProfileActivity extends AppCompatActivity {
                                     }
                                 }
                             }
-                            mProgressDialog.dismiss();
-                            // Sets the current state to "User is Blocked"
-                            setCurrentState(2);
-                            // Shows a toast that the user has been blocked
-                            Toast.makeText(ProfileActivity.this, "User Blocked", Toast.LENGTH_SHORT).show();
                         }
                         @Override
                         public void onCancelled(DatabaseError databaseError) { }
                     });
                 }
+                mProgressDialog.dismiss();
+                // Sets the current state to "User is Blocked"
+                setCurrentState(2);
+                // Shows a toast that the user has been blocked
+                Toast.makeText(ProfileActivity.this, "User Blocked", Toast.LENGTH_SHORT).show();
             }
             @Override
             public void onCancelled(DatabaseError databaseError) { }
