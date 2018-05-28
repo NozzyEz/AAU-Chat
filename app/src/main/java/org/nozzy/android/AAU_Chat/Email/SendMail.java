@@ -63,10 +63,10 @@ public class SendMail extends AsyncTask<Void,Void,Void> {
 
         //Configuring properties for aau mail
         props.put("mail.smtp.host", "mail.aau.dk");
-        props.put("mail.smtp.socketFactory.port", "587 ");
+        props.put("mail.smtp.socketFactory.port", "993");
         props.put("mail.smtp.socketFactory.class", "javax.net.ssl.SSLSocketFactory");
         props.put("mail.smtp.auth", "true");
-        props.put("mail.smtp.port", "587");
+        props.put("mail.smtp.port", "993");
 
         //Creating a new sessiona
         session = Session.getDefaultInstance(props,
