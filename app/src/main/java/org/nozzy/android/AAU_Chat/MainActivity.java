@@ -40,6 +40,8 @@ import com.squareup.picasso.Callback;
 import com.squareup.picasso.NetworkPolicy;
 import com.squareup.picasso.Picasso;
 
+import org.nozzy.android.AAU_Chat.Email.EmailLoginActivity;
+
 import java.util.ArrayList;
 
 import de.hdodenhof.circleimageview.CircleImageView;
@@ -333,7 +335,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         int id = item.getItemId();
 
         if (id == R.id.email_burger_menu) {
-            changeContentFragment(getSupportFragmentManager(), EmailFragment.getFragmentTag(),new EmailFragment(),R.id.flFragmentsContainer,false, EmailFragment.getFragmentTitle());
+//            changeContentFragment(getSupportFragmentManager(), EmailFragment.getFragmentTag(),new EmailFragment(),R.id.flFragmentsContainer,false, EmailFragment.getFragmentTitle());
+            Intent startIntent = new Intent(MainActivity.this, EmailLoginActivity.class);
+            startActivity(startIntent);
         } else if (id == R.id.all_users_burger_menu) {
             changeContentFragment(getSupportFragmentManager(), UsersFragment.getFragmentTag(),new UsersFragment(),R.id.flFragmentsContainer,false, UsersFragment.getFragmentTitle());
         } else if (id == R.id.chats_burger_menu) {

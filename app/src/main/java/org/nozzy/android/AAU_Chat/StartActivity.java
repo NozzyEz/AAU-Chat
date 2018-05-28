@@ -34,7 +34,7 @@ public class StartActivity extends AppCompatActivity {
             }
         });
 
-        // The log in button starts the LoginActivity
+        // The log in button starts the EmailLoginActivity
         mLoggingBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
