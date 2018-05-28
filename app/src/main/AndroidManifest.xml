@@ -69,6 +69,19 @@
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
+
+        <activity android:name=".Email.EmailLoginActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity android:name=".Email.EmailMainActivity" />
+        <activity android:name=".Email.EmailComposeActivity" />
+        <activity android:name=".Email.EmailReceivedActivity" />
+        <activity android:name=".Email.EmailDisplayFolderActivity" />
+        <activity android:name=".Email.EmailDisplayMailActivity" />
     </application>
 
 </manifest>
