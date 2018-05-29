@@ -69,7 +69,7 @@ public class SendMail extends AsyncTask<Void,Void,Void> {
         props.put("mail.smtp.port", "993");
 
         //Creating a new sessiona
-        session = Session.getDefaultInstance(props,
+        session = Session.getInstance(props,
                 new javax.mail.Authenticator() {
                     //Authenticating the password
                     protected PasswordAuthentication getPasswordAuthentication() {
