@@ -1,10 +1,11 @@
-package org.nozzy.android.AAU_Chat.Email;
+package com.mail.mail;
 
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.widget.Toast;
 
+import java.security.GeneralSecurityException;
 import java.util.Properties;
 
 import javax.mail.Message;
@@ -62,11 +63,13 @@ public class SendMail extends AsyncTask<Void,Void,Void> {
         Properties props = new Properties();
 
         //Configuring properties for aau mail
-        props.put("mail.smtp.host", "mail.aau.dk");
-        props.put("mail.smtp.socketFactory.port", "993");
-        props.put("mail.smtp.socketFactory.class", "javax.net.ssl.SSLSocketFactory");
+        props.put("mail.smtp.host", "smtp.aau.dk");
+        props.setProperty("mail.smtp.ssl.trust", "smtpserver");
+        props.put("mail.smtp.starttls.enable", "true");
+        props.put("mail.smtp.socketFactory.port", "587");
         props.put("mail.smtp.auth", "true");
-        props.put("mail.smtp.port", "993");
+        props.put("mail.smtp.port", "587");
+
 
         //Creating a new sessiona
         session = Session.getInstance(props,
