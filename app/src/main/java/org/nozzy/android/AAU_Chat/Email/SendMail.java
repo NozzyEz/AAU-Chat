@@ -1,4 +1,4 @@
-package com.mail.mail;
+package org.nozzy.android.AAU_Chat.Email;
 
 import android.app.ProgressDialog;
 import android.content.Context;
