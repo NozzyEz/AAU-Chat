@@ -73,7 +73,7 @@ public class EmailLoginActivity extends AppCompatActivity {
             // Create all the needed properties - empty!
             Properties connectionProperties = new Properties();
             // Create the session
-            Session session = Session.getDefaultInstance(connectionProperties, null);
+            Session session = Session.getInstance(connectionProperties, null);
 
             System.out.print("Connecting to the IMAP server...");
             // Connecting to the server
